@@ -5,9 +5,13 @@ public class Utils {
         System.loadLibrary("utils-lib");
     }
 
-    public static native void initial();
+    public static native void generateNoiseProfile(byte[] bytes, double start, double duration, String outputFile);
 
-    public static native void quit();
-
-    public static native void write(String filename, String string);
+    /**
+     * @param in_bytes    输入
+     * @param out_bytes   输出
+     * @param profileFile "profile.txt"
+     * @param coefficient "0.21"
+     */
+    public static native void reduceNoise(byte[] in_bytes, byte[] out_bytes, String profileFile, double coefficient);
 }

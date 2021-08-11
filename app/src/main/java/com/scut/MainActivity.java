@@ -1,14 +1,18 @@
 package com.scut;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.scut.databinding.ActivityMainBinding;
-import com.scut.utils.Utils;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +23,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Example of a call to a native method
         TextView tv = binding.sampleText;
-        Utils.initial();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        File dir = getExternalCacheDir();
+        String filename = new File(dir, "test.txt").getAbsolutePath();
+        Log.d(TAG, "onResume: " + filename);
     }
 }

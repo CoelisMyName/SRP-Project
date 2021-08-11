@@ -8,7 +8,7 @@ set(LIB_DIR ${CMAKE_SOURCE_DIR}/../jniLibs)
 include_directories(${INCLUDE_DIR})
 link_directories(${LIB_DIR}/${ANDROID_ABI})
 
-add_library(utils-lib SHARED utils.c)
+add_library(utils-lib SHARED utils.c utils.h config.h)
 
 #find_library(native-lib log)
 
