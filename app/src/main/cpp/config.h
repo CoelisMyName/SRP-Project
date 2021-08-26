@@ -2,6 +2,7 @@
 #define SRP_PROJECT_CONFIG_H
 
 #include <sox.h>
+#include <sys/types.h>
 
 typedef unsigned long long uint64;
 

@@ -6,18 +6,31 @@ import android.os.Message;
 
 import androidx.annotation.NonNull;
 
+import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class AudioProcessor {
-    public static final int SIZE = 60 * AudioRecorder.SAMPLE_RATE * AudioRecorder.BIT_DEPTH / 8;
+    /**
+     * 预留一定长度，保证降噪后的音频至少有60秒
+     */
+    public static final int SIZE = 65 * AudioRecorder.SAMPLE_RATE * AudioRecorder.BIT_DEPTH / 8;
+
+    public static final int FRAME = 60 * AudioRecorder.SAMPLE_RATE * AudioRecorder.BIT_DEPTH / 8;
+
     public static final int AUDIO_DATA = 0x800000;
+
     Handler handler = new Handler(Looper.getMainLooper(), AudioProcessor.this::handleMessage);
+
     ExecutorService service = Executors.newSingleThreadExecutor();
+
     AudioRecorder recorder = new AudioRecorder();
-    byte[] bufferA = new byte[SIZE];
-    byte[] bufferB = new byte[SIZE];
-    int bufferLength = 0;
+
+    byte[] writeBuffer = new byte[SIZE];
+
+    int writeLength = 0;
+
+    byte[] readBuffer = new byte[SIZE];
 
     public AudioProcessor() {
         recorder.setCallback(this::update);
@@ -33,33 +46,46 @@ public class AudioProcessor {
         return false;
     }
 
+    void write(byte[] buffer, int offset, int length) {
+        int copy = Math.min(writeBuffer.length - writeLength, length);
+
+        if (copy > 0) {
+            System.arraycopy(buffer, offset, writeBuffer, writeLength, copy);
+            writeLength += copy;
+            offset += copy;
+            length -= copy;
+        }
+
+        if(writeLength >= writeBuffer.length) {
+            System.arraycopy(writeBuffer, FRAME, readBuffer, 0, SIZE - FRAME);
+            writeLength = SIZE - FRAME;
+            Message msg = handler.obtainMessage(AUDIO_DATA, writeBuffer);
+            handler.sendMessage(msg);
+            swapBuffer();
+        }
+
+        if(length > 0) {
+            System.arraycopy(buffer, offset, writeBuffer, writeLength, length);
+            writeLength += length;
+        }
+
+    }
+
     /**
      * @param data   音频数据
      * @param length 数据长度，必须小于60 * 44100 * 2
      */
     public void update(byte[] data, int length) {
-        int copy = Math.min(bufferA.length - bufferLength, length);
-        if (copy >= 0) {
-            System.arraycopy(data, 0, bufferA, bufferLength, copy);
-        }
-        if (bufferA.length == bufferLength) {
-            Message msg = handler.obtainMessage(AUDIO_DATA, bufferA);
-            handler.sendMessage(msg);
-            bufferLength = 0;
-            swapBuffer();
-        }
-        if (length - copy > 0) {
-            System.arraycopy(data, copy, bufferA, 0, length - copy);
-            bufferLength = length - copy;
-        }
+        write(data, 0, length);
+
     }
 
     /**
      * 交换缓冲区
      */
     void swapBuffer() {
-        byte[] temp = bufferA;
-        bufferA = bufferB;
-        bufferB = temp;
+        byte[] temp = writeBuffer;
+        writeBuffer = readBuffer;
+        readBuffer = temp;
     }
 }
