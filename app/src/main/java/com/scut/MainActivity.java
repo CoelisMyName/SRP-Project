@@ -7,8 +7,11 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.scut.databinding.ActivityMainBinding;
+import com.scut.utils.Utils;
 
 import java.io.File;
+import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,5 +34,9 @@ public class MainActivity extends AppCompatActivity {
         File dir = getExternalCacheDir();
         String filename = new File(dir, "test.txt").getAbsolutePath();
         Log.d(TAG, "onResume: " + filename);
+        ByteBuffer buffer = ByteBuffer.allocateDirect(30);
+        ShortBuffer shortBuffer = buffer.asShortBuffer();
+        long val = Utils.getAddress(shortBuffer);
+        Log.d(TAG, "onResume: " + val);
     }
 }

@@ -1,5 +1,7 @@
 package com.scut.utils;
 
+import java.nio.ShortBuffer;
+
 public class Utils {
     static {
         System.loadLibrary("utils-lib");
@@ -14,4 +16,6 @@ public class Utils {
      * @param coefficient "0.21"
      */
     public static native void reduceNoise(byte[] in_bytes, byte[] out_bytes, String profileFile, double coefficient);
+
+    public static native long getAddress(ShortBuffer buffer);
 }

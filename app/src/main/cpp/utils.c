@@ -174,12 +174,18 @@ JNIEXPORT void JNICALL
 Java_com_scut_utils_Utils_reduceNoise(JNIEnv *env, jclass clazz, jbyteArray in_bytes,
                                       jbyteArray out_bytes, jstring profile_file,
                                       jdouble parameter) {
-
 }
 
 void freeEffects(sox_effect_t *effects[], int count) {
     for (int i = 0; i < count; ++i)
         free(effects[i]);
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_scut_utils_Utils_getAddress(JNIEnv *env, jclass clazz, jobject buffer) {
+    void *ptr = (*env)->GetDirectBufferAddress(env, buffer);
+    if (ptr) return 1;
+    return 0;
 }
 
 #ifdef __cplusplus

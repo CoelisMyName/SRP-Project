@@ -7,7 +7,6 @@ import android.util.Log;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class AudioRecorder {
@@ -24,10 +23,10 @@ public class AudioRecorder {
     volatile boolean recording = false;
 
 
-    /* 0.5 sec */
-    byte[] buffer = new byte[22050 * 2];
+    /* 0.05 sec */
+    short[] buffer = new short[2205];
 
-    ExecutorService service = Executors.newSingleThreadExecutor();
+    ExecutorService service;
 
     Callback callback = null;
 
@@ -35,7 +34,8 @@ public class AudioRecorder {
 
     Future<Integer> future;
 
-    public AudioRecorder() {
+    public AudioRecorder(ExecutorService service) {
+        this.service = service;
     }
 
     public boolean start() {
@@ -51,7 +51,7 @@ public class AudioRecorder {
                 }
                 recording = true;
                 AudioRecord record = new AudioRecord(SOURCE, SAMPLE_RATE, CHANNEL, FORMAT, MIN_BUFFER_SIZE);
-                task = new Task(record);
+                task = new Task(record, buffer, this, callback);
                 future = service.submit(task);
                 return true;
             }
@@ -80,16 +80,27 @@ public class AudioRecorder {
 
     public interface Callback {
 
-        void update(byte[] data, int length);
+        void update(short[] buffer, int length);
 
     }
 
-    class Task implements Callable<Integer> {
+    static class Task implements Callable<Integer> {
+
         AudioRecord record;
+
+        AudioRecorder recorder;
+
+        Callback callback;
+
         volatile boolean working = false;
 
-        public Task(AudioRecord record) {
+        short[] buffer;
+
+        public Task(AudioRecord record, short[] buffer, AudioRecorder recorder, Callback callback) {
             this.record = record;
+            this.buffer = buffer;
+            this.recorder = recorder;
+            this.callback = callback;
         }
 
         public void startWorking() {
@@ -104,8 +115,11 @@ public class AudioRecorder {
                 working = false;
                 record.stop();
                 record.release();
-                record = null;
             }
+            record = null;
+            recorder = null;
+            callback = null;
+            buffer = null;
         }
 
         public synchronized boolean isWorking() {
@@ -118,7 +132,7 @@ public class AudioRecorder {
         public Integer call() {
             startWorking();
             int length;
-            while (isRecording()) {
+            while (recorder.isRecording()) {
                 length = record.read(buffer, 0, buffer.length);
                 if (length < 0) {
                     stopWorking();

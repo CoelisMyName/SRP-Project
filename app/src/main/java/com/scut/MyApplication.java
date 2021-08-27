@@ -1,13 +1,6 @@
 package com.scut;
 
 import android.app.Application;
-import android.util.Log;
-
-import com.scut.utils.Utils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 
 public class MyApplication extends Application {
     private static final String TAG = "MyApplication";
