@@ -8,6 +8,8 @@ typedef unsigned long long uint64;
 
 #define DEFAULT_RATE 44100
 
+#define DEFAULT_LENGTH DEFAULT_RATE * 60
+
 #define DEFAULT_PRECISION 16
 
 #define DEFAULT_CHANNEL 1

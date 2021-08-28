@@ -34,9 +34,5 @@ public class MainActivity extends AppCompatActivity {
         File dir = getExternalCacheDir();
         String filename = new File(dir, "test.txt").getAbsolutePath();
         Log.d(TAG, "onResume: " + filename);
-        ByteBuffer buffer = ByteBuffer.allocateDirect(30);
-        ShortBuffer shortBuffer = buffer.asShortBuffer();
-        long val = Utils.getAddress(shortBuffer);
-        Log.d(TAG, "onResume: " + val);
     }
 }

@@ -17,5 +17,10 @@ public class Utils {
      */
     public static native void reduceNoise(byte[] in_bytes, byte[] out_bytes, String profileFile, double coefficient);
 
-    public static native long getAddress(ShortBuffer buffer);
+    /**
+     * @param buffer 数据
+     * @param classification 分类结果
+     * @param minute 0则是初次启动
+     */
+    public static native void classifier(ShortBuffer buffer, Classification classification, long minute, String profileFile);
 }
