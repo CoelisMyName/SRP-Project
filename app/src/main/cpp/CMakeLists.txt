@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10.2)
 
+set(CMAKE_CXX_STANDARD 11)
+
 project("scut")
 
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
@@ -8,12 +10,16 @@ set(LIB_DIR ${CMAKE_SOURCE_DIR}/../jniLibs)
 include_directories(${INCLUDE_DIR})
 link_directories(${LIB_DIR}/${ANDROID_ABI})
 
-add_library(utils-lib SHARED utils.c utils.h config.h utils-sox.c utils-sox.h)
+#aux_source_directory(. src)
+
+add_library(srp SHARED config.h global.cpp global.h log.h native-lib.cpp utils.h utils.cpp MyMLLiveModel.h MyMLLiveModel.cpp)
 
 #find_library(native-lib log)
 
-set(third-party sox)
+find_package(oboe REQUIRED CONFIG)
+
+set(third-party sox model)
 
 set(native-lib log omp)
 
-target_link_libraries(utils-lib ${native-lib} ${third-party})
+target_link_libraries(srp ${native-lib} ${third-party} oboe::oboe)
