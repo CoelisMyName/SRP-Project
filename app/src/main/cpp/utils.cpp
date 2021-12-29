@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/time.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,15 +19,14 @@ extern "C" {
 #endif
 
 #include "utils.h"
+#include "global.h"
 
 void initSox() {
     assert(sox_init() == SOX_SUCCESS);
-    assert(sox_format_init() == SOX_SUCCESS);
 }
 
 void quitSox() {
     assert(sox_quit() == SOX_SUCCESS);
-    sox_format_quit();
 }
 
 void
@@ -78,4 +78,34 @@ bool checkAndMkdir(const char *path) {
     } else {
         return false;
     }
+}
+
+uint64_t currentTimeMillis() {
+    struct timeval tv{};
+    gettimeofday(&tv, nullptr);
+    return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
+
+EnvHelper::EnvHelper() {
+    m_env = nullptr;
+    jint res = g_jvm->GetEnv((void **) &m_env, g_version);
+    if (res == JNI_OK) {
+        m_fg = false;
+    } else if (res == JNI_EDETACHED) {
+        g_jvm->AttachCurrentThread(&m_env, nullptr);
+        m_fg = true;
+    } else {
+
+    }
+    assert(m_env != nullptr);
+}
+
+EnvHelper::~EnvHelper() {
+    if (m_fg) {
+        g_jvm->DetachCurrentThread();
+    }
+}
+
+JNIEnv *EnvHelper::getEnv() {
+    return m_env;
 }

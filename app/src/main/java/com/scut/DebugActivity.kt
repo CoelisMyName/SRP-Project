@@ -7,7 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.scut.databinding.ActivityDebugBinding
-import com.scut.utils.MyMLLiveModel
+import com.scut.utils.SnoringRecognition
 
 const val TAG = "DebugActivity"
 
@@ -15,13 +15,12 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var binding: ActivityDebugBinding
 
-    val m_model: MyMLLiveModel = MyMLLiveModel
+    val m_snore: SnoringRecognition = SnoringRecognition
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDebugBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        m_model.initial(this)
         binding.start.setOnClickListener(this)
         binding.stop.setOnClickListener(this)
 //        m_model.m_clsCallback =  {minute, start, end, pos -> Log.d(TAG, "onCreate: ${minute}min ${start} ${end} ${pos}")}
@@ -35,7 +34,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
                     this,
                     Manifest.permission.RECORD_AUDIO
                 ) == PackageManager.PERMISSION_GRANTED -> {
-                    m_model.start()
+                    m_snore.start()
                 }
                 else -> {
                     requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 1)
@@ -43,7 +42,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
         if (v == binding.stop) {
-            m_model.stop()
+            m_snore.stop()
         }
     }
 }

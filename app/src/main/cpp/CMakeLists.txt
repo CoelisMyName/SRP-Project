@@ -10,15 +10,15 @@ set(LIB_DIR ${CMAKE_SOURCE_DIR}/../jniLibs)
 include_directories(${INCLUDE_DIR})
 link_directories(${LIB_DIR}/${ANDROID_ABI})
 
-#aux_source_directory(. src)
+aux_source_directory(. src)
 
-add_library(srp SHARED config.h global.cpp global.h log.h native-lib.cpp utils.h utils.cpp MyMLLiveModel.h MyMLLiveModel.cpp)
+add_library(srp SHARED ${src})
 
 #find_library(native-lib log)
 
 find_package(oboe REQUIRED CONFIG)
 
-set(third-party sox model)
+set(third-party sox snore)
 
 set(native-lib log omp)
 

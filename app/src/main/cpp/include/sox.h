@@ -40,7 +40,7 @@ extern "C" {
 #define LSX_GCC(maj, min) 0
 #endif
 
-#if LSX_GCC(4,9)
+#if LSX_GCC(4, 9)
 #define _Ret_ __attribute__ ((returns_nonnull))
 #define _Ret_valid_ _Ret_
 #define _Ret_z_ _Ret_
@@ -272,9 +272,9 @@ data to this memory.
 @param len The parameter that contains the number of bytes in the array.
 */
 #ifdef _Out_bytecap_
-#define LSX_PARAM_OUT_BYTECAP(len) _Out_bytecap_(len) /* Required pointer to writable buffer with room for len bytes. */
+#define LSX_PARAM_OUT_BYTECAP(len) _Out_bytecap_(len) /* Required pointer to writable data with room for len bytes. */
 #else
-#define LSX_PARAM_OUT_BYTECAP(len) /* Required pointer to writable buffer with room for len bytes. */
+#define LSX_PARAM_OUT_BYTECAP(len) /* Required pointer to writable data with room for len bytes. */
 #endif
 
 /**
@@ -290,9 +290,9 @@ written).
 @param filled The dereference of the parameter that receives the number of elements written to the array, or "return" if the value is returned.
 */
 #ifdef _Out_cap_post_count_
-#define LSX_PARAM_OUT_CAP_POST_COUNT(len,filled) _Out_cap_post_count_(len,filled) /* Required pointer to buffer for (len) elements (never NULL); on return, (filled) elements will have been initialized. */
+#define LSX_PARAM_OUT_CAP_POST_COUNT(len,filled) _Out_cap_post_count_(len,filled) /* Required pointer to data for (len) elements (never NULL); on return, (filled) elements will have been initialized. */
 #else
-#define LSX_PARAM_OUT_CAP_POST_COUNT(len,filled) /* Required pointer to buffer for (len) elements (never NULL); on return, (filled) elements will have been initialized. */
+#define LSX_PARAM_OUT_CAP_POST_COUNT(len, filled) /* Required pointer to data for (len) elements (never NULL); on return, (filled) elements will have been initialized. */
 #endif
 
 /**
@@ -308,9 +308,9 @@ the function returns the number of elements written).
 @param filled The dereference of the parameter that receives the number of elements written to the array (not counting the terminating null), or "return" if the value is returned.
 */
 #ifdef _Out_z_cap_post_count_
-#define LSX_PARAM_OUT_Z_CAP_POST_COUNT(len,filled) _Out_z_cap_post_count_(len,filled) /* Required pointer to buffer for (len) elements (never NULL); on return, (filled+1) elements will have been initialized, and the array will be 0-terminated. */
+#define LSX_PARAM_OUT_Z_CAP_POST_COUNT(len,filled) _Out_z_cap_post_count_(len,filled) /* Required pointer to data for (len) elements (never NULL); on return, (filled+1) elements will have been initialized, and the array will be 0-terminated. */
 #else
-#define LSX_PARAM_OUT_Z_CAP_POST_COUNT(len,filled) /* Required pointer to buffer for (len) elements (never NULL); on return, (filled+1) elements will have been initialized, and the array will be 0-terminated. */
+#define LSX_PARAM_OUT_Z_CAP_POST_COUNT(len, filled) /* Required pointer to data for (len) elements (never NULL); on return, (filled+1) elements will have been initialized, and the array will be 0-terminated. */
 #endif
 
 /**
@@ -378,7 +378,7 @@ Compile-time assertion. Causes a compile error if the expression is false.
 @param e  The expression to test. If expression is false, compilation will fail.
 @param f  A unique identifier for the test, for example foo_must_not_be_zero.
 */
-#define lsx_static_assert(e,f) enum {lsx_static_assert_##f = 1/((e) ? 1 : 0)}
+#define lsx_static_assert(e, f) enum {lsx_static_assert_##f = 1/((e) ? 1 : 0)}
 
 /*****************************************************************************
 Basic typedefs:
@@ -460,7 +460,7 @@ typedef double sox_rate_t;
 Client API:
 File's metadata, access via sox_*_comments functions.
 */
-typedef char * * sox_comments_t;
+typedef char **sox_comments_t;
 
 /*****************************************************************************
 Enumerations:
@@ -492,14 +492,14 @@ The libSoX-specific error codes.
 libSoX functions may return these codes or others that map from errno codes.
 */
 enum sox_error_t {
-  SOX_SUCCESS = 0,     /**< Function succeeded = 0 */
-  SOX_EOF = -1,        /**< End Of File or other error = -1 */
-  SOX_EHDR = 2000,     /**< Invalid Audio Header = 2000 */
-  SOX_EFMT,            /**< Unsupported data format = 2001 */
-  SOX_ENOMEM,          /**< Can't alloc memory = 2002 */
-  SOX_EPERM,           /**< Operation not permitted = 2003 */
-  SOX_ENOTSUP,         /**< Operation not supported = 2004 */
-  SOX_EINVAL           /**< Invalid argument = 2005 */
+    SOX_SUCCESS = 0,     /**< Function succeeded = 0 */
+    SOX_EOF = -1,        /**< End Of File or other error = -1 */
+    SOX_EHDR = 2000,     /**< Invalid Audio Header = 2000 */
+    SOX_EFMT,            /**< Unsupported data format = 2001 */
+    SOX_ENOMEM,          /**< Can't alloc memory = 2002 */
+    SOX_EPERM,           /**< Operation not permitted = 2003 */
+    SOX_ENOTSUP,         /**< Operation not supported = 2004 */
+    SOX_EINVAL           /**< Invalid argument = 2005 */
 };
 
 /**
@@ -519,38 +519,38 @@ Client API:
 Format of sample data.
 */
 typedef enum sox_encoding_t {
-  SOX_ENCODING_UNKNOWN   , /**< encoding has not yet been determined */
+    SOX_ENCODING_UNKNOWN, /**< encoding has not yet been determined */
 
-  SOX_ENCODING_SIGN2     , /**< signed linear 2's comp: Mac */
-  SOX_ENCODING_UNSIGNED  , /**< unsigned linear: Sound Blaster */
-  SOX_ENCODING_FLOAT     , /**< floating point (binary format) */
-  SOX_ENCODING_FLOAT_TEXT, /**< floating point (text format) */
-  SOX_ENCODING_FLAC      , /**< FLAC compression */
-  SOX_ENCODING_HCOM      , /**< Mac FSSD files with Huffman compression */
-  SOX_ENCODING_WAVPACK   , /**< WavPack with integer samples */
-  SOX_ENCODING_WAVPACKF  , /**< WavPack with float samples */
-  SOX_ENCODING_ULAW      , /**< u-law signed logs: US telephony, SPARC */
-  SOX_ENCODING_ALAW      , /**< A-law signed logs: non-US telephony, Psion */
-  SOX_ENCODING_G721      , /**< G.721 4-bit ADPCM */
-  SOX_ENCODING_G723      , /**< G.723 3 or 5 bit ADPCM */
-  SOX_ENCODING_CL_ADPCM  , /**< Creative Labs 8 --> 2,3,4 bit Compressed PCM */
-  SOX_ENCODING_CL_ADPCM16, /**< Creative Labs 16 --> 4 bit Compressed PCM */
-  SOX_ENCODING_MS_ADPCM  , /**< Microsoft Compressed PCM */
-  SOX_ENCODING_IMA_ADPCM , /**< IMA Compressed PCM */
-  SOX_ENCODING_OKI_ADPCM , /**< Dialogic/OKI Compressed PCM */
-  SOX_ENCODING_DPCM      , /**< Differential PCM: Fasttracker 2 (xi) */
-  SOX_ENCODING_DWVW      , /**< Delta Width Variable Word */
-  SOX_ENCODING_DWVWN     , /**< Delta Width Variable Word N-bit */
-  SOX_ENCODING_GSM       , /**< GSM 6.10 33byte frame lossy compression */
-  SOX_ENCODING_MP3       , /**< MP3 compression */
-  SOX_ENCODING_VORBIS    , /**< Vorbis compression */
-  SOX_ENCODING_AMR_WB    , /**< AMR-WB compression */
-  SOX_ENCODING_AMR_NB    , /**< AMR-NB compression */
-  SOX_ENCODING_CVSD      , /**< Continuously Variable Slope Delta modulation */
-  SOX_ENCODING_LPC10     , /**< Linear Predictive Coding */
-  SOX_ENCODING_OPUS      , /**< Opus compression */
+    SOX_ENCODING_SIGN2, /**< signed linear 2's comp: Mac */
+    SOX_ENCODING_UNSIGNED, /**< unsigned linear: Sound Blaster */
+    SOX_ENCODING_FLOAT, /**< floating point (binary format) */
+    SOX_ENCODING_FLOAT_TEXT, /**< floating point (text format) */
+    SOX_ENCODING_FLAC, /**< FLAC compression */
+    SOX_ENCODING_HCOM, /**< Mac FSSD files with Huffman compression */
+    SOX_ENCODING_WAVPACK, /**< WavPack with integer samples */
+    SOX_ENCODING_WAVPACKF, /**< WavPack with float samples */
+    SOX_ENCODING_ULAW, /**< u-law signed logs: US telephony, SPARC */
+    SOX_ENCODING_ALAW, /**< A-law signed logs: non-US telephony, Psion */
+    SOX_ENCODING_G721, /**< G.721 4-bit ADPCM */
+    SOX_ENCODING_G723, /**< G.723 3 or 5 bit ADPCM */
+    SOX_ENCODING_CL_ADPCM, /**< Creative Labs 8 --> 2,3,4 bit Compressed PCM */
+    SOX_ENCODING_CL_ADPCM16, /**< Creative Labs 16 --> 4 bit Compressed PCM */
+    SOX_ENCODING_MS_ADPCM, /**< Microsoft Compressed PCM */
+    SOX_ENCODING_IMA_ADPCM, /**< IMA Compressed PCM */
+    SOX_ENCODING_OKI_ADPCM, /**< Dialogic/OKI Compressed PCM */
+    SOX_ENCODING_DPCM, /**< Differential PCM: Fasttracker 2 (xi) */
+    SOX_ENCODING_DWVW, /**< Delta Width Variable Word */
+    SOX_ENCODING_DWVWN, /**< Delta Width Variable Word N-bit */
+    SOX_ENCODING_GSM, /**< GSM 6.10 33byte frame lossy compression */
+    SOX_ENCODING_MP3, /**< MP3 compression */
+    SOX_ENCODING_VORBIS, /**< Vorbis compression */
+    SOX_ENCODING_AMR_WB, /**< AMR-WB compression */
+    SOX_ENCODING_AMR_NB, /**< AMR-NB compression */
+    SOX_ENCODING_CVSD, /**< Continuously Variable Slope Delta modulation */
+    SOX_ENCODING_LPC10, /**< Linear Predictive Coding */
+    SOX_ENCODING_OPUS, /**< Opus compression */
 
-  SOX_ENCODINGS            /**< End of list marker */
+    SOX_ENCODINGS            /**< End of list marker */
 } sox_encoding_t;
 
 /**
@@ -558,9 +558,9 @@ Client API:
 Flags for sox_encodings_info_t: lossless/lossy1/lossy2.
 */
 typedef enum sox_encodings_flags_t {
-  sox_encodings_none   = 0, /**< no flags specified (implies lossless encoding) = 0. */
-  sox_encodings_lossy1 = 1, /**< encode, decode: lossy once = 1. */
-  sox_encodings_lossy2 = 2  /**< encode, decode, encode, decode: lossy twice = 2. */
+    sox_encodings_none = 0, /**< no flags specified (implies lossless encoding) = 0. */
+    sox_encodings_lossy1 = 1, /**< encode, decode: lossy once = 1. */
+    sox_encodings_lossy2 = 2  /**< encode, decode, encode, decode: lossy twice = 2. */
 } sox_encodings_flags_t;
 
 /**
@@ -580,19 +580,18 @@ Loop modes: upper 4 bits mask the loop blass, lower 4 bits describe
 the loop behaviour, for example single shot, bidirectional etc.
 */
 enum sox_loop_flags_t {
-  sox_loop_none = 0,          /**< single-shot = 0 */
-  sox_loop_forward = 1,       /**< forward loop = 1 */
-  sox_loop_forward_back = 2,  /**< forward/back loop = 2 */
-  sox_loop_8 = 32,            /**< 8 loops (??) = 32 */
-  sox_loop_sustain_decay = 64 /**< AIFF style, one sustain & one decay loop = 64 */
+    sox_loop_none = 0,          /**< single-shot = 0 */
+    sox_loop_forward = 1,       /**< forward loop = 1 */
+    sox_loop_forward_back = 2,  /**< forward/back loop = 2 */
+    sox_loop_8 = 32,            /**< 8 loops (??) = 32 */
+    sox_loop_sustain_decay = 64 /**< AIFF style, one sustain & one decay loop = 64 */
 };
 
 /**
 Plugins API:
 Is file a real file, a pipe, or a url?
 */
-typedef enum lsx_io_type
-{
+typedef enum lsx_io_type {
     lsx_io_file, /**< File is a real file = 0. */
     lsx_io_pipe, /**< File is a pipe (no seeking) = 1. */
     lsx_io_url   /**< File is a URL (no seeking) = 2. */
@@ -610,7 +609,7 @@ Compute a 32-bit integer API version from three 8-bit parts.
 @param c Revision or build number.
 @returns 32-bit integer API version 0x000a0b0c.
 */
-#define SOX_LIB_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+#define SOX_LIB_VERSION(a, b, c) (((a) << 16) + ((b) << 8) + (c))
 
 /**
 Client API:
@@ -741,7 +740,7 @@ Converts sox_sample_t to an unsigned integer of width (bits).
 @param clips Variable that is incremented if the result is too big.
 @returns Unsigned integer of width (bits).
 */
-#define SOX_SAMPLE_TO_UNSIGNED(bits,d,clips) \
+#define SOX_SAMPLE_TO_UNSIGNED(bits, d, clips) \
   (sox_uint##bits##_t)(SOX_SAMPLE_TO_SIGNED(bits,d,clips) ^ SOX_INT_MIN(bits))
 
 /**
@@ -752,7 +751,7 @@ Converts sox_sample_t to a signed integer of width (bits).
 @param clips Variable that is incremented if the result is too big.
 @returns Signed integer of width (bits).
 */
-#define SOX_SAMPLE_TO_SIGNED(bits,d,clips)                              \
+#define SOX_SAMPLE_TO_SIGNED(bits, d, clips)                              \
   (sox_int##bits##_t)(                                                  \
     LSX_USE_VAR(sox_macro_temp_double),                                 \
     sox_macro_temp_sample = (d),                                        \
@@ -767,7 +766,7 @@ Converts signed integer of width (bits) to sox_sample_t.
 @param d    Input sample to be converted.
 @returns SoX native sample value.
 */
-#define SOX_SIGNED_TO_SAMPLE(bits,d) ((sox_sample_t)(d) << (32-bits))
+#define SOX_SIGNED_TO_SAMPLE(bits, d) ((sox_sample_t)(d) << (32-bits))
 
 /**
 Client API:
@@ -776,7 +775,7 @@ Converts unsigned integer of width (bits) to sox_sample_t.
 @param d    Input sample to be converted.
 @returns SoX native sample value.
 */
-#define SOX_UNSIGNED_TO_SAMPLE(bits,d) \
+#define SOX_UNSIGNED_TO_SAMPLE(bits, d) \
       (SOX_SIGNED_TO_SAMPLE(bits,d) ^ SOX_SAMPLE_NEG)
 
 /**
@@ -786,7 +785,7 @@ Converts unsigned 8-bit integer to sox_sample_t.
 @param clips The parameter is not used.
 @returns SoX native sample value.
 */
-#define SOX_UNSIGNED_8BIT_TO_SAMPLE(d,clips) SOX_UNSIGNED_TO_SAMPLE(8,d)
+#define SOX_UNSIGNED_8BIT_TO_SAMPLE(d, clips) SOX_UNSIGNED_TO_SAMPLE(8,d)
 
 /**
 Client API:
@@ -795,7 +794,7 @@ Converts signed 8-bit integer to sox_sample_t.
 @param clips The parameter is not used.
 @returns SoX native sample value.
 */
-#define SOX_SIGNED_8BIT_TO_SAMPLE(d,clips) SOX_SIGNED_TO_SAMPLE(8,d)
+#define SOX_SIGNED_8BIT_TO_SAMPLE(d, clips) SOX_SIGNED_TO_SAMPLE(8,d)
 
 /**
 Client API:
@@ -804,7 +803,7 @@ Converts unsigned 16-bit integer to sox_sample_t.
 @param clips The parameter is not used.
 @returns SoX native sample value.
 */
-#define SOX_UNSIGNED_16BIT_TO_SAMPLE(d,clips) SOX_UNSIGNED_TO_SAMPLE(16,d)
+#define SOX_UNSIGNED_16BIT_TO_SAMPLE(d, clips) SOX_UNSIGNED_TO_SAMPLE(16,d)
 
 /**
 Client API:
@@ -813,7 +812,7 @@ Converts signed 16-bit integer to sox_sample_t.
 @param clips The parameter is not used.
 @returns SoX native sample value.
 */
-#define SOX_SIGNED_16BIT_TO_SAMPLE(d,clips) SOX_SIGNED_TO_SAMPLE(16,d)
+#define SOX_SIGNED_16BIT_TO_SAMPLE(d, clips) SOX_SIGNED_TO_SAMPLE(16,d)
 
 /**
 Client API:
@@ -822,7 +821,7 @@ Converts unsigned 24-bit integer to sox_sample_t.
 @param clips The parameter is not used.
 @returns SoX native sample value.
 */
-#define SOX_UNSIGNED_24BIT_TO_SAMPLE(d,clips) SOX_UNSIGNED_TO_SAMPLE(24,d)
+#define SOX_UNSIGNED_24BIT_TO_SAMPLE(d, clips) SOX_UNSIGNED_TO_SAMPLE(24,d)
 
 /**
 Client API:
@@ -831,7 +830,7 @@ Converts signed 24-bit integer to sox_sample_t.
 @param clips The parameter is not used.
 @returns SoX native sample value.
 */
-#define SOX_SIGNED_24BIT_TO_SAMPLE(d,clips) SOX_SIGNED_TO_SAMPLE(24,d)
+#define SOX_SIGNED_24BIT_TO_SAMPLE(d, clips) SOX_SIGNED_TO_SAMPLE(24,d)
 
 /**
 Client API:
@@ -840,7 +839,7 @@ Converts unsigned 32-bit integer to sox_sample_t.
 @param clips The parameter is not used.
 @returns SoX native sample value.
 */
-#define SOX_UNSIGNED_32BIT_TO_SAMPLE(d,clips) \
+#define SOX_UNSIGNED_32BIT_TO_SAMPLE(d, clips) \
   ((sox_sample_t)(d) ^ SOX_SAMPLE_NEG)
 
 /**
@@ -850,7 +849,7 @@ Converts signed 32-bit integer to sox_sample_t.
 @param clips The parameter is not used.
 @returns SoX native sample value.
 */
-#define SOX_SIGNED_32BIT_TO_SAMPLE(d,clips) (sox_sample_t)(d)
+#define SOX_SIGNED_32BIT_TO_SAMPLE(d, clips) (sox_sample_t)(d)
 
 /**
 Client API:
@@ -859,7 +858,7 @@ Converts 32-bit float to sox_sample_t.
 @param clips Variable to increment if the input sample is too large or too small.
 @returns SoX native sample value.
 */
-#define SOX_FLOAT_32BIT_TO_SAMPLE(d,clips) SOX_FLOAT_64BIT_TO_SAMPLE(d, clips)
+#define SOX_FLOAT_32BIT_TO_SAMPLE(d, clips) SOX_FLOAT_64BIT_TO_SAMPLE(d, clips)
 
 /**
 Client API:
@@ -889,7 +888,7 @@ Converts SoX native sample to an unsigned 8-bit integer.
 @param d Input sample to be converted.
 @param clips Variable to increment if input sample is too large.
 */
-#define SOX_SAMPLE_TO_UNSIGNED_8BIT(d,clips) SOX_SAMPLE_TO_UNSIGNED(8,d,clips)
+#define SOX_SAMPLE_TO_UNSIGNED_8BIT(d, clips) SOX_SAMPLE_TO_UNSIGNED(8,d,clips)
 
 /**
 Client API:
@@ -897,7 +896,7 @@ Converts SoX native sample to an signed 8-bit integer.
 @param d Input sample to be converted.
 @param clips Variable to increment if input sample is too large.
 */
-#define SOX_SAMPLE_TO_SIGNED_8BIT(d,clips) SOX_SAMPLE_TO_SIGNED(8,d,clips)
+#define SOX_SAMPLE_TO_SIGNED_8BIT(d, clips) SOX_SAMPLE_TO_SIGNED(8,d,clips)
 
 /**
 Client API:
@@ -905,7 +904,7 @@ Converts SoX native sample to an unsigned 16-bit integer.
 @param d Input sample to be converted.
 @param clips Variable to increment if input sample is too large.
 */
-#define SOX_SAMPLE_TO_UNSIGNED_16BIT(d,clips) SOX_SAMPLE_TO_UNSIGNED(16,d,clips)
+#define SOX_SAMPLE_TO_UNSIGNED_16BIT(d, clips) SOX_SAMPLE_TO_UNSIGNED(16,d,clips)
 
 /**
 Client API:
@@ -913,7 +912,7 @@ Converts SoX native sample to a signed 16-bit integer.
 @param d Input sample to be converted.
 @param clips Variable to increment if input sample is too large.
 */
-#define SOX_SAMPLE_TO_SIGNED_16BIT(d,clips) SOX_SAMPLE_TO_SIGNED(16,d,clips)
+#define SOX_SAMPLE_TO_SIGNED_16BIT(d, clips) SOX_SAMPLE_TO_SIGNED(16,d,clips)
 
 /**
 Client API:
@@ -921,7 +920,7 @@ Converts SoX native sample to an unsigned 24-bit integer.
 @param d Input sample to be converted.
 @param clips Variable to increment if input sample is too large.
 */
-#define SOX_SAMPLE_TO_UNSIGNED_24BIT(d,clips) SOX_SAMPLE_TO_UNSIGNED(24,d,clips)
+#define SOX_SAMPLE_TO_UNSIGNED_24BIT(d, clips) SOX_SAMPLE_TO_UNSIGNED(24,d,clips)
 
 /**
 Client API:
@@ -929,7 +928,7 @@ Converts SoX native sample to a signed 24-bit integer.
 @param d Input sample to be converted.
 @param clips Variable to increment if input sample is too large.
 */
-#define SOX_SAMPLE_TO_SIGNED_24BIT(d,clips) SOX_SAMPLE_TO_SIGNED(24,d,clips)
+#define SOX_SAMPLE_TO_SIGNED_24BIT(d, clips) SOX_SAMPLE_TO_SIGNED(24,d,clips)
 
 /**
 Client API:
@@ -937,7 +936,7 @@ Converts SoX native sample to an unsigned 32-bit integer.
 @param d Input sample to be converted.
 @param clips The parameter is not used.
 */
-#define SOX_SAMPLE_TO_UNSIGNED_32BIT(d,clips) (sox_uint32_t)((d)^SOX_SAMPLE_NEG)
+#define SOX_SAMPLE_TO_UNSIGNED_32BIT(d, clips) (sox_uint32_t)((d)^SOX_SAMPLE_NEG)
 
 /**
 Client API:
@@ -945,7 +944,7 @@ Converts SoX native sample to a signed 32-bit integer.
 @param d Input sample to be converted.
 @param clips The parameter is not used.
 */
-#define SOX_SAMPLE_TO_SIGNED_32BIT(d,clips) (sox_int32_t)(d)
+#define SOX_SAMPLE_TO_SIGNED_32BIT(d, clips) (sox_int32_t)(d)
 
 /**
 Client API:
@@ -953,7 +952,7 @@ Converts SoX native sample to a 32-bit float.
 @param d Input sample to be converted.
 @param clips The parameter is not used.
 */
-#define SOX_SAMPLE_TO_FLOAT_32BIT(d,clips) ((d)*(1.0 / (SOX_SAMPLE_MAX + 1.0)))
+#define SOX_SAMPLE_TO_FLOAT_32BIT(d, clips) ((d)*(1.0 / (SOX_SAMPLE_MAX + 1.0)))
 
 /**
 Client API:
@@ -961,7 +960,7 @@ Converts SoX native sample to a 64-bit float.
 @param d Input sample to be converted.
 @param clips The parameter is not used.
 */
-#define SOX_SAMPLE_TO_FLOAT_64BIT(d,clips) ((d)*(1.0 / (SOX_SAMPLE_MAX + 1.0)))
+#define SOX_SAMPLE_TO_FLOAT_64BIT(d, clips) ((d)*(1.0 / (SOX_SAMPLE_MAX + 1.0)))
 
 /**
 Client API:
@@ -999,7 +998,7 @@ and increment a counter if clipping occurs.
 @param clips Value (lvalue) that is incremented if clipping is needed.
 @returns Clipped value.
 */
-#define SOX_INTEGER_CLIP_COUNT(bits,i,clips) ( \
+#define SOX_INTEGER_CLIP_COUNT(bits, i, clips) ( \
   (i) >(1 << ((bits)-1))- 1? ++(clips),(1 << ((bits)-1))- 1 : \
   (i) <-1 << ((bits)-1)    ? ++(clips),-1 << ((bits)-1) : (i))
 
@@ -1011,7 +1010,7 @@ if clipping occurs.
 @param clips Value (lvalue) that is incremented if clipping is needed.
 @returns Clipped value.
 */
-#define SOX_16BIT_CLIP_COUNT(i,clips) SOX_INTEGER_CLIP_COUNT(16,i,clips)
+#define SOX_16BIT_CLIP_COUNT(i, clips) SOX_INTEGER_CLIP_COUNT(16,i,clips)
 
 /**
 Client API:
@@ -1021,7 +1020,7 @@ if clipping occurs.
 @param clips Value (lvalue) that is incremented if clipping is needed.
 @returns Clipped value.
 */
-#define SOX_24BIT_CLIP_COUNT(i,clips) SOX_INTEGER_CLIP_COUNT(24,i,clips)
+#define SOX_24BIT_CLIP_COUNT(i, clips) SOX_INTEGER_CLIP_COUNT(24,i,clips)
 
 #define SOX_SIZE_MAX ((size_t)(-1)) /**< Client API: Maximum value of size_t. */
 
@@ -1093,12 +1092,13 @@ Client API:
 Callback to write a message to an output device (console or log file),
 used by sox_globals_t.output_message_handler.
 */
-typedef void (LSX_API * sox_output_message_handler_t)(
-    unsigned level,                       /**< 1 = FAIL, 2 = WARN, 3 = INFO, 4 = DEBUG, 5 = DEBUG_MORE, 6 = DEBUG_MOST. */
-    LSX_PARAM_IN_Z char const * filename, /**< Source code __FILENAME__ from which message originates. */
-    LSX_PARAM_IN_PRINTF char const * fmt, /**< Message format string. */
-    LSX_PARAM_IN va_list ap               /**< Message format parameters. */
-    );
+typedef void (LSX_API *sox_output_message_handler_t)(
+        unsigned level,                       /**< 1 = FAIL, 2 = WARN, 3 = INFO, 4 = DEBUG, 5 = DEBUG_MORE, 6 = DEBUG_MOST. */
+        LSX_PARAM_IN_Z
+        char const *filename, /**< Source code __FILENAME__ from which message originates. */
+        LSX_PARAM_IN_PRINTF char const *fmt, /**< Message format string. */
+        LSX_PARAM_IN va_list ap               /**< Message format parameters. */
+);
 
 /**
 Client API:
@@ -1106,7 +1106,7 @@ Callback to retrieve information about a format handler,
 used by sox_format_tab_t.fn.
 @returns format handler information.
 */
-typedef sox_format_handler_t const * (LSX_API * sox_format_fn_t)(void);
+typedef sox_format_handler_t const *(LSX_API *sox_format_fn_t)(void);
 
 /**
 Client API:
@@ -1114,7 +1114,7 @@ Callback to get information about an effect handler,
 used by the table returned from sox_get_effect_fns(void).
 @returns Pointer to information about an effect handler.
 */
-typedef sox_effect_handler_t const * (LSX_API *sox_effect_fn_t)(void);
+typedef sox_effect_handler_t const *(LSX_API *sox_effect_fn_t)(void);
 
 /**
 Client API:
@@ -1122,9 +1122,9 @@ Callback to initialize reader (decoder), used by
 sox_format_handler.startread.
 @returns SOX_SUCCESS if successful.
 */
-typedef int (LSX_API * sox_format_handler_startread)(
-    LSX_PARAM_INOUT sox_format_t * ft /**< Format pointer. */
-    );
+typedef int (LSX_API *sox_format_handler_startread)(
+        LSX_PARAM_INOUT sox_format_t *ft /**< Format pointer. */
+);
 
 /**
 Client API:
@@ -1132,11 +1132,12 @@ Callback to read (decode) a block of samples,
 used by sox_format_handler.read.
 @returns number of samples read, or 0 if unsuccessful.
 */
-typedef size_t (LSX_API * sox_format_handler_read)(
-    LSX_PARAM_INOUT sox_format_t * ft, /**< Format pointer. */
-    LSX_PARAM_OUT_CAP_POST_COUNT(len,return) sox_sample_t *buf, /**< Buffer from which to read samples. */
-    size_t len /**< Number of samples available in buf. */
-    );
+typedef size_t (LSX_API *sox_format_handler_read)(
+        LSX_PARAM_INOUT sox_format_t *ft, /**< Format pointer. */
+        LSX_PARAM_OUT_CAP_POST_COUNT(len, return)
+        sox_sample_t *buf, /**< Buffer from which to read samples. */
+        size_t len /**< Number of samples available in buf. */
+);
 
 /**
 Client API:
@@ -1144,9 +1145,9 @@ Callback to close reader (decoder),
 used by sox_format_handler.stopread.
 @returns SOX_SUCCESS if successful.
 */
-typedef int (LSX_API * sox_format_handler_stopread)(
-    LSX_PARAM_INOUT sox_format_t * ft /**< Format pointer. */
-    );
+typedef int (LSX_API *sox_format_handler_stopread)(
+        LSX_PARAM_INOUT sox_format_t *ft /**< Format pointer. */
+);
 
 /**
 Client API:
@@ -1154,9 +1155,9 @@ Callback to initialize writer (encoder),
 used by sox_format_handler.startwrite.
 @returns SOX_SUCCESS if successful.
 */
-typedef int (LSX_API * sox_format_handler_startwrite)(
-    LSX_PARAM_INOUT sox_format_t * ft /**< Format pointer. */
-    );
+typedef int (LSX_API *sox_format_handler_startwrite)(
+        LSX_PARAM_INOUT sox_format_t *ft /**< Format pointer. */
+);
 
 /**
 Client API:
@@ -1164,11 +1165,12 @@ Callback to write (encode) a block of samples,
 used by sox_format_handler.write.
 @returns number of samples written, or 0 if unsuccessful.
 */
-typedef size_t (LSX_API * sox_format_handler_write)(
-    LSX_PARAM_INOUT sox_format_t * ft, /**< Format pointer. */
-    LSX_PARAM_IN_COUNT(len) sox_sample_t const * buf, /**< Buffer to which samples are written. */
-    size_t len /**< Capacity of buf, measured in samples. */
-    );
+typedef size_t (LSX_API *sox_format_handler_write)(
+        LSX_PARAM_INOUT sox_format_t *ft, /**< Format pointer. */
+        LSX_PARAM_IN_COUNT(len)
+        sox_sample_t const *buf, /**< Buffer to which samples are written. */
+        size_t len /**< Capacity of buf, measured in samples. */
+);
 
 /**
 Client API:
@@ -1176,9 +1178,9 @@ Callback to close writer (decoder),
 used by sox_format_handler.stopwrite.
 @returns SOX_SUCCESS if successful.
 */
-typedef int (LSX_API * sox_format_handler_stopwrite)(
-    LSX_PARAM_INOUT sox_format_t * ft /**< Format pointer. */
-    );
+typedef int (LSX_API *sox_format_handler_stopwrite)(
+        LSX_PARAM_INOUT sox_format_t *ft /**< Format pointer. */
+);
 
 /**
 Client API:
@@ -1186,10 +1188,10 @@ Callback to reposition reader,
 used by sox_format_handler.seek.
 @returns SOX_SUCCESS if successful.
 */
-typedef int (LSX_API * sox_format_handler_seek)(
-    LSX_PARAM_INOUT sox_format_t * ft, /**< Format pointer. */
-    sox_uint64_t offset /**< Sample offset to which reader should be positioned. */
-    );
+typedef int (LSX_API *sox_format_handler_seek)(
+        LSX_PARAM_INOUT sox_format_t *ft, /**< Format pointer. */
+        sox_uint64_t offset /**< Sample offset to which reader should be positioned. */
+);
 
 /**
 Client API:
@@ -1197,11 +1199,11 @@ Callback to parse command-line arguments (called once per effect),
 used by sox_effect_handler.getopts.
 @returns SOX_SUCCESS if successful.
 */
-typedef int (LSX_API * sox_effect_handler_getopts)(
-    LSX_PARAM_INOUT sox_effect_t * effp, /**< Effect pointer. */
-    int argc, /**< Number of arguments in argv. */
-    LSX_PARAM_IN_COUNT(argc) char *argv[] /**< Array of command-line arguments. */
-    );
+typedef int (LSX_API *sox_effect_handler_getopts)(
+        LSX_PARAM_INOUT sox_effect_t *effp, /**< Effect pointer. */
+        int argc, /**< Number of arguments in argv. */
+        LSX_PARAM_IN_COUNT(argc) char *argv[] /**< Array of command-line arguments. */
+);
 
 /**
 Client API:
@@ -1209,9 +1211,9 @@ Callback to initialize effect (called once per flow),
 used by sox_effect_handler.start.
 @returns SOX_SUCCESS if successful.
 */
-typedef int (LSX_API * sox_effect_handler_start)(
-    LSX_PARAM_INOUT sox_effect_t * effp /**< Effect pointer. */
-    );
+typedef int (LSX_API *sox_effect_handler_start)(
+        LSX_PARAM_INOUT sox_effect_t *effp /**< Effect pointer. */
+);
 
 /**
 Client API:
@@ -1219,13 +1221,17 @@ Callback to process samples,
 used by sox_effect_handler.flow.
 @returns SOX_SUCCESS if successful.
 */
-typedef int (LSX_API * sox_effect_handler_flow)(
-    LSX_PARAM_INOUT sox_effect_t * effp, /**< Effect pointer. */
-    LSX_PARAM_IN_COUNT(*isamp) sox_sample_t const * ibuf, /**< Buffer from which to read samples. */
-    LSX_PARAM_OUT_CAP_POST_COUNT(*osamp,*osamp) sox_sample_t * obuf, /**< Buffer to which samples are written. */
-    LSX_PARAM_INOUT size_t *isamp, /**< On entry, contains capacity of ibuf; on exit, contains number of samples consumed. */
-    LSX_PARAM_INOUT size_t *osamp /**< On entry, contains capacity of obuf; on exit, contains number of samples written. */
-    );
+typedef int (LSX_API *sox_effect_handler_flow)(
+        LSX_PARAM_INOUT sox_effect_t *effp, /**< Effect pointer. */
+        LSX_PARAM_IN_COUNT(*isamp)
+        sox_sample_t const *ibuf, /**< Buffer from which to read samples. */
+        LSX_PARAM_OUT_CAP_POST_COUNT(*osamp, *osamp)
+        sox_sample_t *obuf, /**< Buffer to which samples are written. */
+        LSX_PARAM_INOUT
+        size_t *isamp, /**< On entry, contains capacity of ibuf; on exit, contains number of samples consumed. */
+        LSX_PARAM_INOUT
+        size_t *osamp /**< On entry, contains capacity of obuf; on exit, contains number of samples written. */
+);
 
 /**
 Client API:
@@ -1233,11 +1239,13 @@ Callback to finish getting output after input is complete,
 used by sox_effect_handler.drain.
 @returns SOX_SUCCESS if successful.
 */
-typedef int (LSX_API * sox_effect_handler_drain)(
-    LSX_PARAM_INOUT sox_effect_t * effp, /**< Effect pointer. */
-    LSX_PARAM_OUT_CAP_POST_COUNT(*osamp,*osamp) sox_sample_t *obuf, /**< Buffer to which samples are written. */
-    LSX_PARAM_INOUT size_t *osamp /**< On entry, contains capacity of obuf; on exit, contains number of samples written. */
-    );
+typedef int (LSX_API *sox_effect_handler_drain)(
+        LSX_PARAM_INOUT sox_effect_t *effp, /**< Effect pointer. */
+        LSX_PARAM_OUT_CAP_POST_COUNT(*osamp, *osamp)
+        sox_sample_t *obuf, /**< Buffer to which samples are written. */
+        LSX_PARAM_INOUT
+        size_t *osamp /**< On entry, contains capacity of obuf; on exit, contains number of samples written. */
+);
 
 /**
 Client API:
@@ -1245,9 +1253,9 @@ Callback to shut down effect (called once per flow),
 used by sox_effect_handler.stop.
 @returns SOX_SUCCESS if successful.
 */
-typedef int (LSX_API * sox_effect_handler_stop)(
-    LSX_PARAM_INOUT sox_effect_t * effp /**< Effect pointer. */
-    );
+typedef int (LSX_API *sox_effect_handler_stop)(
+        LSX_PARAM_INOUT sox_effect_t *effp /**< Effect pointer. */
+);
 
 /**
 Client API:
@@ -1255,20 +1263,20 @@ Callback to shut down effect (called once per effect),
 used by sox_effect_handler.kill.
 @returns SOX_SUCCESS if successful.
 */
-typedef int (LSX_API * sox_effect_handler_kill)(
-    LSX_PARAM_INOUT sox_effect_t * effp /**< Effect pointer. */
-    );
+typedef int (LSX_API *sox_effect_handler_kill)(
+        LSX_PARAM_INOUT sox_effect_t *effp /**< Effect pointer. */
+);
 
 /**
 Client API:
-Callback called while flow is running (called once per buffer),
+Callback called while flow is running (called once per data),
 used by sox_flow_effects.callback.
 @returns SOX_SUCCESS to continue, other value to abort flow.
 */
-typedef int (LSX_API * sox_flow_effects_callback)(
-    sox_bool all_done,
-    void * client_data
-    );
+typedef int (LSX_API *sox_flow_effects_callback)(
+        sox_bool all_done,
+        void *client_data
+);
 
 /**
 Client API:
@@ -1276,10 +1284,10 @@ Callback for enumerating the contents of a playlist,
 used by the sox_parse_playlist function.
 @returns SOX_SUCCESS if successful, any other value to abort playlist enumeration.
 */
-typedef int (LSX_API * sox_playlist_callback_t)(
-    void * callback_data,
-    LSX_PARAM_IN_Z char const * filename
-    );
+typedef int (LSX_API *sox_playlist_callback_t)(
+        void *callback_data,
+        LSX_PARAM_IN_Z char const *filename
+);
 
 /*****************************************************************************
 Structures:
@@ -1291,15 +1299,15 @@ Information about a build of libSoX, returned from the sox_version_info
 function.
 */
 typedef struct sox_version_info_t {
-    size_t       size;         /**< structure size = sizeof(sox_version_info_t) */
+    size_t size;         /**< structure size = sizeof(sox_version_info_t) */
     sox_version_flags_t flags; /**< feature flags = popen | magic | threads | memopen */
     sox_uint32_t version_code; /**< version number = 0x140400 */
-    char const * version;      /**< version string = sox_version(), for example, "14.4.0" */
-    char const * version_extra;/**< version extra info or null = "PACKAGE_EXTRA", for example, "beta" */
-    char const * time;         /**< build time = "__DATE__ __TIME__", for example, "Jan  7 2010 03:31:50" */
-    char const * distro;       /**< distro or null = "DISTRO", for example, "Debian" */
-    char const * compiler;     /**< compiler info or null, for example, "msvc 160040219" */
-    char const * arch;         /**< arch, for example, "1248 48 44 L OMP" */
+    char const *version;      /**< version string = sox_version(), for example, "14.4.0" */
+    char const *version_extra;/**< version extra info or null = "PACKAGE_EXTRA", for example, "beta" */
+    char const *time;         /**< build time = "__DATE__ __TIME__", for example, "Jan  7 2010 03:31:50" */
+    char const *distro;       /**< distro or null = "DISTRO", for example, "Debian" */
+    char const *compiler;     /**< compiler info or null, for example, "msvc 160040219" */
+    char const *arch;         /**< arch, for example, "1248 48 44 L OMP" */
     /* new info should be added at the end for version backwards-compatibility. */
 } sox_version_info_t;
 
@@ -1310,36 +1318,36 @@ function.
 */
 typedef struct sox_globals_t {
 /* public: */
-  unsigned     verbosity; /**< messages are only written if globals.verbosity >= message.level */
-  sox_output_message_handler_t output_message_handler; /**< client-specified message output callback */
-  sox_bool     repeatable; /**< true to use pre-determined timestamps and PRNG seed */
+    unsigned verbosity; /**< messages are only written if globals.verbosity >= message.level */
+    sox_output_message_handler_t output_message_handler; /**< client-specified message output callback */
+    sox_bool repeatable; /**< true to use pre-determined timestamps and PRNG seed */
 
-  /**
-  Default size (in bytes) used by libSoX for blocks of sample data.
-  Plugins should use similarly-sized buffers to get best performance.
-  */
-  size_t       bufsiz;
+    /**
+    Default size (in bytes) used by libSoX for blocks of sample data.
+    Plugins should use similarly-sized buffers to get best performance.
+    */
+    size_t bufsiz;
 
-  /**
-  Default size (in bytes) used by libSoX for blocks of input sample data.
-  Plugins should use similarly-sized buffers to get best performance.
-  */
-  size_t       input_bufsiz;
+    /**
+    Default size (in bytes) used by libSoX for blocks of input sample data.
+    Plugins should use similarly-sized buffers to get best performance.
+    */
+    size_t input_bufsiz;
 
-  sox_int32_t  ranqd1; /**< Can be used to re-seed libSoX's PRNG */
+    sox_int32_t ranqd1; /**< Can be used to re-seed libSoX's PRNG */
 
-  char const * stdin_in_use_by;  /**< Private: tracks the name of the handler currently using stdin */
-  char const * stdout_in_use_by; /**< Private: tracks the name of the handler currently using stdout */
-  char const * subsystem;        /**< Private: tracks the name of the handler currently writing an output message */
-  char       * tmp_path;         /**< Private: client-configured path to use for temporary files */
-  sox_bool     use_magic;        /**< Private: true if client has requested use of 'magic' file-type detection */
-  sox_bool     use_threads;      /**< Private: true if client has requested parallel effects processing */
+    char const *stdin_in_use_by;  /**< Private: tracks the name of the handler currently using stdin */
+    char const *stdout_in_use_by; /**< Private: tracks the name of the handler currently using stdout */
+    char const *subsystem;        /**< Private: tracks the name of the handler currently writing an output message */
+    char *tmp_path;         /**< Private: client-configured path to use for temporary files */
+    sox_bool use_magic;        /**< Private: true if client has requested use of 'magic' file-type detection */
+    sox_bool use_threads;      /**< Private: true if client has requested parallel effects processing */
 
-  /**
-  Log to base 2 of minimum size (in bytes) used by libSoX for DFT (filtering).
-  Plugins should use similarly-sized DFTs to get best performance.
-  */
-  size_t       log2_dft_min_size;
+    /**
+    Log to base 2 of minimum size (in bytes) used by libSoX for DFT (filtering).
+    Plugins should use similarly-sized DFTs to get best performance.
+    */
+    size_t log2_dft_min_size;
 } sox_globals_t;
 
 /**
@@ -1347,11 +1355,11 @@ Client API:
 Signal parameters; members should be set to SOX_UNSPEC (= 0) if unknown.
 */
 typedef struct sox_signalinfo_t {
-  sox_rate_t       rate;         /**< samples per second, 0 if unknown */
-  unsigned         channels;     /**< number of sound channels, 0 if unknown */
-  unsigned         precision;    /**< bits per sample, 0 if unknown */
-  sox_uint64_t     length;       /**< samples * chans in file, 0 if unknown, -1 if unspecified */
-  double           * mult;       /**< Effects headroom multiplier; may be null */
+    sox_rate_t rate;         /**< samples per second, 0 if unknown */
+    unsigned channels;     /**< number of sound channels, 0 if unknown */
+    unsigned precision;    /**< bits per sample, 0 if unknown */
+    sox_uint64_t length;       /**< samples * chans in file, 0 if unknown, -1 if unspecified */
+    double *mult;       /**< Effects headroom multiplier; may be null */
 } sox_signalinfo_t;
 
 /**
@@ -1359,9 +1367,9 @@ Client API:
 Basic information about an encoding.
 */
 typedef struct sox_encodings_info_t {
-  sox_encodings_flags_t flags; /**< lossy once (lossy1), lossy twice (lossy2), or lossless (none). */
-  char const * name;           /**< encoding name. */
-  char const * desc;           /**< encoding description. */
+    sox_encodings_flags_t flags; /**< lossy once (lossy1), lossy twice (lossy2), or lossless (none). */
+    char const *name;           /**< encoding name. */
+    char const *desc;           /**< encoding description. */
 } sox_encodings_info_t;
 
 /**
@@ -1369,35 +1377,35 @@ Client API:
 Encoding parameters.
 */
 typedef struct sox_encodinginfo_t {
-  sox_encoding_t encoding; /**< format of sample numbers */
-  unsigned bits_per_sample;/**< 0 if unknown or variable; uncompressed value if lossless; compressed value if lossy */
-  double compression;      /**< compression factor (where applicable) */
+    sox_encoding_t encoding; /**< format of sample numbers */
+    unsigned bits_per_sample;/**< 0 if unknown or variable; uncompressed value if lossless; compressed value if lossy */
+    double compression;      /**< compression factor (where applicable) */
 
-  /**
-  Should bytes be reversed? If this is default during sox_open_read or
-  sox_open_write, libSoX will set them to either no or yes according to the
-  machine or format default.
-  */
-  sox_option_t reverse_bytes;
+    /**
+    Should bytes be reversed? If this is default during sox_open_read or
+    sox_open_write, libSoX will set them to either no or yes according to the
+    machine or format default.
+    */
+    sox_option_t reverse_bytes;
 
-  /**
-  Should nibbles be reversed? If this is default during sox_open_read or
-  sox_open_write, libSoX will set them to either no or yes according to the
-  machine or format default.
-  */
-  sox_option_t reverse_nibbles;
+    /**
+    Should nibbles be reversed? If this is default during sox_open_read or
+    sox_open_write, libSoX will set them to either no or yes according to the
+    machine or format default.
+    */
+    sox_option_t reverse_nibbles;
 
-  /**
-  Should bits be reversed? If this is default during sox_open_read or
-  sox_open_write, libSoX will set them to either no or yes according to the
-  machine or format default.
-  */
-  sox_option_t reverse_bits;
+    /**
+    Should bits be reversed? If this is default during sox_open_read or
+    sox_open_write, libSoX will set them to either no or yes according to the
+    machine or format default.
+    */
+    sox_option_t reverse_bits;
 
-  /**
-  If set to true, the format should reverse its default endianness.
-  */
-  sox_bool opposite_endian;
+    /**
+    If set to true, the format should reverse its default endianness.
+    */
+    sox_bool opposite_endian;
 } sox_encodinginfo_t;
 
 /**
@@ -1405,33 +1413,33 @@ Client API:
 Looping parameters (out-of-band data).
 */
 typedef struct sox_loopinfo_t {
-  sox_uint64_t  start;  /**< first sample */
-  sox_uint64_t  length; /**< length */
-  unsigned      count;  /**< number of repeats, 0=forever */
-  unsigned char type;   /**< 0=no, 1=forward, 2=forward/back (see sox_loop_* for valid values). */
+    sox_uint64_t start;  /**< first sample */
+    sox_uint64_t length; /**< length */
+    unsigned count;  /**< number of repeats, 0=forever */
+    unsigned char type;   /**< 0=no, 1=forward, 2=forward/back (see sox_loop_* for valid values). */
 } sox_loopinfo_t;
 
 /**
 Client API:
 Instrument information.
 */
-typedef struct sox_instrinfo_t{
-  signed char MIDInote;   /**< for unity pitch playback */
-  signed char MIDIlow;    /**< MIDI pitch-bend low range */
-  signed char MIDIhi;     /**< MIDI pitch-bend high range */
-  unsigned char loopmode; /**< 0=no, 1=forward, 2=forward/back (see sox_loop_* values) */
-  unsigned nloops;  /**< number of active loops (max SOX_MAX_NLOOPS). */
+typedef struct sox_instrinfo_t {
+    signed char MIDInote;   /**< for unity pitch playback */
+    signed char MIDIlow;    /**< MIDI pitch-bend low range */
+    signed char MIDIhi;     /**< MIDI pitch-bend high range */
+    unsigned char loopmode; /**< 0=no, 1=forward, 2=forward/back (see sox_loop_* values) */
+    unsigned nloops;  /**< number of active loops (max SOX_MAX_NLOOPS). */
 } sox_instrinfo_t;
 
 /**
 Client API:
-File buffer info.  Holds info so that data can be read in blocks.
+File data info.  Holds info so that data can be read in blocks.
 */
 typedef struct sox_fileinfo_t {
-  char          *buf;                 /**< Pointer to data buffer */
-  size_t        size;                 /**< Size of buffer in bytes */
-  size_t        count;                /**< Count read into buffer */
-  size_t        pos;                  /**< Position in buffer */
+    char *buf;                 /**< Pointer to data data */
+    size_t size;                 /**< Size of data in bytes */
+    size_t count;                /**< Count read into data */
+    size_t pos;                  /**< Position in data */
 } sox_fileinfo_t;
 
 /**
@@ -1439,58 +1447,58 @@ Client API:
 Handler structure defined by each format.
 */
 struct sox_format_handler_t {
-  unsigned     sox_lib_version_code;  /**< Checked on load; must be 1st in struct*/
-  char         const * description;   /**< short description of format */
-  char         const * const * names; /**< null-terminated array of filename extensions that are handled by this format */
-  unsigned int flags;                 /**< File flags (SOX_FILE_* values). */
-  sox_format_handler_startread startread; /**< called to initialize reader (decoder) */
-  sox_format_handler_read read;       /**< called to read (decode) a block of samples */
-  sox_format_handler_stopread stopread; /**< called to close reader (decoder); may be null if no closing necessary */
-  sox_format_handler_startwrite startwrite; /**< called to initialize writer (encoder) */
-  sox_format_handler_write write;     /**< called to write (encode) a block of samples */
-  sox_format_handler_stopwrite stopwrite; /**< called to close writer (decoder); may be null if no closing necessary */
-  sox_format_handler_seek seek;       /**< called to reposition reader; may be null if not supported */
+    unsigned sox_lib_version_code;  /**< Checked on load; must be 1st in struct*/
+    char const *description;   /**< short description of format */
+    char const *const *names; /**< null-terminated array of filename extensions that are handled by this format */
+    unsigned int flags;                 /**< File flags (SOX_FILE_* values). */
+    sox_format_handler_startread startread; /**< called to initialize reader (decoder) */
+    sox_format_handler_read read;       /**< called to read (decode) a block of samples */
+    sox_format_handler_stopread stopread; /**< called to close reader (decoder); may be null if no closing necessary */
+    sox_format_handler_startwrite startwrite; /**< called to initialize writer (encoder) */
+    sox_format_handler_write write;     /**< called to write (encode) a block of samples */
+    sox_format_handler_stopwrite stopwrite; /**< called to close writer (decoder); may be null if no closing necessary */
+    sox_format_handler_seek seek;       /**< called to reposition reader; may be null if not supported */
 
-  /**
-  Array of values indicating the encodings and precisions supported for
-  writing (encoding). Precisions specified with default precision first.
-  Encoding, precision, precision, ..., 0, repeat. End with one more 0.
-  Example:
-  unsigned const * formats = {
-    SOX_ENCODING_SIGN2, 16, 24, 0, // Support SIGN2 at 16 and 24 bits, default to 16 bits.
-    SOX_ENCODING_UNSIGNED, 8, 0,   // Support UNSIGNED at 8 bits, default to 8 bits.
-    0 // No more supported encodings.
-  };
-  */
-  unsigned     const * write_formats;
+    /**
+    Array of values indicating the encodings and precisions supported for
+    writing (encoding). Precisions specified with default precision first.
+    Encoding, precision, precision, ..., 0, repeat. End with one more 0.
+    Example:
+    unsigned const * formats = {
+      SOX_ENCODING_SIGN2, 16, 24, 0, // Support SIGN2 at 16 and 24 bits, default to 16 bits.
+      SOX_ENCODING_UNSIGNED, 8, 0,   // Support UNSIGNED at 8 bits, default to 8 bits.
+      0 // No more supported encodings.
+    };
+    */
+    unsigned const *write_formats;
 
-  /**
-  Array of sample rates (samples per second) supported for writing (encoding).
-  NULL if all (or almost all) rates are supported. End with 0.
-  */
-  sox_rate_t   const * write_rates;
+    /**
+    Array of sample rates (samples per second) supported for writing (encoding).
+    NULL if all (or almost all) rates are supported. End with 0.
+    */
+    sox_rate_t const *write_rates;
 
-  /**
-  SoX will automatically allocate a buffer in which the handler can store data.
-  Specify the size of the buffer needed here. Usually this will be sizeof(your_struct).
-  The buffer will be allocated and zeroed before the call to startread/startwrite.
-  The buffer will be freed after the call to stopread/stopwrite.
-  The buffer will be provided via format.priv in each call to the handler.
-  */
-  size_t       priv_size;
+    /**
+    SoX will automatically allocate a data in which the handler can store data.
+    Specify the size of the data needed here. Usually this will be sizeof(your_struct).
+    The data will be allocated and zeroed before the call to startread/startwrite.
+    The data will be freed after the call to stopread/stopwrite.
+    The data will be provided via format.priv in each call to the handler.
+    */
+    size_t priv_size;
 };
 
 /**
 Client API:
 Comments, instrument info, loop info (out-of-band data).
 */
-typedef struct sox_oob_t{
-  /* Decoded: */
-  sox_comments_t   comments;              /**< Comment strings in id=value format. */
-  sox_instrinfo_t  instr;                 /**< Instrument specification */
-  sox_loopinfo_t   loops[SOX_MAX_NLOOPS]; /**< Looping specification */
+typedef struct sox_oob_t {
+    /* Decoded: */
+    sox_comments_t comments;              /**< Comment strings in id=value format. */
+    sox_instrinfo_t instr;                 /**< Instrument specification */
+    sox_loopinfo_t loops[SOX_MAX_NLOOPS]; /**< Looping specification */
 
-  /* TBD: Non-decoded chunks, etc: */
+    /* TBD: Non-decoded chunks, etc: */
 } sox_oob_t;
 
 /**
@@ -1498,44 +1506,44 @@ Client API:
 Data passed to/from the format handler
 */
 struct sox_format_t {
-  char             * filename;      /**< File name */
+    char *filename;      /**< File name */
 
-  /**
-  Signal specifications for reader (decoder) or writer (encoder):
-  sample rate, number of channels, precision, length, headroom multiplier.
-  Any info specified by the user is here on entry to startread or
-  startwrite. Info will be SOX_UNSPEC if the user provided no info.
-  At exit from startread, should be completely filled in, using
-  either data from the file's headers (if available) or whatever
-  the format is guessing/assuming (if header data is not available).
-  At exit from startwrite, should be completely filled in, using
-  either the data that was specified, or values chosen by the format
-  based on the format's defaults or capabilities.
-  */
-  sox_signalinfo_t signal;
+    /**
+    Signal specifications for reader (decoder) or writer (encoder):
+    sample rate, number of channels, precision, length, headroom multiplier.
+    Any info specified by the user is here on entry to startread or
+    startwrite. Info will be SOX_UNSPEC if the user provided no info.
+    At exit from startread, should be completely filled in, using
+    either data from the file's headers (if available) or whatever
+    the format is guessing/assuming (if header data is not available).
+    At exit from startwrite, should be completely filled in, using
+    either the data that was specified, or values chosen by the format
+    based on the format's defaults or capabilities.
+    */
+    sox_signalinfo_t signal;
 
-  /**
-  Encoding specifications for reader (decoder) or writer (encoder):
-  encoding (sample format), bits per sample, compression rate, endianness.
-  Should be filled in by startread. Values specified should be used
-  by startwrite when it is configuring the encoding parameters.
-  */
-  sox_encodinginfo_t encoding;
+    /**
+    Encoding specifications for reader (decoder) or writer (encoder):
+    encoding (sample format), bits per sample, compression rate, endianness.
+    Should be filled in by startread. Values specified should be used
+    by startwrite when it is configuring the encoding parameters.
+    */
+    sox_encodinginfo_t encoding;
 
-  char             * filetype;      /**< Type of file, as determined by header inspection or libmagic. */
-  sox_oob_t        oob;             /**< comments, instrument info, loop info (out-of-band data) */
-  sox_bool         seekable;        /**< Can seek on this file */
-  char             mode;            /**< Read or write mode ('r' or 'w') */
-  sox_uint64_t     olength;         /**< Samples * chans written to file */
-  sox_uint64_t     clips;           /**< Incremented if clipping occurs */
-  int              sox_errno;       /**< Failure error code */
-  char             sox_errstr[256]; /**< Failure error text */
-  void             * fp;            /**< File stream pointer */
-  lsx_io_type      io_type;         /**< Stores whether this is a file, pipe or URL */
-  sox_uint64_t     tell_off;        /**< Current offset within file */
-  sox_uint64_t     data_start;      /**< Offset at which headers end and sound data begins (set by lsx_check_read_params) */
-  sox_format_handler_t handler;     /**< Format handler for this file */
-  void             * priv;          /**< Format handler's private data area */
+    char *filetype;      /**< Type of file, as determined by header inspection or libmagic. */
+    sox_oob_t oob;             /**< comments, instrument info, loop info (out-of-band data) */
+    sox_bool seekable;        /**< Can seek on this file */
+    char mode;            /**< Read or write mode ('r' or 'w') */
+    sox_uint64_t olength;         /**< Samples * chans written to file */
+    sox_uint64_t clips;           /**< Incremented if clipping occurs */
+    int sox_errno;       /**< Failure error code */
+    char sox_errstr[256]; /**< Failure error text */
+    void *fp;            /**< File stream pointer */
+    lsx_io_type io_type;         /**< Stores whether this is a file, pipe or URL */
+    sox_uint64_t tell_off;        /**< Current offset within file */
+    sox_uint64_t data_start;      /**< Offset at which headers end and sound data begins (set by lsx_check_read_params) */
+    sox_format_handler_t handler;     /**< Format handler for this file */
+    void *priv;          /**< Format handler's private data area */
 };
 
 /**
@@ -1545,8 +1553,8 @@ function pointer that can be invoked to get additional information about the
 format.
 */
 typedef struct sox_format_tab_t {
-  char *name;         /**< Name of format handler */
-  sox_format_fn_t fn; /**< Function to call to get format handler's information */
+    char *name;         /**< Name of format handler */
+    sox_format_fn_t fn; /**< Function to call to get format handler's information */
 } sox_format_tab_t;
 
 /**
@@ -1554,8 +1562,8 @@ Client API:
 Global parameters for effects.
 */
 typedef struct sox_effects_globals_t {
-  sox_plot_t plot;         /**< To help the user choose effect & options */
-  sox_globals_t * global_info; /**< Pointer to associated SoX globals */
+    sox_plot_t plot;         /**< To help the user choose effect & options */
+    sox_globals_t *global_info; /**< Pointer to associated SoX globals */
 } sox_effects_globals_t;
 
 /**
@@ -1563,16 +1571,16 @@ Client API:
 Effect handler information.
 */
 struct sox_effect_handler_t {
-  char const * name;  /**< Effect name */
-  char const * usage; /**< Short explanation of parameters accepted by effect */
-  unsigned int flags; /**< Combination of SOX_EFF_* flags */
-  sox_effect_handler_getopts getopts; /**< Called to parse command-line arguments (called once per effect). */
-  sox_effect_handler_start start;     /**< Called to initialize effect (called once per flow). */
-  sox_effect_handler_flow flow;       /**< Called to process samples. */
-  sox_effect_handler_drain drain;     /**< Called to finish getting output after input is complete. */
-  sox_effect_handler_stop stop;       /**< Called to shut down effect (called once per flow). */
-  sox_effect_handler_kill kill;       /**< Called to shut down effect (called once per effect). */
-  size_t       priv_size;             /**< Size of private data SoX should pre-allocate for effect */
+    char const *name;  /**< Effect name */
+    char const *usage; /**< Short explanation of parameters accepted by effect */
+    unsigned int flags; /**< Combination of SOX_EFF_* flags */
+    sox_effect_handler_getopts getopts; /**< Called to parse command-line arguments (called once per effect). */
+    sox_effect_handler_start start;     /**< Called to initialize effect (called once per flow). */
+    sox_effect_handler_flow flow;       /**< Called to process samples. */
+    sox_effect_handler_drain drain;     /**< Called to finish getting output after input is complete. */
+    sox_effect_handler_stop stop;       /**< Called to shut down effect (called once per flow). */
+    sox_effect_handler_kill kill;       /**< Called to shut down effect (called once per effect). */
+    size_t priv_size;             /**< Size of private data SoX should pre-allocate for effect */
 };
 
 /**
@@ -1580,21 +1588,21 @@ Client API:
 Effect information.
 */
 struct sox_effect_t {
-  sox_effects_globals_t    * global_info; /**< global effect parameters */
-  sox_signalinfo_t         in_signal;     /**< Information about the incoming data stream */
-  sox_signalinfo_t         out_signal;    /**< Information about the outgoing data stream */
-  sox_encodinginfo_t       const * in_encoding;  /**< Information about the incoming data encoding */
-  sox_encodinginfo_t       const * out_encoding; /**< Information about the outgoing data encoding */
-  sox_effect_handler_t     handler;   /**< The handler for this effect */
-  sox_uint64_t         clips;         /**< increment if clipping occurs */
-  size_t               flows;         /**< 1 if MCHAN, number of chans otherwise */
-  size_t               flow;          /**< flow number */
-  void                 * priv;        /**< Effect's private data area (each flow has a separate copy) */
-  /* The following items are private to the libSoX effects chain functions. */
-  sox_sample_t             * obuf;    /**< output buffer */
-  size_t                   obeg;      /**< output buffer: start of valid data section */
-  size_t                   oend;      /**< output buffer: one past valid data section (oend-obeg is length of current content) */
-  size_t               imin;          /**< minimum input buffer content required for calling this effect's flow function; set via lsx_effect_set_imin() */
+    sox_effects_globals_t *global_info; /**< global effect parameters */
+    sox_signalinfo_t in_signal;     /**< Information about the incoming data stream */
+    sox_signalinfo_t out_signal;    /**< Information about the outgoing data stream */
+    sox_encodinginfo_t const *in_encoding;  /**< Information about the incoming data encoding */
+    sox_encodinginfo_t const *out_encoding; /**< Information about the outgoing data encoding */
+    sox_effect_handler_t handler;   /**< The handler for this effect */
+    sox_uint64_t clips;         /**< increment if clipping occurs */
+    size_t flows;         /**< 1 if MCHAN, number of chans otherwise */
+    size_t flow;          /**< flow number */
+    void *priv;        /**< Effect's private data area (each flow has a separate copy) */
+    /* The following items are private to the libSoX effects chain functions. */
+    sox_sample_t *obuf;    /**< output data */
+    size_t obeg;      /**< output data: start of valid data section */
+    size_t oend;      /**< output data: one past valid data section (oend-obeg is length of current content) */
+    size_t imin;          /**< minimum input data content required for calling this effect's flow function; set via lsx_effect_set_imin() */
 };
 
 /**
@@ -1602,14 +1610,14 @@ Client API:
 Chain of effects to be applied to a stream.
 */
 typedef struct sox_effects_chain_t {
-  sox_effect_t **effects;                  /**< Table of effects to be applied to a stream */
-  size_t length;                           /**< Number of effects to be applied */
-  sox_effects_globals_t global_info;       /**< Copy of global effects settings */
-  sox_encodinginfo_t const * in_enc;       /**< Input encoding */
-  sox_encodinginfo_t const * out_enc;      /**< Output encoding */
-  /* The following items are private to the libSoX effects chain functions. */
-  size_t table_size;                       /**< Size of effects table (including unused entries) */
-  sox_sample_t *il_buf;                    /**< Channel interleave buffer */
+    sox_effect_t **effects;                  /**< Table of effects to be applied to a stream */
+    size_t length;                           /**< Number of effects to be applied */
+    sox_effects_globals_t global_info;       /**< Copy of global effects settings */
+    sox_encodinginfo_t const *in_enc;       /**< Input encoding */
+    sox_encodinginfo_t const *out_enc;      /**< Output encoding */
+    /* The following items are private to the libSoX effects chain functions. */
+    size_t table_size;                       /**< Size of effects table (including unused entries) */
+    sox_sample_t *il_buf;                    /**< Channel interleave data */
 } sox_effects_chain_t;
 
 /*****************************************************************************
@@ -1678,8 +1686,9 @@ Fills in an encodinginfo with default values.
 void
 LSX_API
 sox_init_encodinginfo(
-    LSX_PARAM_OUT sox_encodinginfo_t * e /**< Pointer to uninitialized encoding info structure to be initialized. */
-    );
+        LSX_PARAM_OUT
+        sox_encodinginfo_t *e /**< Pointer to uninitialized encoding info structure to be initialized. */
+);
 
 /**
 Client API:
@@ -1695,9 +1704,9 @@ LSX_RETURN_PURE
 unsigned
 LSX_API
 sox_precision(
-    sox_encoding_t encoding,   /**< Encoding for which to lookup precision information. */
-    unsigned bits_per_sample   /**< The number of encoded bits per sample. */
-    );
+        sox_encoding_t encoding,   /**< Encoding for which to lookup precision information. */
+        unsigned bits_per_sample   /**< The number of encoded bits per sample. */
+);
 
 /**
 Client API:
@@ -1707,8 +1716,8 @@ Returns the number of items in the metadata block.
 size_t
 LSX_API
 sox_num_comments(
-    LSX_PARAM_IN_OPT sox_comments_t comments /**< Metadata block. */
-    );
+        LSX_PARAM_IN_OPT sox_comments_t comments /**< Metadata block. */
+);
 
 /**
 Client API:
@@ -1717,9 +1726,10 @@ Adds an "id=value" item to the metadata block.
 void
 LSX_API
 sox_append_comment(
-    LSX_PARAM_DEREF_PRE_MAYBENULL LSX_PARAM_DEREF_POST_NOTNULL sox_comments_t * comments, /**< Metadata block. */
-    LSX_PARAM_IN_Z char const * item /**< Item to be added in "id=value" format. */
-    );
+        LSX_PARAM_DEREF_PRE_MAYBENULL LSX_PARAM_DEREF_POST_NOTNULL
+        sox_comments_t *comments, /**< Metadata block. */
+        LSX_PARAM_IN_Z char const *item /**< Item to be added in "id=value" format. */
+);
 
 /**
 Client API:
@@ -1728,9 +1738,11 @@ Adds a newline-delimited list of "id=value" items to the metadata block.
 void
 LSX_API
 sox_append_comments(
-    LSX_PARAM_DEREF_PRE_MAYBENULL LSX_PARAM_DEREF_POST_NOTNULL sox_comments_t * comments, /**< Metadata block. */
-    LSX_PARAM_IN_Z char const * items /**< Newline-separated list of items to be added, for example "id1=value1\\nid2=value2". */
-    );
+        LSX_PARAM_DEREF_PRE_MAYBENULL LSX_PARAM_DEREF_POST_NOTNULL
+        sox_comments_t *comments, /**< Metadata block. */
+        LSX_PARAM_IN_Z
+        char const *items /**< Newline-separated list of items to be added, for example "id1=value1\\nid2=value2". */
+);
 
 /**
 Client API:
@@ -1741,8 +1753,8 @@ LSX_RETURN_OPT
 sox_comments_t
 LSX_API
 sox_copy_comments(
-    LSX_PARAM_IN_OPT sox_comments_t comments /**< Metadata block to copy. */
-    );
+        LSX_PARAM_IN_OPT sox_comments_t comments /**< Metadata block to copy. */
+);
 
 /**
 Client API:
@@ -1751,8 +1763,9 @@ Frees the metadata block.
 void
 LSX_API
 sox_delete_comments(
-    LSX_PARAM_DEREF_PRE_MAYBENULL LSX_PARAM_DEREF_POST_NULL sox_comments_t * comments /**< Metadata block. */
-    );
+        LSX_PARAM_DEREF_PRE_MAYBENULL LSX_PARAM_DEREF_POST_NULL
+        sox_comments_t *comments /**< Metadata block. */
+);
 
 /**
 Client API:
@@ -1763,9 +1776,9 @@ LSX_RETURN_OPT
 char const *
 LSX_API
 sox_find_comment(
-    LSX_PARAM_IN_OPT sox_comments_t comments, /**< Metadata block in which to search. */
-    LSX_PARAM_IN_Z char const * id /**< Id for which to search */
-    );
+        LSX_PARAM_IN_OPT sox_comments_t comments, /**< Metadata block in which to search. */
+        LSX_PARAM_IN_Z char const *id /**< Id for which to search */
+);
 
 /**
 Client API:
@@ -1827,27 +1840,34 @@ LSX_RETURN_OPT
 sox_format_t *
 LSX_API
 sox_open_read(
-    LSX_PARAM_IN_Z   char               const * path,      /**< Path to file to be opened (required). */
-    LSX_PARAM_IN_OPT sox_signalinfo_t   const * signal,    /**< Information already known about audio stream, or NULL if none. */
-    LSX_PARAM_IN_OPT sox_encodinginfo_t const * encoding,  /**< Information already known about sample encoding, or NULL if none. */
-    LSX_PARAM_IN_OPT_Z char             const * filetype   /**< Previously-determined file type, or NULL to auto-detect. */
-    );
+        LSX_PARAM_IN_Z   char const *path,      /**< Path to file to be opened (required). */
+        LSX_PARAM_IN_OPT
+        sox_signalinfo_t const *signal,    /**< Information already known about audio stream, or NULL if none. */
+        LSX_PARAM_IN_OPT
+        sox_encodinginfo_t const *encoding,  /**< Information already known about sample encoding, or NULL if none. */
+        LSX_PARAM_IN_OPT_Z
+        char const *filetype   /**< Previously-determined file type, or NULL to auto-detect. */
+);
 
 /**
 Client API:
-Opens a decoding session for a memory buffer. Returned handle must be closed with sox_close().
+Opens a decoding session for a memory data. Returned handle must be closed with sox_close().
 @returns The handle for the new session, or null on failure.
 */
 LSX_RETURN_OPT
 sox_format_t *
 LSX_API
 sox_open_mem_read(
-    LSX_PARAM_IN_BYTECOUNT(buffer_size) void  * buffer,     /**< Pointer to audio data buffer (required). */
-    size_t                                      buffer_size,/**< Number of bytes to read from audio data buffer. */
-    LSX_PARAM_IN_OPT sox_signalinfo_t   const * signal,     /**< Information already known about audio stream, or NULL if none. */
-    LSX_PARAM_IN_OPT sox_encodinginfo_t const * encoding,   /**< Information already known about sample encoding, or NULL if none. */
-    LSX_PARAM_IN_OPT_Z char             const * filetype    /**< Previously-determined file type, or NULL to auto-detect. */
-    );
+        LSX_PARAM_IN_BYTECOUNT(buffer_size)
+        void *buffer,     /**< Pointer to audio data data (required). */
+        size_t buffer_size,/**< Number of bytes to read from audio data data. */
+        LSX_PARAM_IN_OPT
+        sox_signalinfo_t const *signal,     /**< Information already known about audio stream, or NULL if none. */
+        LSX_PARAM_IN_OPT
+        sox_encodinginfo_t const *encoding,   /**< Information already known about sample encoding, or NULL if none. */
+        LSX_PARAM_IN_OPT_Z
+        char const *filetype    /**< Previously-determined file type, or NULL to auto-detect. */
+);
 
 /**
 Client API:
@@ -1857,10 +1877,13 @@ Returns true if the format handler for the specified file type supports the spec
 sox_bool
 LSX_API
 sox_format_supports_encoding(
-    LSX_PARAM_IN_OPT_Z char               const * path,       /**< Path to file to be examined (required if filetype is NULL). */
-    LSX_PARAM_IN_OPT_Z char               const * filetype,   /**< Previously-determined file type, or NULL to use extension from path. */
-    LSX_PARAM_IN       sox_encodinginfo_t const * encoding    /**< Encoding for which format handler should be queried. */
-    );
+        LSX_PARAM_IN_OPT_Z
+        char const *path,       /**< Path to file to be examined (required if filetype is NULL). */
+        LSX_PARAM_IN_OPT_Z
+        char const *filetype,   /**< Previously-determined file type, or NULL to use extension from path. */
+        LSX_PARAM_IN
+        sox_encodinginfo_t const *encoding    /**< Encoding for which format handler should be queried. */
+);
 
 /**
 Client API:
@@ -1871,10 +1894,13 @@ LSX_RETURN_OPT
 sox_format_handler_t const *
 LSX_API
 sox_write_handler(
-    LSX_PARAM_IN_OPT_Z char               const * path,         /**< Path to file (required if filetype is NULL). */
-    LSX_PARAM_IN_OPT_Z char               const * filetype,     /**< Filetype for which handler is needed, or NULL to use extension from path. */
-    LSX_PARAM_OUT_OPT  char               const * * filetype1   /**< Receives the filetype that was detected. Pass NULL if not needed. */
-    );
+        LSX_PARAM_IN_OPT_Z
+        char const *path,         /**< Path to file (required if filetype is NULL). */
+        LSX_PARAM_IN_OPT_Z
+        char const *filetype,     /**< Filetype for which handler is needed, or NULL to use extension from path. */
+        LSX_PARAM_OUT_OPT
+        char const **filetype1   /**< Receives the filetype that was detected. Pass NULL if not needed. */
+);
 
 /**
 Client API:
@@ -1885,73 +1911,91 @@ LSX_RETURN_OPT
 sox_format_t *
 LSX_API
 sox_open_write(
-    LSX_PARAM_IN_Z     char               const * path,     /**< Path to file to be written (required). */
-    LSX_PARAM_IN       sox_signalinfo_t   const * signal,   /**< Information about desired audio stream (required). */
-    LSX_PARAM_IN_OPT   sox_encodinginfo_t const * encoding, /**< Information about desired sample encoding, or NULL to use defaults. */
-    LSX_PARAM_IN_OPT_Z char               const * filetype, /**< Previously-determined file type, or NULL to auto-detect. */
-    LSX_PARAM_IN_OPT   sox_oob_t          const * oob,      /**< Out-of-band data to add to file, or NULL if none. */
-    LSX_PARAM_IN_OPT   sox_bool           (LSX_API * overwrite_permitted)(LSX_PARAM_IN_Z char const * filename) /**< Called if file exists to determine whether overwrite is ok. */
-    );
+        LSX_PARAM_IN_Z     char const *path,     /**< Path to file to be written (required). */
+        LSX_PARAM_IN
+        sox_signalinfo_t const *signal,   /**< Information about desired audio stream (required). */
+        LSX_PARAM_IN_OPT
+        sox_encodinginfo_t const *encoding, /**< Information about desired sample encoding, or NULL to use defaults. */
+        LSX_PARAM_IN_OPT_Z
+        char const *filetype, /**< Previously-determined file type, or NULL to auto-detect. */
+        LSX_PARAM_IN_OPT
+        sox_oob_t const *oob,      /**< Out-of-band data to add to file, or NULL if none. */
+        LSX_PARAM_IN_OPT sox_bool           (LSX_API *overwrite_permitted)(LSX_PARAM_IN_Z
+                                                                           char const *filename) /**< Called if file exists to determine whether overwrite is ok. */
+);
 
 /**
 Client API:
-Opens an encoding session for a memory buffer. Returned handle must be closed with sox_close().
+Opens an encoding session for a memory data. Returned handle must be closed with sox_close().
 @returns The new session handle, or null on failure.
 */
 LSX_RETURN_OPT
 sox_format_t *
 LSX_API
 sox_open_mem_write(
-    LSX_PARAM_OUT_BYTECAP(buffer_size) void                     * buffer,      /**< Pointer to audio data buffer that receives data (required). */
-    LSX_PARAM_IN                       size_t                     buffer_size, /**< Maximum number of bytes to write to audio data buffer. */
-    LSX_PARAM_IN                       sox_signalinfo_t   const * signal,      /**< Information about desired audio stream (required). */
-    LSX_PARAM_IN_OPT                   sox_encodinginfo_t const * encoding,    /**< Information about desired sample encoding, or NULL to use defaults. */
-    LSX_PARAM_IN_OPT_Z                 char               const * filetype,    /**< Previously-determined file type, or NULL to auto-detect. */
-    LSX_PARAM_IN_OPT                   sox_oob_t          const * oob          /**< Out-of-band data to add to file, or NULL if none. */
-    );
+        LSX_PARAM_OUT_BYTECAP(buffer_size)
+        void *buffer,      /**< Pointer to audio data data that receives data (required). */
+        LSX_PARAM_IN
+        size_t buffer_size, /**< Maximum number of bytes to write to audio data data. */
+        LSX_PARAM_IN
+        sox_signalinfo_t const *signal,      /**< Information about desired audio stream (required). */
+        LSX_PARAM_IN_OPT
+        sox_encodinginfo_t const *encoding,    /**< Information about desired sample encoding, or NULL to use defaults. */
+        LSX_PARAM_IN_OPT_Z
+        char const *filetype,    /**< Previously-determined file type, or NULL to auto-detect. */
+        LSX_PARAM_IN_OPT
+        sox_oob_t const *oob          /**< Out-of-band data to add to file, or NULL if none. */
+);
 
 /**
 Client API:
-Opens an encoding session for a memstream buffer. Returned handle must be closed with sox_close().
+Opens an encoding session for a memstream data. Returned handle must be closed with sox_close().
 @returns The new session handle, or null on failure.
 */
 LSX_RETURN_OPT
 sox_format_t *
 LSX_API
 sox_open_memstream_write(
-    LSX_PARAM_OUT      char                     * * buffer_ptr,    /**< Receives pointer to audio data buffer that receives data (required). */
-    LSX_PARAM_OUT      size_t                   * buffer_size_ptr, /**< Receives size of data written to audio data buffer (required). */
-    LSX_PARAM_IN       sox_signalinfo_t   const * signal,          /**< Information about desired audio stream (required). */
-    LSX_PARAM_IN_OPT   sox_encodinginfo_t const * encoding,        /**< Information about desired sample encoding, or NULL to use defaults. */
-    LSX_PARAM_IN_OPT_Z char               const * filetype,        /**< Previously-determined file type, or NULL to auto-detect. */
-    LSX_PARAM_IN_OPT   sox_oob_t          const * oob              /**< Out-of-band data to add to file, or NULL if none. */
-    );
+        LSX_PARAM_OUT
+        char **buffer_ptr,    /**< Receives pointer to audio data data that receives data (required). */
+        LSX_PARAM_OUT
+        size_t *buffer_size_ptr, /**< Receives size of data written to audio data data (required). */
+        LSX_PARAM_IN
+        sox_signalinfo_t const *signal,          /**< Information about desired audio stream (required). */
+        LSX_PARAM_IN_OPT
+        sox_encodinginfo_t const *encoding,        /**< Information about desired sample encoding, or NULL to use defaults. */
+        LSX_PARAM_IN_OPT_Z
+        char const *filetype,        /**< Previously-determined file type, or NULL to auto-detect. */
+        LSX_PARAM_IN_OPT
+        sox_oob_t const *oob              /**< Out-of-band data to add to file, or NULL if none. */
+);
 
 /**
 Client API:
-Reads samples from a decoding session into a sample buffer.
+Reads samples from a decoding session into a sample data.
 @returns Number of samples decoded, or 0 for EOF.
 */
 size_t
 LSX_API
 sox_read(
-    LSX_PARAM_INOUT sox_format_t * ft, /**< Format pointer. */
-    LSX_PARAM_OUT_CAP_POST_COUNT(len,return) sox_sample_t *buf, /**< Buffer from which to read samples. */
-    size_t len /**< Number of samples available in buf. */
-    );
+        LSX_PARAM_INOUT sox_format_t *ft, /**< Format pointer. */
+        LSX_PARAM_OUT_CAP_POST_COUNT(len, return)
+        sox_sample_t *buf, /**< Buffer from which to read samples. */
+        size_t len /**< Number of samples available in buf. */
+);
 
 /**
 Client API:
-Writes samples to an encoding session from a sample buffer.
+Writes samples to an encoding session from a sample data.
 @returns Number of samples encoded.
 */
 size_t
 LSX_API
 sox_write(
-    LSX_PARAM_INOUT sox_format_t * ft, /**< Format pointer. */
-    LSX_PARAM_IN_COUNT(len) sox_sample_t const * buf, /**< Buffer from which to read samples. */
-    size_t len /**< Number of samples available in buf. */
-    );
+        LSX_PARAM_INOUT sox_format_t *ft, /**< Format pointer. */
+        LSX_PARAM_IN_COUNT(len) sox_sample_t const *buf, /**< Buffer from which to read samples. */
+        size_t len /**< Number of samples available in buf. */
+);
 
 /**
 Client API:
@@ -1961,8 +2005,8 @@ Closes an encoding or decoding session.
 int
 LSX_API
 sox_close(
-    LSX_PARAM_INOUT sox_format_t * ft /**< Format pointer. */
-    );
+        LSX_PARAM_INOUT sox_format_t *ft /**< Format pointer. */
+);
 
 /**
 Client API:
@@ -1972,10 +2016,10 @@ Sets the location at which next samples will be decoded. Returns SOX_SUCCESS if 
 int
 LSX_API
 sox_seek(
-    LSX_PARAM_INOUT sox_format_t * ft, /**< Format pointer. */
-    sox_uint64_t offset, /**< Sample offset at which to position reader. */
-    int whence /**< Set to SOX_SEEK_SET. */
-    );
+        LSX_PARAM_INOUT sox_format_t *ft, /**< Format pointer. */
+        sox_uint64_t offset, /**< Sample offset at which to position reader. */
+        int whence /**< Set to SOX_SEEK_SET. */
+);
 
 /**
 Client API:
@@ -1986,9 +2030,9 @@ LSX_RETURN_OPT
 sox_format_handler_t const *
 LSX_API
 sox_find_format(
-    LSX_PARAM_IN_Z char const * name, /**< Name of format handler to find. */
-    sox_bool ignore_devices /**< Set to true to ignore device names. */
-    );
+        LSX_PARAM_IN_Z char const *name, /**< Name of format handler to find. */
+        sox_bool ignore_devices /**< Set to true to ignore device names. */
+);
 
 /**
 Client API:
@@ -2015,8 +2059,8 @@ LSX_RETURN_OPT LSX_RETURN_PURE
 sox_effect_handler_t const *
 LSX_API
 sox_find_effect(
-    LSX_PARAM_IN_Z char const * name /**< Name of effect to find. */
-    );
+        LSX_PARAM_IN_Z char const *name /**< Name of effect to find. */
+);
 
 /**
 Client API:
@@ -2027,8 +2071,8 @@ LSX_RETURN_OPT
 sox_effect_t *
 LSX_API
 sox_create_effect(
-    LSX_PARAM_IN sox_effect_handler_t const * eh /**< Handler to use for effect. */
-    );
+        LSX_PARAM_IN sox_effect_handler_t const *eh /**< Handler to use for effect. */
+);
 
 /**
 Client API:
@@ -2038,10 +2082,10 @@ Applies the command-line options to the effect.
 int
 LSX_API
 sox_effect_options(
-    LSX_PARAM_IN sox_effect_t *effp, /**< Effect pointer on which to set options. */
-    int argc, /**< Number of arguments in argv. */
-    LSX_PARAM_IN_COUNT(argc) char * const argv[] /**< Array of command-line options. */
-    );
+        LSX_PARAM_IN sox_effect_t *effp, /**< Effect pointer on which to set options. */
+        int argc, /**< Number of arguments in argv. */
+        LSX_PARAM_IN_COUNT(argc) char *const argv[] /**< Array of command-line options. */
+);
 
 /**
 Client API:
@@ -2068,9 +2112,9 @@ LSX_RETURN_OPT
 sox_effects_chain_t *
 LSX_API
 sox_create_effects_chain(
-    LSX_PARAM_IN sox_encodinginfo_t const * in_enc, /**< Input encoding. */
-    LSX_PARAM_IN sox_encodinginfo_t const * out_enc /**< Output encoding. */
-    );
+        LSX_PARAM_IN sox_encodinginfo_t const *in_enc, /**< Input encoding. */
+        LSX_PARAM_IN sox_encodinginfo_t const *out_enc /**< Output encoding. */
+);
 
 /**
 Client API:
@@ -2079,8 +2123,8 @@ Closes an effects chain.
 void
 LSX_API
 sox_delete_effects_chain(
-    LSX_PARAM_INOUT sox_effects_chain_t *ecp /**< Effects chain pointer. */
-    );
+        LSX_PARAM_INOUT sox_effects_chain_t *ecp /**< Effects chain pointer. */
+);
 
 /**
 Client API:
@@ -2090,11 +2134,12 @@ Adds an effect to the effects chain, returns SOX_SUCCESS if successful.
 int
 LSX_API
 sox_add_effect(
-    LSX_PARAM_INOUT sox_effects_chain_t * chain, /**< Effects chain to which effect should be added . */
-    LSX_PARAM_INOUT sox_effect_t * effp, /**< Effect to be added. */
-    LSX_PARAM_INOUT sox_signalinfo_t * in, /**< Input format. */
-    LSX_PARAM_IN    sox_signalinfo_t const * out /**< Output format. */
-    );
+        LSX_PARAM_INOUT
+        sox_effects_chain_t *chain, /**< Effects chain to which effect should be added . */
+        LSX_PARAM_INOUT sox_effect_t *effp, /**< Effect to be added. */
+        LSX_PARAM_INOUT sox_signalinfo_t *in, /**< Input format. */
+        LSX_PARAM_IN    sox_signalinfo_t const *out /**< Output format. */
+);
 
 /**
 Client API:
@@ -2104,10 +2149,11 @@ Runs the effects chain, returns SOX_SUCCESS if successful.
 int
 LSX_API
 sox_flow_effects(
-    LSX_PARAM_INOUT  sox_effects_chain_t * chain, /**< Effects chain to run. */
-    LSX_PARAM_IN_OPT sox_flow_effects_callback callback, /**< Callback for monitoring flow progress. */
-    LSX_PARAM_IN_OPT void * client_data /**< Data to pass into callback. */
-    );
+        LSX_PARAM_INOUT  sox_effects_chain_t *chain, /**< Effects chain to run. */
+        LSX_PARAM_IN_OPT
+        sox_flow_effects_callback callback, /**< Callback for monitoring flow progress. */
+        LSX_PARAM_IN_OPT void *client_data /**< Data to pass into callback. */
+);
 
 /**
 Client API:
@@ -2117,8 +2163,9 @@ Gets the number of clips that occurred while running an effects chain.
 sox_uint64_t
 LSX_API
 sox_effects_clips(
-    LSX_PARAM_IN sox_effects_chain_t * chain /**< Effects chain from which to read clip information. */
-    );
+        LSX_PARAM_IN
+        sox_effects_chain_t *chain /**< Effects chain from which to read clip information. */
+);
 
 /**
 Client API:
@@ -2128,8 +2175,8 @@ Shuts down an effect (calls stop on each of its flows).
 sox_uint64_t
 LSX_API
 sox_stop_effect(
-    LSX_PARAM_INOUT_COUNT(effp->flows) sox_effect_t * effp /**< Effect to stop. */
-    );
+        LSX_PARAM_INOUT_COUNT(effp->flows) sox_effect_t *effp /**< Effect to stop. */
+);
 
 /**
 Client API:
@@ -2138,9 +2185,10 @@ Adds an already-initialized effect to the end of the chain.
 void
 LSX_API
 sox_push_effect_last(
-    LSX_PARAM_INOUT sox_effects_chain_t * chain, /**< Effects chain to which effect should be added. */
-    LSX_PARAM_INOUT sox_effect_t * effp /**< Effect to be added. */
-    );
+        LSX_PARAM_INOUT
+        sox_effects_chain_t *chain, /**< Effects chain to which effect should be added. */
+        LSX_PARAM_INOUT sox_effect_t *effp /**< Effect to be added. */
+);
 
 /**
 Client API:
@@ -2151,8 +2199,9 @@ LSX_RETURN_OPT
 sox_effect_t *
 LSX_API
 sox_pop_effect_last(
-    LSX_PARAM_INOUT sox_effects_chain_t *chain /**< Effects chain from which to remove an effect. */
-    );
+        LSX_PARAM_INOUT
+        sox_effects_chain_t *chain /**< Effects chain from which to remove an effect. */
+);
 
 /**
 Client API:
@@ -2161,8 +2210,8 @@ Shut down and delete an effect.
 void
 LSX_API
 sox_delete_effect(
-    LSX_PARAM_INOUT_COUNT(effp->flows) sox_effect_t *effp /**< Effect to be deleted. */
-    );
+        LSX_PARAM_INOUT_COUNT(effp->flows) sox_effect_t *effp /**< Effect to be deleted. */
+);
 
 /**
 Client API:
@@ -2171,8 +2220,9 @@ Shut down and delete the last effect in the chain.
 void
 LSX_API
 sox_delete_effect_last(
-    LSX_PARAM_INOUT sox_effects_chain_t *chain /**< Effects chain from which to remove the last effect. */
-    );
+        LSX_PARAM_INOUT
+        sox_effects_chain_t *chain /**< Effects chain from which to remove the last effect. */
+);
 
 /**
 Client API:
@@ -2181,8 +2231,9 @@ Shut down and delete all effects in the chain.
 void
 LSX_API
 sox_delete_effects(
-    LSX_PARAM_INOUT sox_effects_chain_t *chain /**< Effects chain from which to delete effects. */
-    );
+        LSX_PARAM_INOUT
+        sox_effects_chain_t *chain /**< Effects chain from which to delete effects. */
+);
 
 /**
 Client API:
@@ -2194,8 +2245,8 @@ clear trim start).
 sox_uint64_t
 LSX_API
 sox_trim_get_start(
-    LSX_PARAM_IN sox_effect_t * effp /**< Trim effect. */
-    );
+        LSX_PARAM_IN sox_effect_t *effp /**< Trim effect. */
+);
 
 /**
 Client API:
@@ -2204,8 +2255,8 @@ Clears the start of the trim to 0.
 void
 LSX_API
 sox_trim_clear_start(
-    LSX_PARAM_INOUT sox_effect_t * effp /**< Trim effect. */
-    );
+        LSX_PARAM_INOUT sox_effect_t *effp /**< Trim effect. */
+);
 
 /**
 Client API:
@@ -2215,8 +2266,8 @@ Returns true if the specified file is a known playlist file type.
 sox_bool
 LSX_API
 sox_is_playlist(
-    LSX_PARAM_IN_Z char const * filename /**< Name of file to examine. */
-    );
+        LSX_PARAM_IN_Z char const *filename /**< Name of file to examine. */
+);
 
 /**
 Client API:
@@ -2226,10 +2277,11 @@ Parses the specified playlist file.
 int
 LSX_API
 sox_parse_playlist(
-    LSX_PARAM_IN sox_playlist_callback_t callback, /**< Callback to call for each item in the playlist. */
-    void * p, /**< Data to pass to callback. */
-    LSX_PARAM_IN char const * const listname /**< Filename of playlist file. */
-    );
+        LSX_PARAM_IN
+        sox_playlist_callback_t callback, /**< Callback to call for each item in the playlist. */
+        void *p, /**< Data to pass to callback. */
+        LSX_PARAM_IN char const *const listname /**< Filename of playlist file. */
+);
 
 /**
 Client API:
@@ -2241,8 +2293,8 @@ LSX_RETURN_VALID_Z LSX_RETURN_PURE
 char const *
 LSX_API
 sox_strerror(
-    int sox_errno /**< Error code to look up. */
-    );
+        int sox_errno /**< Error code to look up. */
+);
 
 /**
 Client API:
@@ -2254,10 +2306,11 @@ or 0 on failure.
 size_t
 LSX_API
 sox_basename(
-    LSX_PARAM_OUT_Z_CAP_POST_COUNT(base_buffer_len,return) char * base_buffer, /**< Buffer into which basename should be written. */
-    size_t base_buffer_len, /**< Size of base_buffer, in bytes. */
-    LSX_PARAM_IN_Z char const * filename /**< Filename from which to extract basename. */
-    );
+        LSX_PARAM_OUT_Z_CAP_POST_COUNT(base_buffer_len, return)
+        char *base_buffer, /**< Buffer into which basename should be written. */
+        size_t base_buffer_len, /**< Size of base_buffer, in bytes. */
+        LSX_PARAM_IN_Z char const *filename /**< Filename from which to extract basename. */
+);
 
 /*****************************************************************************
 Internal API:
@@ -2273,9 +2326,9 @@ Print a fatal error in libSoX.
 void
 LSX_API
 lsx_fail_impl(
-    LSX_PARAM_IN_PRINTF char const * fmt, /**< printf-style format string. */
-    ...)
-    LSX_PRINTF12;
+        LSX_PARAM_IN_PRINTF char const *fmt, /**< printf-style format string. */
+        ...)
+LSX_PRINTF12;
 
 /**
 Plugins API:
@@ -2284,9 +2337,9 @@ Print a warning in libSoX.
 void
 LSX_API
 lsx_warn_impl(
-    LSX_PARAM_IN_PRINTF char const * fmt, /**< printf-style format string. */
-    ...)
-    LSX_PRINTF12;
+        LSX_PARAM_IN_PRINTF char const *fmt, /**< printf-style format string. */
+        ...)
+LSX_PRINTF12;
 
 /**
 Plugins API:
@@ -2295,9 +2348,9 @@ Print an informational message in libSoX.
 void
 LSX_API
 lsx_report_impl(
-    LSX_PARAM_IN_PRINTF char const * fmt, /**< printf-style format string. */
-    ...)
-    LSX_PRINTF12;
+        LSX_PARAM_IN_PRINTF char const *fmt, /**< printf-style format string. */
+        ...)
+LSX_PRINTF12;
 
 /**
 Plugins API:
@@ -2306,9 +2359,9 @@ Print a debug message in libSoX.
 void
 LSX_API
 lsx_debug_impl(
-    LSX_PARAM_IN_PRINTF char const * fmt, /**< printf-style format string. */
-    ...)
-    LSX_PRINTF12;
+        LSX_PARAM_IN_PRINTF char const *fmt, /**< printf-style format string. */
+        ...)
+LSX_PRINTF12;
 
 /**
 Plugins API:
@@ -2357,8 +2410,7 @@ Declares a static instance of an lsx_enum_item structure in format
 Plugins API:
 Flags for use with lsx_find_enum_item.
 */
-enum
-{
+enum {
     lsx_find_enum_item_none = 0, /**< Default parameters (case-insensitive). */
     lsx_find_enum_item_case_sensitive = 1 /**< Enable case-sensitive search. */
 };
@@ -2372,10 +2424,11 @@ LSX_RETURN_OPT LSX_RETURN_PURE
 lsx_enum_item const *
 LSX_API
 lsx_find_enum_text(
-    LSX_PARAM_IN_Z char const * text, /**< Name of enumeration to find. */
-    LSX_PARAM_IN lsx_enum_item const * lsx_enum_items, /**< Array of items to search, with text == NULL for last item. */
-    int flags /**< Search flags: 0 (case-insensitive) or lsx_find_enum_item_case_sensitive (case-sensitive). */
-    );
+        LSX_PARAM_IN_Z char const *text, /**< Name of enumeration to find. */
+        LSX_PARAM_IN
+        lsx_enum_item const *lsx_enum_items, /**< Array of items to search, with text == NULL for last item. */
+        int flags /**< Search flags: 0 (case-insensitive) or lsx_find_enum_item_case_sensitive (case-sensitive). */
+);
 
 /**
 Plugins API:
@@ -2386,9 +2439,10 @@ LSX_RETURN_OPT LSX_RETURN_PURE
 lsx_enum_item const *
 LSX_API
 lsx_find_enum_value(
-    unsigned value, /**< Enumeration value to find. */
-    LSX_PARAM_IN lsx_enum_item const * lsx_enum_items /**< Array of items to search, with text == NULL for last item. */
-    );
+        unsigned value, /**< Enumeration value to find. */
+        LSX_PARAM_IN
+        lsx_enum_item const *lsx_enum_items /**< Array of items to search, with text == NULL for last item. */
+);
 
 /**
 Plugins API:
@@ -2401,10 +2455,11 @@ LSX_RETURN_PURE
 int
 LSX_API
 lsx_enum_option(
-    int c, /**< Option character to which arg is associated, for example with -a, c would be 'a'. */
-    LSX_PARAM_IN_Z char const * arg, /**< Argument to find in enumeration list. */
-    LSX_PARAM_IN lsx_enum_item const * items /**< Array of items to search, with text == NULL for last item. */
-    );
+        int c, /**< Option character to which arg is associated, for example with -a, c would be 'a'. */
+        LSX_PARAM_IN_Z char const *arg, /**< Argument to find in enumeration list. */
+        LSX_PARAM_IN
+        lsx_enum_item const *items /**< Array of items to search, with text == NULL for last item. */
+);
 
 /**
 Plugins API:
@@ -2415,9 +2470,9 @@ LSX_RETURN_PURE
 sox_bool
 LSX_API
 lsx_strends(
-    LSX_PARAM_IN_Z char const * str, /**< String to search. */
-    LSX_PARAM_IN_Z char const * end  /**< Suffix to search for. */
-    );
+        LSX_PARAM_IN_Z char const *str, /**< String to search. */
+        LSX_PARAM_IN_Z char const *end  /**< Suffix to search for. */
+);
 
 /**
 Plugins API:
@@ -2429,50 +2484,51 @@ LSX_RETURN_OPT LSX_RETURN_PURE
 char const *
 LSX_API
 lsx_find_file_extension(
-    LSX_PARAM_IN_Z char const * pathname /**< Filename to search for extension. */
-    );
+        LSX_PARAM_IN_Z char const *pathname /**< Filename to search for extension. */
+);
 
 /**
 Plugins API:
 Formats the specified number with up to three significant figures and adds a
 metric suffix in place of the exponent, such as 1.23G.
-@returns A static buffer with the formatted number, valid until the next time
+@returns A static data with the formatted number, valid until the next time
 this function is called (note: not thread safe).
 */
 LSX_RETURN_VALID_Z
 char const *
 LSX_API
 lsx_sigfigs3(
-    double number /**< Number to be formatted. */
-    );
+        double number /**< Number to be formatted. */
+);
 
 /**
 Plugins API:
 Formats the specified number as a percentage, showing up to three significant
 figures.
-@returns A static buffer with the formatted number, valid until the next time
+@returns A static data with the formatted number, valid until the next time
 this function is called (note: not thread safe).
 */
 LSX_RETURN_VALID_Z
 char const *
 LSX_API
 lsx_sigfigs3p(
-    double percentage /**< Number to be formatted. */
-    );
+        double percentage /**< Number to be formatted. */
+);
 
 /**
 Plugins API:
 Allocates, deallocates, or resizes; like C's realloc, except that this version
 terminates the running application if unable to allocate the requested memory.
-@returns New buffer, or null if buffer was freed.
+@returns New data, or null if data was freed.
 */
 LSX_RETURN_OPT
 void *
 LSX_API
 lsx_realloc(
-    LSX_PARAM_IN_OPT void *ptr, /**< Pointer to be freed or resized, or null if allocating a new buffer. */
-    size_t newsize /**< New size for buffer, or 0 to free the buffer. */
-    );
+        LSX_PARAM_IN_OPT
+        void *ptr, /**< Pointer to be freed or resized, or null if allocating a new data. */
+        size_t newsize /**< New size for data, or 0 to free the data. */
+);
 
 /**
 Plugins API:
@@ -2483,9 +2539,9 @@ LSX_RETURN_PURE
 int
 LSX_API
 lsx_strcasecmp(
-    LSX_PARAM_IN_Z char const * s1, /**< First string. */
-    LSX_PARAM_IN_Z char const * s2  /**< Second string. */
-    );
+        LSX_PARAM_IN_Z char const *s1, /**< First string. */
+        LSX_PARAM_IN_Z char const *s2  /**< Second string. */
+);
 
 
 /**
@@ -2497,10 +2553,10 @@ LSX_RETURN_PURE
 int
 LSX_API
 lsx_strncasecmp(
-    LSX_PARAM_IN_Z char const * s1, /**< First string. */
-    LSX_PARAM_IN_Z char const * s2, /**< Second string. */
-    size_t n /**< Maximum number of characters to examine. */
-    );
+        LSX_PARAM_IN_Z char const *s1, /**< First string. */
+        LSX_PARAM_IN_Z char const *s2, /**< Second string. */
+        size_t n /**< Maximum number of characters to examine. */
+);
 
 /**
 Plugins API:
@@ -2527,10 +2583,10 @@ Plugins API:
 lsx_getopt long option descriptor.
 */
 typedef struct lsx_option_t {
-    char const *     name;    /**< Name of the long option. */
+    char const *name;    /**< Name of the long option. */
     lsx_option_arg_t has_arg; /**< Whether the long option supports an argument and, if so, whether the argument is required or optional. */
-    int *            flag;    /**< Flag to set if argument is present. */
-    int              val;     /**< Value to put in flag if argument is present. */
+    int *flag;    /**< Flag to set if argument is present. */
+    int val;     /**< Value to _put in flag if argument is present. */
 } lsx_option_t;
 
 /**
@@ -2538,16 +2594,16 @@ Plugins API:
 lsx_getopt session information (initialization data and state).
 */
 typedef struct lsx_getopt_t {
-    int                  argc;     /**< IN    argc:      Number of arguments in argv */
-    char * const *       argv;     /**< IN    argv:      Array of arguments */
-    char const *         shortopts;/**< IN    shortopts: Short option characters */
-    lsx_option_t const * longopts; /**< IN    longopts:  Array of long option descriptors */
-    lsx_getopt_flags_t   flags;    /**< IN    flags:     Flags for longonly and opterr */
-    char const *         curpos;   /**< INOUT curpos:    Maintains state between calls to lsx_getopt */
-    int                  ind;      /**< INOUT optind:    Maintains the index of next element to be processed */
-    int                  opt;      /**< OUT   optopt:    Receives the option character that caused error */
-    char const *         arg;      /**< OUT   optarg:    Receives the value of the option's argument */
-    int                  lngind;   /**< OUT   lngind:    Receives the index of the matched long option or -1 if not a long option */
+    int argc;     /**< IN    argc:      Number of arguments in argv */
+    char *const *argv;     /**< IN    argv:      Array of arguments */
+    char const *shortopts;/**< IN    shortopts: Short option characters */
+    lsx_option_t const *longopts; /**< IN    longopts:  Array of long option descriptors */
+    lsx_getopt_flags_t flags;    /**< IN    flags:     Flags for longonly and opterr */
+    char const *curpos;   /**< INOUT curpos:    Maintains state between calls to lsx_getopt */
+    int ind;      /**< INOUT optind:    Maintains the index of next element to be processed */
+    int opt;      /**< OUT   optopt:    Receives the option character that caused error */
+    char const *arg;      /**< OUT   optarg:    Receives the value of the option's argument */
+    int lngind;   /**< OUT   lngind:    Receives the index of the matched long option or -1 if not a long option */
 } lsx_getopt_t;
 
 /**
@@ -2557,14 +2613,19 @@ Initializes an lsx_getopt_t structure for use with lsx_getopt.
 void
 LSX_API
 lsx_getopt_init(
-    LSX_PARAM_IN             int argc,                      /**< Number of arguments in argv */
-    LSX_PARAM_IN_COUNT(argc) char * const * argv,           /**< Array of arguments */
-    LSX_PARAM_IN_Z           char const * shortopts,        /**< Short options, for example ":abc:def::ghi" (+/- not supported) */
-    LSX_PARAM_IN_OPT         lsx_option_t const * longopts, /**< Array of long option descriptors */
-    LSX_PARAM_IN             lsx_getopt_flags_t flags,      /**< Flags for longonly and opterr */
-    LSX_PARAM_IN             int first,                     /**< First argv to check (usually 1) */
-    LSX_PARAM_OUT            lsx_getopt_t * state           /**< State object to be initialized */
-    );
+        LSX_PARAM_IN             int argc,                      /**< Number of arguments in argv */
+        LSX_PARAM_IN_COUNT(argc) char *const *argv,           /**< Array of arguments */
+        LSX_PARAM_IN_Z
+        char const *shortopts,        /**< Short options, for example ":abc:def::ghi" (+/- not supported) */
+        LSX_PARAM_IN_OPT
+        lsx_option_t const *longopts, /**< Array of long option descriptors */
+        LSX_PARAM_IN
+        lsx_getopt_flags_t flags,      /**< Flags for longonly and opterr */
+        LSX_PARAM_IN
+        int first,                     /**< First argv to check (usually 1) */
+        LSX_PARAM_OUT
+        lsx_getopt_t *state           /**< State object to be initialized */
+);
 
 /**
 Plugins API:
@@ -2580,8 +2641,8 @@ Note: lsx_getopt does not permute the non-option arguments.
 int
 LSX_API
 lsx_getopt(
-    LSX_PARAM_INOUT lsx_getopt_t * state /**< The getopt state pointer. */
-    );
+        LSX_PARAM_INOUT lsx_getopt_t *state /**< The getopt state pointer. */
+);
 
 /**
 Plugins API:
@@ -2591,8 +2652,8 @@ Gets the file length, or 0 if the file is not seekable/normal.
 sox_uint64_t
 LSX_API
 lsx_filelength(
-    LSX_PARAM_IN sox_format_t * ft
-    );
+        LSX_PARAM_IN sox_format_t *ft
+);
 
 /* WARNING END */
 

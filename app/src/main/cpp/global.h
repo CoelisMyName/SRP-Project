@@ -2,12 +2,16 @@
 #define SRP_PROJECT_GLOBAL_H
 
 #include <jni.h>
-#include "MyMLLiveModel.h"
+#include "SnoringRecognition.h"
 
 extern JavaVM *g_jvm;
 
-extern MyMLLiveModel *g_model;
+extern jint g_version;
 
-extern char g_external_path[1024];
+extern SnoringRecognition *g_snoringRecognition;
+
+extern const char *const g_cache;
+
+extern const char *const g_audio;
 
 #endif
