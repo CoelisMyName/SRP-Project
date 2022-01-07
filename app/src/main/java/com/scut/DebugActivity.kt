@@ -9,9 +9,12 @@ import androidx.core.content.ContextCompat
 import com.scut.databinding.ActivityDebugBinding
 import com.scut.utils.SnoringRecognition
 
-const val TAG = "DebugActivity"
 
 class DebugActivity : AppCompatActivity(), View.OnClickListener {
+
+    companion object {
+        const val TAG = "DebugActivity"
+    }
 
     private lateinit var binding: ActivityDebugBinding
 
