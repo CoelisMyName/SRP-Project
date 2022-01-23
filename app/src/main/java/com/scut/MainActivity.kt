@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 
 import androidx.appcompat.app.AppCompatActivity
+import com.scut.Config.DEBUG
 import com.scut.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

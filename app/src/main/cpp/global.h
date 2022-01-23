@@ -2,16 +2,13 @@
 #define SRP_PROJECT_GLOBAL_H
 
 #include <jni.h>
-#include "SnoringRecognition.h"
 
-extern JavaVM *g_jvm;
+extern JavaVM *g_jvm; // jvm虚拟机
 
-extern jint g_version;
+extern jint g_version; // jni版本
 
-extern SnoringRecognition *g_snoringRecognition;
+extern const char *const g_cache; // cache路径
 
-extern const char *const g_cache;
-
-extern const char *const g_audio;
+extern const char *const g_audio; // 保存音频路径
 
 #endif

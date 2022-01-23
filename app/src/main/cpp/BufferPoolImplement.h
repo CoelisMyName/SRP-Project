@@ -1,9 +1,11 @@
-/**
- * 缓存池实现
- */
 #include <cstring>
 #include <algorithm>
+#include "log.h"
 #include "BufferPool.h"
+
+/*
+ * 不要在这里添加 TAG 宏定义来调试
+ */
 
 template<typename T>
 BufferPool<T>::BufferPool(uint32_t frame_size, uint32_t buffer_size, uint32_t redundancy) {

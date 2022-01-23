@@ -7,7 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.scut.databinding.ActivityDebugBinding
-import com.scut.utils.SnoringRecognition
+import com.scut.utils.ModuleController
 
 
 class DebugActivity : AppCompatActivity(), View.OnClickListener {
@@ -18,7 +18,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var binding: ActivityDebugBinding
 
-    val m_snore: SnoringRecognition = SnoringRecognition
+    private val mController = ModuleController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,18 +26,16 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(binding.root)
         binding.start.setOnClickListener(this)
         binding.stop.setOnClickListener(this)
-//        m_model.m_clsCallback =  {minute, start, end, pos -> Log.d(TAG, "onCreate: ${minute}min ${start} ${end} ${pos}")}
-//        m_model.m_splCallback = {spl -> Log.d(TAG, spl.toString()) }
     }
 
     override fun onClick(v: View?) {
         if (v == binding.start) {
-            when {
+            when (PackageManager.PERMISSION_GRANTED) {
                 ContextCompat.checkSelfPermission(
                     this,
                     Manifest.permission.RECORD_AUDIO
-                ) == PackageManager.PERMISSION_GRANTED -> {
-                    m_snore.start()
+                ) -> {
+                    mController.start()
                 }
                 else -> {
                     requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 1)
@@ -45,7 +43,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
         if (v == binding.stop) {
-            m_snore.stop()
+            mController.stop()
         }
     }
 }

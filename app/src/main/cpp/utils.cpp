@@ -80,7 +80,7 @@ bool checkAndMkdir(const char *path) {
     }
 }
 
-uint64_t currentTimeMillis() {
+int64_t currentTimeMillis() {
     struct timeval tv{};
     gettimeofday(&tv, nullptr);
     return tv.tv_sec * 1000 + tv.tv_usec / 1000;

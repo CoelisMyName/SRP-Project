@@ -43,6 +43,6 @@ extern bool checkAndMkdir(const char *path);
  * 获取毫秒时间戳
  * @return 毫秒时间戳
  */
-extern uint64_t currentTimeMillis();
+extern int64_t currentTimeMillis();
 
 #endif

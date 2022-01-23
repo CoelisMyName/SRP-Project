@@ -1250,7 +1250,7 @@ typedef int (LSX_API *sox_effect_handler_drain)(
 /**
 Client API:
 Callback to shut down effect (called once per flow),
-used by sox_effect_handler.stop.
+used by sox_effect_handler.waitForExit.
 @returns SOX_SUCCESS if successful.
 */
 typedef int (LSX_API *sox_effect_handler_stop)(
@@ -2169,13 +2169,13 @@ sox_effects_clips(
 
 /**
 Client API:
-Shuts down an effect (calls stop on each of its flows).
+Shuts down an effect (calls waitForExit on each of its flows).
 @returns the number of clips from all flows.
 */
 sox_uint64_t
 LSX_API
 sox_stop_effect(
-        LSX_PARAM_INOUT_COUNT(effp->flows) sox_effect_t *effp /**< Effect to stop. */
+        LSX_PARAM_INOUT_COUNT(effp->flows) sox_effect_t *effp /**< Effect to waitForExit. */
 );
 
 /**

@@ -77,14 +77,14 @@ public:
     void clear();
 
 private:
-    Buffer<T> *m_pool; ///缓存数组
-    uint32_t m_size; ///缓存数组大小
-    uint32_t m_wt = 0; ///写指针
-    uint32_t m_rd = 0; ///读指针
-    uint32_t m_rdd; ///冗余数据大小
-    bool m_full; ///是否为满
-    bool m_buf_on; ///是否要将m_buffer写回
-    T *m_buffer; ///冗余数据缓冲
+    Buffer<T> *m_pool; // 缓存数组
+    uint32_t m_size; // 缓存数组大小
+    uint32_t m_wt = 0; // 写指针
+    uint32_t m_rd = 0; // 读指针
+    uint32_t m_rdd; // 冗余数据大小
+    bool m_full; // 是否为满
+    bool m_buf_on; // 是否要将m_buffer写回
+    T *m_buffer; // 冗余数据缓冲
 
     /**
      * 读指针向前

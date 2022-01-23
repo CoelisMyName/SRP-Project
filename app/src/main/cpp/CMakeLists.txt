@@ -18,8 +18,8 @@ add_library(srp SHARED ${src})
 
 find_package(oboe REQUIRED CONFIG)
 
-set(third-party sox snore)
+set(third-party sox snore oboe::oboe)
 
-set(native-lib log omp)
+set(native-lib log omp android EGL m GLESv3)
 
-target_link_libraries(srp ${native-lib} ${third-party} oboe::oboe)
+target_link_libraries(srp ${native-lib} ${third-party})
