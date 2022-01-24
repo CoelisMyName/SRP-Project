@@ -1,8 +1,11 @@
 #include <cassert>
+#include "log.h"
 #include "utils.h"
 #include "config.h"
 #include "SPLThread.h"
 #include "SPLJNICallback.h"
+
+TAG(SPLThread)
 
 SPLThread::SPLThread(jobject global_obj) : m_frame(0), m_size(SPL_INPUT_SIZE), m_obj(nullptr),
                                            m_state(STOP),
@@ -36,8 +39,8 @@ void SPLThread::onStart(int64_t timestamp) {
     }
     m_state = START;
     m_start = timestamp;
-    m_frame = 0;
     m_sample_count = 0;
+    m_frame = 0;
     m_buffer_pool.clear();
     while (!m_timestamp.empty()) {
         m_timestamp.pop();
@@ -66,8 +69,11 @@ void SPLThread::onReceive(int64_t timestamp, int16_t *data, int32_t length) {
         m_timestamp.push(timestamp);
         m_frame += 1;
     }
-    m_sample_count += length;
-    m_buffer_pool.write(data, length);
+    int32_t write = m_buffer_pool.write(data, length);
+    m_sample_count += write;
+    if (write != length) {
+        log_w("%s(): discard %d samples", __FUNCTION__, length - write);
+    }
     if (m_buffer_pool.ready()) {
         m_cond.notify_all();
     }

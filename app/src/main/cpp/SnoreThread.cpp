@@ -36,14 +36,14 @@ void SnoreThread::onAttach() {
 
 void SnoreThread::onStart(int64_t timestamp) {
     unique_lock<mutex> lock(m_mutex);
-    if (!m_alive || m_exit) {
+    if (m_exit || !m_alive) {
         m_cond.notify_all();
         return;
     }
-    m_start = timestamp;
-    m_frame = 0;
-    m_sample_count = 0;
     m_state = START;
+    m_start = timestamp;
+    m_sample_count = 0;
+    m_frame = 0;
     m_buffer_pool.clear();
     while (!m_timestamp.empty()) {
         m_timestamp.pop();
@@ -53,12 +53,12 @@ void SnoreThread::onStart(int64_t timestamp) {
 
 void SnoreThread::onStop(int64_t timestamp) {
     unique_lock<mutex> lock(m_mutex);
-    if (!m_alive || m_exit) {
+    if (m_exit || !m_alive) {
         m_cond.notify_all();
         return;
     }
-    m_stop = timestamp;
     m_state = STOP;
+    m_stop = timestamp;
     m_cond.notify_all();
 }
 
@@ -72,8 +72,11 @@ void SnoreThread::onReceive(int64_t timestamp, int16_t *data, int32_t length) {
         m_timestamp.push(timestamp);
         m_frame += 1;
     }
-    m_sample_count += length;
-    m_buffer_pool.write(data, length);
+    int32_t write = m_buffer_pool.write(data, length);
+    m_sample_count += write;
+    if (write != length) {
+        log_w("%s(): discard %d samples", __FUNCTION__, length - write);
+    }
     if (m_buffer_pool.ready()) {
         m_cond.notify_all();
     }
