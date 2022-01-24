@@ -99,6 +99,9 @@ Java_com_scut_component_LibGLThread_destroy(JNIEnv *env, jobject thiz,
 JNIEXPORT jboolean JNICALL
 Java_com_scut_utils_LibSRP_create(JNIEnv *env, jobject thiz, jobject controller) {
     if (initialFlag) return true;
+    jclass snore = (jclass) env->NewGlobalRef(env->FindClass("com/scut/utils/Snore"));
+    jclass clazz = (jclass) env->NewGlobalRef(env->FindClass("com/scut/utils/ModuleController"));
+    jclass spl = (jclass) env->NewGlobalRef(env->FindClass("com/scut/utils/SPL"));
     jobject g_controller = env->NewGlobalRef(controller);
     dispatcher = new AudioDataDispatcher();
     audioSource = new AudioRecord(dispatcher, SAMPLE_RATE, FRAME_SIZE);

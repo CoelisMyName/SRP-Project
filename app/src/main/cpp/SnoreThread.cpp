@@ -15,8 +15,10 @@ SnoreThread::SnoreThread(jobject global_obj) : m_state(STOP), m_start(0), m_stop
                                                                              SNORE_INPUT_SIZE),
                                                m_size(SNORE_BUFFER_SIZE),
                                                m_thread([this] {
-                                                   EnvHelper helper;
-                                                   this->run(helper.getEnv());
+                                                   JNIEnv *env;
+                                                   g_jvm->AttachCurrentThread(&env, nullptr);
+                                                   this->run(env);
+                                                   g_jvm->DetachCurrentThread();
                                                }) {
     m_sample_rate = SAMPLE_RATE;
     unique_lock<mutex> lock(m_mutex);
@@ -97,7 +99,8 @@ void SnoreThread::run(JNIEnv *env) {
     m_obj = nullptr;
     m_cond.notify_all();
     lock.unlock();
-
+//    env->FindClass("com/scut/utils/ModuleController");
+//    env->FindClass("com/scut/utils/Snore");
     SnoreJNICallback jniCallback(env, obj);
     int64_t start = 0, stop = 0, timestamp = 0;
     DispatchState state = STOP;

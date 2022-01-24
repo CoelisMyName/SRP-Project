@@ -26,6 +26,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(binding.root)
         binding.start.setOnClickListener(this)
         binding.stop.setOnClickListener(this)
+        mController.initial()
     }
 
     override fun onClick(v: View?) {
@@ -45,5 +46,11 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         if (v == binding.stop) {
             mController.stop()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mController.stop()
+        mController.destroy()
     }
 }
