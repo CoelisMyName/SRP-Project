@@ -4,33 +4,54 @@
 #include <jni.h>
 #include "SPLBuilder.h"
 
+/**
+ *
+ */
 class SPLJNICallback {
 public:
+    /**
+     * 该类最好在全局下保存
+     * 只能在主线程调用
+     * @param env 主线程的 env
+     * @param obj ModuleController 实例
+     */
     SPLJNICallback(JNIEnv *env, jobject obj) : m_builder(env) {
         m_env = env;
-        m_obj = obj;
-        m_cls = env->FindClass("com/scut/utils/ModuleController");
+        m_obj = env->NewGlobalRef(obj);
+        jclass local_class = env->FindClass("com/scut/utils/ModuleController");
+        m_cls = (jclass) env->NewGlobalRef(local_class);
+        env->DeleteLocalRef(local_class);
         m_onStart = env->GetMethodID(m_cls, "onSPLStart", "(J)V");
         m_onDetect = env->GetMethodID(m_cls, "onSPLDetect", "(Lcom/scut/utils/SPL;)V");
         m_onStop = env->GetMethodID(m_cls, "onSPLStop", "(J)V");
     }
 
+    /**
+     * 当需要回收对象时更新 env
+     * @param env
+     */
+    void updateEnv(JNIEnv *env) {
+        m_env = env;
+    }
+
     ~SPLJNICallback() {
-        m_env->DeleteLocalRef(m_cls);
+        m_env->DeleteGlobalRef(m_obj);
+        m_env->DeleteGlobalRef(m_cls);
     }
 
-    void onStart(jlong timestamp) {
-        m_env->CallVoidMethod(m_obj, m_onStart, timestamp);
+    // java 方法
+    void onStart(JNIEnv *env, jlong timestamp) {
+        env->CallVoidMethod(m_obj, m_onStart, timestamp);
     }
 
-    void onDetect(SPL &spl) {
-        jobject obj = m_builder.getNewSPL(spl);
-        m_env->CallVoidMethod(m_obj, m_onDetect, obj);
-        m_env->DeleteLocalRef(obj);
+    void onDetect(JNIEnv *env, SPL &spl) {
+        jobject obj = m_builder.getNewSPL(env, spl);
+        env->CallVoidMethod(m_obj, m_onDetect, obj);
+        env->DeleteLocalRef(obj);
     }
 
-    void onStop(jlong timestamp) {
-        m_env->CallVoidMethod(m_obj, m_onStop, timestamp);
+    void onStop(JNIEnv *env, jlong timestamp) {
+        env->CallVoidMethod(m_obj, m_onStop, timestamp);
     }
 
 private:

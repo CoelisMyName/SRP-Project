@@ -7,18 +7,17 @@
 
 TAG(SPLThread)
 
-SPLThread::SPLThread(jobject global_obj) : m_frame(0), m_size(SPL_INPUT_SIZE), m_obj(nullptr),
-                                           m_state(STOP),
-                                           m_start(0), m_stop(0), m_sample_count(0), m_exit(false),
-                                           m_alive(false), m_buffer_pool(3, SPL_INPUT_SIZE),
-                                           m_thread([this] {
-                                               EnvHelper helper;
-                                               this->run(helper.getEnv());
-                                           }) {
+SPLThread::SPLThread(SPLJNICallback *callback) : m_callback(callback), m_frame(0),
+                                                 m_size(SPL_INPUT_SIZE), m_state(STOP), m_start(0),
+                                                 m_stop(0), m_sample_count(0), m_exit(false),
+                                                 m_alive(false), m_buffer_pool(3, SPL_INPUT_SIZE),
+                                                 m_thread([this] {
+                                                     EnvHelper helper;
+                                                     this->run(helper.getEnv());
+                                                 }) {
     m_sample_rate = SAMPLE_RATE;
     unique_lock<mutex> lock(m_mutex);
-    m_obj = global_obj;
-    while (m_obj != nullptr) {
+    while (!m_alive) {
         m_cond.notify_all();
         m_cond.wait(lock);
     }
@@ -83,20 +82,13 @@ void SPLThread::onDetach() {
 }
 
 void SPLThread::run(JNIEnv *env) {
-    // initial
-    m_alive = true;
     // 初始化
     unique_lock<mutex> lock(m_mutex);
-    while (m_obj == nullptr) {
-        m_cond.notify_all();
-        m_cond.wait(lock);
-    }
-    jobject obj = env->NewLocalRef(m_obj);
-    m_obj = nullptr;
+    m_alive = true;
     m_cond.notify_all();
     lock.unlock();
 
-    SPLJNICallback jniCallback(env, obj);
+    SPLJNICallback *callback = m_callback;
     DispatchState state = STOP;
     bool exit = false, ready = false, onStart = false, onStop = false;
     uint32_t size = m_size;
@@ -140,7 +132,7 @@ void SPLThread::run(JNIEnv *env) {
 
         if (onStart) {
             onStart = false;
-            jniCallback.onStart(start);
+            callback->onStart(env, start);
         }
 
         if (ready) {
@@ -161,12 +153,13 @@ void SPLThread::run(JNIEnv *env) {
                 spl.c_pow[i] = libSnoreSpl.c_pow[i];
                 spl.z_pow[i] = libSnoreSpl.z_pow[i];
             }
-            jniCallback.onDetect(spl);
+            log_i("%s(): spl detect", __FUNCTION__);
+            callback->onDetect(env, spl);
         }
 
         if (onStop) {
             onStop = false;
-            jniCallback.onStop(stop);
+            callback->onStop(env, stop);
         }
     }
     // exit

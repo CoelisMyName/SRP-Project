@@ -6,6 +6,7 @@
 #include <thread>
 #include "config.h"
 #include "BufferPool.h"
+#include "SnoreJNICallback.h"
 #include "AudioDataCallback.h"
 #include "AudioDataDispatcher.h"
 
@@ -17,19 +18,13 @@ using std::condition_variable;
 using snore::I16pcm;
 using snore::F64pcm;
 using snore::ModelResult;
-using snore::snoreInitial;
-using snore::snoreDestroy;
+using snore::reduceNoise;
 using snore::calculateModelResult;
 using snore::generateNoiseProfile;
-using snore::reduceNoise;
 
 class SnoreThread : public AudioDataCallback {
 public:
-    /**
-     * 应当传递全局引用类型的 ModuleController 对象
-     * @param global_obj
-     */
-    SnoreThread(jobject global_obj);
+    SnoreThread(SnoreJNICallback *callback);
 
     virtual ~SnoreThread() override;
 
@@ -55,11 +50,14 @@ public:
     void waitForExit();
 
 private:
+    uint32_t m_size;
+    int32_t m_sample_rate;
+
     thread m_thread;
     mutex m_mutex;
     condition_variable m_cond;
-    uint32_t m_size;
-    int32_t m_sample_rate;
+
+    SnoreJNICallback *m_callback;
 
     BufferPool<int16_t> m_buffer_pool;
     queue<int64_t> m_timestamp;
@@ -69,7 +67,6 @@ private:
     volatile int64_t m_stop;
     volatile int64_t m_frame;
     volatile int64_t m_sample_count;
-    volatile jobject m_obj;
     volatile bool m_exit;
     volatile bool m_alive;
 };

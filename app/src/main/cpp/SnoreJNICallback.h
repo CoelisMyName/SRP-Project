@@ -17,36 +17,52 @@ class SnoreJNICallback {
 public:
     SnoreJNICallback(JNIEnv *env, jobject obj) {
         m_env = env;
-        m_obj = obj;
-        m_cls = env->FindClass("com/scut/utils/ModuleController");
-        m_snore = env->FindClass("com/scut/utils/Snore");
+        // 全局共享引用
+        m_obj = env->NewGlobalRef(obj);
+        jclass local_class = env->FindClass("com/scut/utils/ModuleController");
+        m_cls = (jclass) env->NewGlobalRef(local_class);
+        env->DeleteLocalRef(local_class);
+        local_class = env->FindClass("com/scut/utils/Snore");
+        m_snore = (jclass) env->NewGlobalRef(local_class);
+        env->DeleteLocalRef(local_class);
+        // 方法 id
         m_constructor = env->GetMethodID(m_snore, "<init>", "(JJZJ)V");
         m_onStart = env->GetMethodID(m_cls, "onSnoreStart", "(J)V");
         m_onRecognize = env->GetMethodID(m_cls, "onSnoreRecognize", "(Lcom/scut/utils/Snore;)V");
         m_onStop = env->GetMethodID(m_cls, "onSnoreStop", "(J)V");
     }
 
+    /**
+     * 当需要回收对象时更新 env
+     * @param env
+     */
+    void updateEnv(JNIEnv *env) {
+        m_env = env;
+    }
+
     ~SnoreJNICallback() {
-        m_env->DeleteLocalRef(m_cls);
+        m_env->DeleteGlobalRef(m_cls);
+        m_env->DeleteGlobalRef(m_snore);
     }
 
-    void onStart(jlong timestamp) {
-        m_env->CallVoidMethod(m_obj, m_onStart, timestamp);
+    void onStart(JNIEnv *env, jlong timestamp) {
+        env->CallVoidMethod(m_obj, m_onStart, timestamp);
     }
 
-    void onRecognize(Snore &snore) {
-        jobject obj = m_env->NewObject(m_snore, m_constructor, snore.timestamp, snore.length,
-                                       snore.confirm, snore.startTime);
-        m_env->CallVoidMethod(m_obj, m_onRecognize, obj);
-        m_env->DeleteLocalRef(obj);
+    void onRecognize(JNIEnv *env, Snore &snore) {
+        jobject obj = env->NewObject(m_snore, m_constructor, snore.timestamp, snore.length,
+                                     snore.confirm, snore.startTime);
+        env->CallVoidMethod(m_obj, m_onRecognize, obj);
+        env->DeleteLocalRef(obj);
     }
 
-    void onStop(jlong timestamp) {
-        m_env->CallVoidMethod(m_obj, m_onStop, timestamp);
+    void onStop(JNIEnv *env, jlong timestamp) {
+        env->CallVoidMethod(m_obj, m_onStop, timestamp);
     }
 
 private:
     JNIEnv *m_env;
+    // 全局引用类型
     jobject m_obj;
     jclass m_cls;
     jclass m_snore;

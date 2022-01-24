@@ -8,6 +8,8 @@
 #include "SnoreThread.h"
 #include "AudioSource.h"
 #include "AudioRecord.h"
+#include "SPLJNICallback.h"
+#include "SnoreJNICallback.h"
 #include "AudioDataDispatcher.h"
 
 TAG(libsrp)
@@ -17,6 +19,8 @@ static AudioDataDispatcher *dispatcher = nullptr;
 static SnoreThread *snoreThread = nullptr;
 static SPLThread *splThread = nullptr;
 static WaveRender *waveRender = nullptr;
+static SnoreJNICallback *snoreJNICallback = nullptr;
+static SPLJNICallback *splJNICallback = nullptr;
 static bool initialFlag = false;
 
 extern "C" {
@@ -99,15 +103,12 @@ Java_com_scut_component_LibGLThread_destroy(JNIEnv *env, jobject thiz,
 JNIEXPORT jboolean JNICALL
 Java_com_scut_utils_LibSRP_create(JNIEnv *env, jobject thiz, jobject controller) {
     if (initialFlag) return true;
-    jclass snore = (jclass) env->NewGlobalRef(env->FindClass("com/scut/utils/Snore"));
-    jclass clazz = (jclass) env->NewGlobalRef(env->FindClass("com/scut/utils/ModuleController"));
-    jclass spl = (jclass) env->NewGlobalRef(env->FindClass("com/scut/utils/SPL"));
-    jobject g_controller = env->NewGlobalRef(controller);
     dispatcher = new AudioDataDispatcher();
     audioSource = new AudioRecord(dispatcher, SAMPLE_RATE, FRAME_SIZE);
-    snoreThread = new SnoreThread(g_controller);
-    splThread = new SPLThread(g_controller);
-    env->DeleteGlobalRef(g_controller);
+    snoreJNICallback = new SnoreJNICallback(env, controller);
+    splJNICallback = new SPLJNICallback(env, controller);
+    snoreThread = new SnoreThread(snoreJNICallback);
+    splThread = new SPLThread(splJNICallback);
     dispatcher->registerCallback(splThread);
     dispatcher->registerCallback(snoreThread);
     initialFlag = true;
@@ -118,6 +119,9 @@ JNIEXPORT jboolean JNICALL
 Java_com_scut_utils_LibSRP_destroy(JNIEnv *env, jobject thiz, jobject controller) {
     if (!initialFlag) return true;
     audioSource->stop();
+    dispatcher->clear();
+    snoreThread->waitForExit();
+    splThread->waitForExit();
     delete audioSource;
     delete dispatcher;
     delete snoreThread;

@@ -19,15 +19,29 @@ typedef struct {
  */
 class SPLBuilder {
 public:
+    /**
+     * 在主线程调用，传递主线程 env
+     * @param env
+     */
     SPLBuilder(JNIEnv *env) {
         m_env = env;
-        m_class = env->FindClass("com/scut/utils/SPL");
+        jclass local_class = env->FindClass("com/scut/utils/SPL");
+        m_class = (jclass) env->NewGlobalRef(local_class);
+        env->DeleteLocalRef(local_class);
         m_init = env->GetMethodID(m_class, "<init>", "()V");
         m_init_args = env->GetMethodID(m_class, "<init>", "(JDDD[D[D[D[D)V");
     }
 
+    /**
+     * 当需要回收对象时更新 env
+     * @param env
+     */
+    void updateEnv(JNIEnv *env) {
+        m_env = env;
+    }
+
     ~SPLBuilder() {
-        m_env->DeleteLocalRef(m_class);
+        m_env->DeleteGlobalRef(m_class);
     }
 
     /**
@@ -35,8 +49,8 @@ public:
      * @param env
      * @return SPL
      */
-    jobject getNewSPL() {
-        return m_env->NewObject(m_class, m_init);
+    jobject getNewSPL(JNIEnv *env) {
+        return env->NewObject(m_class, m_init);
     }
 
     /**
@@ -52,23 +66,23 @@ public:
      * @param z_pow
      * @return SPL
      */
-    jobject getNewSPL(SPL &spl) {
+    jobject getNewSPL(JNIEnv *env, SPL &spl) {
         jdoubleArray j_freq, j_a_pow, j_c_pow, j_z_pow;
-        j_freq = m_env->NewDoubleArray(8);
-        j_a_pow = m_env->NewDoubleArray(8);
-        j_c_pow = m_env->NewDoubleArray(8);
-        j_z_pow = m_env->NewDoubleArray(8);
-        m_env->SetDoubleArrayRegion(j_freq, 0, 8, spl.freq);
-        m_env->SetDoubleArrayRegion(j_a_pow, 0, 8, spl.a_pow);
-        m_env->SetDoubleArrayRegion(j_c_pow, 0, 8, spl.c_pow);
-        m_env->SetDoubleArrayRegion(j_z_pow, 0, 8, spl.z_pow);
-        jobject obj = m_env->NewObject(m_class, m_init_args, spl.timestamp, spl.a_sum, spl.c_sum,
-                                       spl.z_sum, j_freq, j_a_pow, j_c_pow, j_z_pow);
+        j_freq = env->NewDoubleArray(8);
+        j_a_pow = env->NewDoubleArray(8);
+        j_c_pow = env->NewDoubleArray(8);
+        j_z_pow = env->NewDoubleArray(8);
+        env->SetDoubleArrayRegion(j_freq, 0, 8, spl.freq);
+        env->SetDoubleArrayRegion(j_a_pow, 0, 8, spl.a_pow);
+        env->SetDoubleArrayRegion(j_c_pow, 0, 8, spl.c_pow);
+        env->SetDoubleArrayRegion(j_z_pow, 0, 8, spl.z_pow);
+        jobject obj = env->NewObject(m_class, m_init_args, spl.timestamp, spl.a_sum, spl.c_sum,
+                                     spl.z_sum, j_freq, j_a_pow, j_c_pow, j_z_pow);
         //释放不被引用的资源
-        m_env->DeleteLocalRef(j_freq);
-        m_env->DeleteLocalRef(j_a_pow);
-        m_env->DeleteLocalRef(j_c_pow);
-        m_env->DeleteLocalRef(j_z_pow);
+        env->DeleteLocalRef(j_freq);
+        env->DeleteLocalRef(j_a_pow);
+        env->DeleteLocalRef(j_c_pow);
+        env->DeleteLocalRef(j_z_pow);
         return obj;
     }
 

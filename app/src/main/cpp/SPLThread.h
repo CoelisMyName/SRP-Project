@@ -6,6 +6,7 @@
 #include <thread>
 #include <snore.h>
 #include "BufferPool.h"
+#include "SPLJNICallback.h"
 #include "AudioDataCallback.h"
 #include "AudioDataDispatcher.h"
 
@@ -23,11 +24,7 @@ typedef snore::SPL LibSnoreSPL;
 
 class SPLThread : public AudioDataCallback {
 public:
-    /**
-     * 应当传递全局引用类型的 ModuleController 对象
-     * @param global_obj
-     */
-    SPLThread(jobject global_obj);
+    SPLThread(SPLJNICallback *callback);
 
     virtual ~SPLThread() override;
 
@@ -46,15 +43,18 @@ public:
     void waitForExit();
 
 private:
+    uint32_t m_size;
+    int32_t m_sample_rate;
+
     thread m_thread;
     mutex m_mutex;
     condition_variable m_cond;
+
+    SPLJNICallback *m_callback;
+
     BufferPool<int16_t> m_buffer_pool;
     queue<int64_t> m_timestamp;
-    int32_t m_sample_rate;
-    uint32_t m_size;
 
-    volatile jobject m_obj;
     volatile DispatchState m_state;
     volatile int64_t m_start, m_stop;
     volatile int64_t m_frame;

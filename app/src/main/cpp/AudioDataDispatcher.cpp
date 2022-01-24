@@ -83,3 +83,11 @@ void AudioDataDispatcher::unregisterCallback(AudioDataCallback *callback) {
     }
     log_i("%s(): %s", __FUNCTION__, "unregister callback");
 }
+
+void AudioDataDispatcher::clear() {
+    unique_lock<mutex> lock(m_mutex);
+    for (AudioDataCallback *cb : m_callbacks) {
+        cb->onDetach();
+    }
+    m_callbacks.clear();
+}

@@ -4,26 +4,24 @@
 #include "utils.h"
 #include "global.h"
 #include "SnoreThread.h"
-#include "SnoreJNICallback.h"
 
-static const char *const TAG = "SnoreThread";
+TAG(SnoreThread)
 
-SnoreThread::SnoreThread(jobject global_obj) : m_state(STOP), m_start(0), m_stop(0), m_frame(0),
-                                               m_sample_count(0), m_obj(nullptr), m_exit(false),
-                                               m_alive(false), m_buffer_pool(3, SNORE_BUFFER_SIZE,
-                                                                             SNORE_BUFFER_SIZE -
-                                                                             SNORE_INPUT_SIZE),
-                                               m_size(SNORE_BUFFER_SIZE),
-                                               m_thread([this] {
-                                                   JNIEnv *env;
-                                                   g_jvm->AttachCurrentThread(&env, nullptr);
-                                                   this->run(env);
-                                                   g_jvm->DetachCurrentThread();
-                                               }) {
+SnoreThread::SnoreThread(SnoreJNICallback *callback) : m_callback(callback), m_state(STOP),
+                                                       m_start(0), m_stop(0), m_frame(0),
+                                                       m_sample_count(0), m_exit(false),
+                                                       m_alive(false),
+                                                       m_buffer_pool(3, SNORE_BUFFER_SIZE,
+                                                                     SNORE_BUFFER_SIZE -
+                                                                     SNORE_INPUT_SIZE),
+                                                       m_size(SNORE_BUFFER_SIZE),
+                                                       m_thread([this] {
+                                                           EnvHelper helper;
+                                                           this->run(helper.getEnv());
+                                                       }) {
     m_sample_rate = SAMPLE_RATE;
     unique_lock<mutex> lock(m_mutex);
-    m_obj = global_obj;
-    while (m_obj != nullptr) {
+    while (!m_alive) {
         m_cond.notify_all();
         m_cond.wait(lock);
     }
@@ -88,20 +86,13 @@ void SnoreThread::onDetach() {
 }
 
 void SnoreThread::run(JNIEnv *env) {
-    m_alive = true;
     // 初始化
     unique_lock<mutex> lock(m_mutex);
-    while (m_obj == nullptr) {
-        m_cond.notify_all();
-        m_cond.wait(lock);
-    }
-    jobject obj = env->NewLocalRef(m_obj);
-    m_obj = nullptr;
+    m_alive = true;
     m_cond.notify_all();
     lock.unlock();
-//    env->FindClass("com/scut/utils/ModuleController");
-//    env->FindClass("com/scut/utils/Snore");
-    SnoreJNICallback jniCallback(env, obj);
+
+    SnoreJNICallback *callback = m_callback;
     int64_t start = 0, stop = 0, timestamp = 0;
     DispatchState state = STOP;
     uint32_t size = m_size;
@@ -151,7 +142,7 @@ void SnoreThread::run(JNIEnv *env) {
 
         if (onStart) {
             onStart = false;
-            jniCallback.onStart(start);
+            callback->onStart(env, start);
         }
 
         if (ready) {
@@ -176,7 +167,7 @@ void SnoreThread::run(JNIEnv *env) {
                 log_i("%s(): frame: %d, start: %lld ms, end: %lld ms, result: %s", __FUNCTION__,
                       frame, sms, ems, result.label[i] > 0.5 ? "positive" : "negative");
                 Snore snore = {timestamp + sms, ems - sms, result.label[i] > 0.5, start};
-                jniCallback.onRecognize(snore);
+                callback->onRecognize(env, snore);
             }
             if (result.n_start >= 0 && result.n_length >= 0) {
                 log_i("%s(): update noise profile", __FUNCTION__);
@@ -188,14 +179,13 @@ void SnoreThread::run(JNIEnv *env) {
 
         if (onStop) {
             onStop = false;
-            jniCallback.onStop(stop);
+            callback->onStop(env, stop);
         }
     }
 
     delete[] buf1;
     delete[] buf2;
     delete[] buf3;
-    env->DeleteLocalRef(obj);
     lock.lock();
     m_alive = false;
     m_cond.notify_all();

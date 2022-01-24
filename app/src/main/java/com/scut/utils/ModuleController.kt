@@ -58,7 +58,7 @@ object ModuleController {
         mSPLCallback.onDetect(spl)
     }
 
-    fun initial(): Boolean {
+    fun create(): Boolean {
         return LibSRP.create(this)
     }
 

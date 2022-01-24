@@ -55,6 +55,11 @@ public:
      */
     void unregisterCallback(AudioDataCallback *callback);
 
+    /**
+     * 清除所有回调
+     */
+    void clear();
+
 private:
     vector<AudioDataCallback *> m_callbacks;
     mutex m_mutex;

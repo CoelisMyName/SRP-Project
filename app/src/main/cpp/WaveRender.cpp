@@ -1,4 +1,7 @@
+#include "log.h"
 #include "WaveRender.h"
+
+TAG(WaveRender)
 
 void WaveRender::onAttach() {
 

@@ -26,7 +26,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(binding.root)
         binding.start.setOnClickListener(this)
         binding.stop.setOnClickListener(this)
-        mController.initial()
+        mController.create()
     }
 
     override fun onClick(v: View?) {
