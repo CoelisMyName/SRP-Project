@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.scut.component.RenderFactory
 import com.scut.databinding.ActivityDebugBinding
 import com.scut.utils.ModuleController
 
@@ -27,6 +28,8 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         binding.start.setOnClickListener(this)
         binding.stop.setOnClickListener(this)
         mController.create()
+        binding.textureView.setRender(RenderFactory.DEFAULT_RENDER)
+        mController.registerNativeCallback(binding.textureView.getRender().getNativePointer())
     }
 
     override fun onClick(v: View?) {
@@ -51,6 +54,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
     override fun onDestroy() {
         super.onDestroy()
         mController.stop()
+        mController.unregisterNativeCallback(binding.textureView.getRender().getNativePointer())
         mController.destroy()
     }
 }

@@ -4,10 +4,10 @@
 #include "global.h"
 #include "GLThread.h"
 #include "SPLThread.h"
-#include "WaveRender.h"
 #include "SnoreThread.h"
 #include "AudioSource.h"
 #include "AudioRecord.h"
+#include "RenderFactory.h"
 #include "SPLJNICallback.h"
 #include "SnoreJNICallback.h"
 #include "AudioDataDispatcher.h"
@@ -18,7 +18,6 @@ static AudioSource *audioSource = nullptr;
 static AudioDataDispatcher *dispatcher = nullptr;
 static SnoreThread *snoreThread = nullptr;
 static SPLThread *splThread = nullptr;
-static WaveRender *waveRender = nullptr;
 static SnoreJNICallback *snoreJNICallback = nullptr;
 static SPLJNICallback *splJNICallback = nullptr;
 static bool initialFlag = false;
@@ -126,6 +125,10 @@ Java_com_scut_utils_LibSRP_destroy(JNIEnv *env, jobject thiz, jobject controller
     delete dispatcher;
     delete snoreThread;
     delete splThread;
+    snoreJNICallback->updateEnv(env);
+    splJNICallback->updateEnv(env);
+    delete snoreJNICallback;
+    delete splJNICallback;
     initialFlag = false;
     return true;
 }
@@ -159,5 +162,39 @@ JNIEXPORT jboolean JNICALL
 Java_com_scut_utils_LibSRP_isRunning(JNIEnv *env, jobject thiz, jobject controller) {
     if (!initialFlag) return false;
     return audioSource->isRunning();
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_scut_utils_LibSRP_registerCallback(JNIEnv *env, jobject thiz, jobject controller,
+                                            jlong pointer) {
+    if (!initialFlag) return false;
+    auto callback = (AudioDataCallback *) pointer;
+    if (callback == nullptr) return false;
+    dispatcher->registerCallback(callback);
+    return true;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_scut_utils_LibSRP_unregisterCallback(JNIEnv *env, jobject thiz, jobject controller,
+                                              jlong pointer) {
+    if (!initialFlag) return false;
+    auto callback = (AudioDataCallback *) pointer;
+    if (callback == nullptr) return false;
+    dispatcher->unregisterCallback(callback);
+    return true;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_scut_component_RenderFactory_newRender(JNIEnv *env, jobject thiz, jstring type) {
+    auto str = env->GetStringUTFChars(type, nullptr);
+    GLRender *render = newRender(str);
+    env->ReleaseStringUTFChars(type, str);
+    return (jlong) render;
+}
+
+JNIEXPORT void JNICALL
+Java_com_scut_component_RenderFactory_deleteRender(JNIEnv *env, jobject thiz, jlong pointer) {
+    auto render = (GLRender *) pointer;
+    deleteRender(render);
 }
 }

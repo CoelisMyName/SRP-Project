@@ -15,15 +15,15 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
                 const val TAG = "NativeGLThread"
             }
 
-            private val mRender: Long
+            private val mRender: NativeRender
             private val mThread: Long
 
             init {
                 if (render.getNativePointer() == 0L) {
                     throw NullPointerException("native render pointer is nullptr")
                 }
-                mRender = render.getNativePointer()
-                mThread = LibGLThread.create(view, mRender)
+                mRender = render
+                mThread = LibGLThread.create(view, mRender.getNativePointer())
             }
 
             fun surfaceCreate(surface: SurfaceTexture, width: Int, height: Int) {
@@ -44,6 +44,8 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
 
             protected fun finalize() {
                 LibGLThread.destroy(mThread)
+                RenderFactory.destroyRender(mRender)
+                Log.d(TAG, "finalize: ")
             }
         }
     }
@@ -65,10 +67,15 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
     /**
      * 必须在 onCreate 时候调用，否则不显示
      */
-    fun setRender(render: NativeRender) {
-        mRender = render
+    fun setRender(type: String) {
+        if (mFlagInit) return
+        mRender = RenderFactory.createRender(type)
         mThread = NativeGLThread(this, mRender)
         mFlagInit = true
+    }
+
+    fun getRender(): NativeRender {
+        return mRender
     }
 
     override fun onSurfaceTextureAvailable(st: SurfaceTexture, width: Int, height: Int) {
@@ -91,7 +98,7 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
 
     override fun onSurfaceTextureUpdated(st: SurfaceTexture) {
         if (!mFlagInit) return
-        Log.d(TAG, "onSurfaceTextureUpdated: ")
+//        Log.d(TAG, "onSurfaceTextureUpdated: ")
         mThread.surfaceUpdated(st)
     }
 

@@ -12,4 +12,6 @@ object LibSRP {
     external fun getSampleRate(controller: ModuleController): Long
     external fun getStartTime(controller: ModuleController): Long
     external fun isRunning(controller: ModuleController): Boolean
+    external fun registerCallback(controller: ModuleController, pointer: Long): Boolean
+    external fun unregisterCallback(controller: ModuleController, pointer: Long): Boolean
 }

@@ -3,6 +3,14 @@
 
 TAG(WaveRender)
 
+WaveRender::WaveRender() {
+
+}
+
+WaveRender::~WaveRender() {
+
+}
+
 void WaveRender::onAttach() {
 
 }

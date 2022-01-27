@@ -173,6 +173,7 @@ void SPLThread::run(JNIEnv *env) {
 
 void SPLThread::waitForExit() {
     unique_lock<mutex> lock(m_mutex);
+    if (!m_alive) return;
     m_exit = true;
     while (m_alive) {
         m_cond.notify_all();

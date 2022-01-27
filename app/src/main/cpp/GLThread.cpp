@@ -174,7 +174,7 @@ void GLThread::run(JNIEnv *env) {
         if (hasSurface) {
             m_render->onDraw();
             EGLBoolean ret = eglSwapBuffers(eglObject.display, eglObject.surface);
-            log_i("%s(): drawing", __FUNCTION__);
+//            log_i("%s(): drawing", __FUNCTION__);
             if (ret == EGL_FALSE) {
                 log_e("%s(): swap buffer error %s", __FUNCTION__, getErrorMessage(eglGetError()));
             }

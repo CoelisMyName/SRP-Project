@@ -6,7 +6,9 @@
 
 class WaveRender : public GLRender, public AudioDataCallback {
 public:
-    virtual ~WaveRender() override = default;
+    WaveRender();
+
+    virtual ~WaveRender() override;
 
     virtual void onAttach() override;
 
