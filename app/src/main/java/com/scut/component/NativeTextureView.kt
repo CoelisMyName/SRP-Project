@@ -42,6 +42,22 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
                 LibGLThread.surfaceUpdated(mThread, surface)
             }
 
+            fun onStart() {
+                LibGLThread.onStart(mThread)
+            }
+
+            fun onStop() {
+                LibGLThread.onStop(mThread)
+            }
+
+            fun onResume() {
+                LibGLThread.onResume(mThread)
+            }
+
+            fun onPause() {
+                LibGLThread.onPause(mThread)
+            }
+
             protected fun finalize() {
                 LibGLThread.destroy(mThread)
                 RenderFactory.destroyRender(mRender)
@@ -112,11 +128,19 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
         super.onDetachedFromWindow()
     }
 
+    fun onStart() {
+        mThread.onStart()
+    }
+
+    fun onStop() {
+        mThread.onStop()
+    }
+
     fun onResume() {
-        Log.d(TAG, "onResume: ")
+        mThread.onResume()
     }
 
     fun onPause() {
-        Log.d(TAG, "onPause: ")
+        mThread.onPause()
     }
 }

@@ -13,4 +13,8 @@ object LibGLThread {
     external fun surfaceDestroyed(thread: Long): Boolean
     external fun surfaceUpdated(thread: Long, surface: SurfaceTexture)
     external fun destroy(thread: Long)
+    external fun onStart(thread: Long)
+    external fun onStop(thread: Long)
+    external fun onResume(thread: Long)
+    external fun onPause(thread: Long)
 }

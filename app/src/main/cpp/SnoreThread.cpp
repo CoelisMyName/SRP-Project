@@ -7,14 +7,11 @@
 
 TAG(SnoreThread)
 
-SnoreThread::SnoreThread(SnoreJNICallback *callback) : m_callback(callback), m_state(STOP),
-                                                       m_start(0), m_stop(0), m_frame(0),
-                                                       m_sample_count(0), m_exit(false),
-                                                       m_alive(false),
+SnoreThread::SnoreThread(SnoreJNICallback *callback) : m_callback(callback),
+                                                       m_size(SNORE_BUFFER_SIZE),
                                                        m_buffer_pool(3, SNORE_BUFFER_SIZE,
                                                                      SNORE_BUFFER_SIZE -
                                                                      SNORE_INPUT_SIZE),
-                                                       m_size(SNORE_BUFFER_SIZE),
                                                        m_thread([this] {
                                                            EnvHelper helper;
                                                            this->run(helper.getEnv());
@@ -40,7 +37,7 @@ void SnoreThread::onStart(int64_t timestamp) {
         m_cond.notify_all();
         return;
     }
-    m_state = START;
+    m_state = DispatchState::START;
     m_start = timestamp;
     m_sample_count = 0;
     m_frame = 0;
@@ -57,7 +54,7 @@ void SnoreThread::onStop(int64_t timestamp) {
         m_cond.notify_all();
         return;
     }
-    m_state = STOP;
+    m_state = DispatchState::STOP;
     m_stop = timestamp;
     m_cond.notify_all();
 }
@@ -94,7 +91,7 @@ void SnoreThread::run(JNIEnv *env) {
 
     SnoreJNICallback *callback = m_callback;
     int64_t start = 0, stop = 0, timestamp = 0;
-    DispatchState state = STOP;
+    DispatchState state = DispatchState::STOP;
     uint32_t size = m_size;
     int32_t frame = 0;
     bool exit = false, ready = false, onStart = false, onStop = false;
@@ -110,16 +107,17 @@ void SnoreThread::run(JNIEnv *env) {
         lock.lock();
         // 未退出，缓存池未准备好，状态未改变
         while (!m_exit && !m_buffer_pool.ready() && state == m_state) {
+            m_cond.notify_all();
             m_cond.wait(lock);
         }
         exit = m_exit;
-        if (state != m_state && m_state == START) {
+        if (state != m_state && m_state == DispatchState::START) {
             start = m_start;
             onStart = true;
             frame = 0;
         }
 
-        if (state != m_state && m_state == STOP) {
+        if (state != m_state && m_state == DispatchState::STOP) {
             stop = m_stop;
             onStop = true;
         }

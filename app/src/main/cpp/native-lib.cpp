@@ -54,7 +54,7 @@ JNIEXPORT jlong JNICALL
 Java_com_scut_component_LibGLThread_create(JNIEnv *env, jobject thiz, jobject view,
                                            jlong render) {
     auto p_render = (GLRender *) render;
-    auto p_thread = new GLThread(env, view, p_render);
+    auto p_thread = new GLThread(p_render);
     auto thread = (jlong) p_thread;
     return thread;
 }
@@ -96,6 +96,30 @@ Java_com_scut_component_LibGLThread_destroy(JNIEnv *env, jobject thiz,
     auto p_thread = (GLThread *) thread;
     p_thread->waitForExit();
     delete p_thread;
+}
+
+JNIEXPORT void JNICALL
+Java_com_scut_component_LibGLThread_onStart(JNIEnv *env, jobject thiz, jlong thread) {
+    auto p_thread = (GLThread *) thread;
+    p_thread->onLifecycleChanged(LifecycleState::START);
+}
+
+JNIEXPORT void JNICALL
+Java_com_scut_component_LibGLThread_onStop(JNIEnv *env, jobject thiz, jlong thread) {
+    auto p_thread = (GLThread *) thread;
+    p_thread->onLifecycleChanged(LifecycleState::STOP);
+}
+
+JNIEXPORT void JNICALL
+Java_com_scut_component_LibGLThread_onResume(JNIEnv *env, jobject thiz, jlong thread) {
+    auto p_thread = (GLThread *) thread;
+    p_thread->onLifecycleChanged(LifecycleState::RESUME);
+}
+
+JNIEXPORT void JNICALL
+Java_com_scut_component_LibGLThread_onPause(JNIEnv *env, jobject thiz, jlong thread) {
+    auto p_thread = (GLThread *) thread;
+    p_thread->onLifecycleChanged(LifecycleState::PAUSE);
 }
 
 // LibSRP.kt

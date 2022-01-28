@@ -50,25 +50,25 @@ public:
     void waitForExit();
 
 private:
-    uint32_t m_size;
-    int32_t m_sample_rate;
+    volatile DispatchState m_state = DispatchState::STOP;
+    volatile int64_t m_start = 0;
+    volatile int64_t m_stop = 0;
+    volatile int64_t m_frame = 0;
+    volatile int64_t m_sample_count = 0;
+    volatile bool m_exit = false;
+    volatile bool m_alive = false;
 
-    thread m_thread;
-    mutex m_mutex;
-    condition_variable m_cond;
+    int32_t m_size;
+    int32_t m_sample_rate;
 
     SnoreJNICallback *m_callback;
 
     BufferPool<int16_t> m_buffer_pool;
     queue<int64_t> m_timestamp;
 
-    volatile DispatchState m_state;
-    volatile int64_t m_start;
-    volatile int64_t m_stop;
-    volatile int64_t m_frame;
-    volatile int64_t m_sample_count;
-    volatile bool m_exit;
-    volatile bool m_alive;
+    mutex m_mutex;
+    condition_variable m_cond;
+    thread m_thread;
 };
 
 #endif

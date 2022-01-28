@@ -9,7 +9,7 @@ TAG(AudioDataDispatcher)
 
 AudioDataDispatcher::AudioDataDispatcher() {
     m_callbacks.reserve(10);
-    m_state = STOP;
+    m_state = DispatchState::STOP;
     m_start = 0;
     m_timestamp = 0;
     m_stop = 0;
@@ -20,7 +20,7 @@ AudioDataDispatcher::~AudioDataDispatcher() = default;
 
 void AudioDataDispatcher::dispatchStart(int64_t timestamp) {
     unique_lock<mutex> lock(m_mutex);
-    m_state = START;
+    m_state = DispatchState::START;
     m_start = timestamp;
     for (auto cb : m_callbacks) {
         cb->onStart(timestamp);
@@ -30,7 +30,7 @@ void AudioDataDispatcher::dispatchStart(int64_t timestamp) {
 
 void AudioDataDispatcher::dispatchStop(int64_t timestamp) {
     unique_lock<mutex> lock(m_mutex);
-    m_state = STOP;
+    m_state = DispatchState::STOP;
     m_stop = timestamp;
     for (auto cb : m_callbacks) {
         cb->onStop(timestamp);
@@ -64,7 +64,7 @@ void AudioDataDispatcher::registerCallback(AudioDataCallback *callback) {
     }
     m_callbacks.push_back(callback);
     callback->onAttach();
-    if (m_state == START) {
+    if (m_state == DispatchState::START) {
         callback->onStart(m_start);
     }
     log_i("%s(): %s", __FUNCTION__, "register callback");

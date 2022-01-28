@@ -10,7 +10,7 @@ using std::mutex;
 using std::thread;
 using std::vector;
 
-enum DispatchState {
+enum class DispatchState {
     START, STOP
 };
 

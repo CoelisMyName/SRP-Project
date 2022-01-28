@@ -3,6 +3,7 @@
 #include <android/surface_texture.h>
 #include <android/surface_texture_jni.h>
 #include "log.h"
+#include "utils.h"
 #include "global.h"
 #include "GLThread.h"
 
@@ -35,6 +36,8 @@ typedef struct {
     EGLContext context;
     EGLSurface surface;
     EGLint error;
+    ANativeWindow *window;
+    ASurfaceTexture *surfaceTexture;
 } EGLObject;
 
 static bool initialEGL(EGLObject &eglObject); // 初始化 EGL
@@ -47,26 +50,22 @@ static bool destroyEGL(EGLObject &eglObject); // 销毁 EGL
 
 static const char *getRenderTypeString(EGLint renderType); // 返回渲染器字符串
 
-static void logConfig(EGLDisplay display, EGLConfig config); // 调试打印 EGL 配置信息
-
-static void attachGLThread(GLThread *glThread); // 线程运行 GLThread 调用函数
+__unused static void logConfig(EGLDisplay display, EGLConfig config); // 调试打印 EGL 配置信息
 
 static const char *getErrorMessage(EGLint error); // 返回 EGL 错误字符串
 
-GLThread::GLThread(JNIEnv *env, jobject view, GLRender *render) : m_render(render), m_width(0),
-                                                                  m_height(0),
-                                                                  m_alive(false), m_exit(false),
-                                                                  m_wait(0),
-                                                                  m_surfaceSizeChange(false),
-                                                                  m_surfaceCreate(false),
-                                                                  m_surfaceDestroy(false),
-                                                                  m_surface(nullptr),
-                                                                  m_thread([this] {
-                                                                      attachGLThread(this);
-                                                                  }) {
+static bool lifecycleVisible(LifecycleState state);
+
+static bool lifecycleInvisible(LifecycleState state);
+
+static const char *lifecycleString(LifecycleState state);
+
+GLThread::GLThread(GLRender *render) : m_render(render),
+                                       m_thread([this] {
+                                           EnvHelper helper;
+                                           this->run(helper.getEnv());
+                                       }) {
     unique_lock<mutex> lock(m_mutex);
-    jweak w_view = env->NewWeakGlobalRef(view);
-    m_view = w_view;
     while (!m_alive) {
         m_cond.wait(lock);
     }
@@ -80,12 +79,12 @@ void GLThread::run(JNIEnv *env) {
     unique_lock<mutex> lock(m_mutex);
     m_alive = true;
     m_cond.notify_all();
-    log_i("%s(): is alive", __FUNCTION__);
     lock.unlock();
 
     jobject surface = nullptr;
     bool hasSurface = false, exit = false, createSurface = false, destroySurface = false, sizeChange = false;
     int32_t width = 0, height = 0;
+    LifecycleState lifecycle = LifecycleState::IDLE;
 
     EGLObject eglObject;
     while (!initialEGL(eglObject)) {
@@ -94,14 +93,19 @@ void GLThread::run(JNIEnv *env) {
 
     while (true) {
         // 同步状态
-        if (m_wait > 0 || !hasSurface) {
+        if (m_wait > 0 || !hasSurface || lifecycleInvisible(lifecycle)) {
             lock.lock();
-            log_i("%s(): wait = %d", __FUNCTION__, m_wait);
-            // 等待条件，有请求，没有 surface，没有创建 surface 的请求，没有退出请求
-            while (m_wait <= 0 && (!hasSurface && !m_surfaceCreate) && !m_exit) {
+            // 等待条件，有请求，没有 surface，没有创建 surface 的请求，没有退出请求，生命周期没变化
+            while (true) {
+                if (m_exit) break;
+                if (m_wait > 0) break;
+                if (m_lifecycle != LifecycleState::IDLE) break;
+                if (m_surfaceCreate) break;
+                if (m_surfaceDestroy) break;
                 m_cond.notify_all();
                 m_cond.wait(lock);
             }
+            log_i("%s(): wait = %d", __FUNCTION__, m_wait);
             exit = m_exit;
             if (m_surfaceCreate) {
                 m_surfaceCreate = false;
@@ -110,21 +114,23 @@ void GLThread::run(JNIEnv *env) {
                 createSurface = true;
                 surface = env->NewLocalRef(m_surface);
             }
-
             if (m_surfaceSizeChange) {
                 m_surfaceSizeChange = false;
                 width = m_width;
                 height = m_height;
                 sizeChange = true;
             }
-
             if (m_surfaceDestroy) {
                 m_surfaceDestroy = false;
                 width = 0;
                 height = 0;
                 destroySurface = true;
             }
-
+            if (m_lifecycle != LifecycleState::IDLE) {
+                lifecycle = m_lifecycle;
+                m_lifecycle = LifecycleState::IDLE;
+                log_i("%s(): lifecycle change %s", __FUNCTION__, lifecycleString(lifecycle));
+            }
             m_wait = 0;
             m_cond.notify_all();
             lock.unlock();
@@ -134,7 +140,6 @@ void GLThread::run(JNIEnv *env) {
             if (hasSurface) {
                 m_render->onDestroy();
             }
-            hasSurface = false;
             break;
         }
         // EGL API 可能线程不安全
@@ -162,29 +167,25 @@ void GLThread::run(JNIEnv *env) {
             hasSurface = false;
             log_i("%s(): surface destroy", __FUNCTION__);
         }
-
         // 大小发生改变
         if (sizeChange) {
             sizeChange = false;
             m_render->onChange(width, height);
             log_i("%s(): surface size change width = %d, height = %d", __FUNCTION__, width, height);
         }
-
-        // 渲染
-        if (hasSurface) {
+        // 渲染 当生命周期在 START 以前，PAUSE 以后就不绘制
+        if (hasSurface && lifecycleVisible(lifecycle)) {
             m_render->onDraw();
+//            log_i("%s(): swap buffer", __FUNCTION__);
             EGLBoolean ret = eglSwapBuffers(eglObject.display, eglObject.surface);
-//            log_i("%s(): drawing", __FUNCTION__);
             if (ret == EGL_FALSE) {
                 log_e("%s(): swap buffer error %s", __FUNCTION__, getErrorMessage(eglGetError()));
             }
         }
     }
-
     lock.lock();
     destroyEGLSurface(eglObject);
     destroyEGL(eglObject);
-    env->DeleteWeakGlobalRef(m_view);
     m_alive = false;
     m_cond.notify_all();
     log_i("%s(): exiting", __FUNCTION__);
@@ -237,6 +238,7 @@ void GLThread::surfaceUpdated(JNIEnv *env, jobject surface) {
 
 void GLThread::waitForExit() {
     unique_lock<mutex> lock(m_mutex);
+    if (!m_alive) return;
     m_exit = true;
     while (m_alive) {
         m_wait += 1;
@@ -247,8 +249,19 @@ void GLThread::waitForExit() {
     m_thread.join();
 }
 
+void GLThread::onLifecycleChanged(LifecycleState state) {
+    unique_lock<mutex> lock(m_mutex);
+    m_lifecycle = state;
+    m_wait += 1;
+    m_cond.notify_all();
+    // 如果主线程被阻塞，Render 调用 glClear 的时候会阻塞，原因可能是因为主线程需要处理
+    lock.unlock();
+}
+
 static bool initialEGL(EGLObject &eglObject) {
-    eglObject = {EGL_NO_DISPLAY, 0, 0, nullptr, EGL_NO_CONTEXT, EGL_NO_SURFACE, EGL_SUCCESS};
+    eglObject = {EGL_NO_DISPLAY, 0, 0, nullptr, EGL_NO_CONTEXT, EGL_NO_SURFACE, EGL_SUCCESS,
+                 nullptr,
+                 nullptr};
     EGLBoolean ret = EGL_FALSE;
     EGLDisplay dpy = EGL_NO_DISPLAY;
     EGLint mjr = 0, mnr = 0, num = 0, err = EGL_SUCCESS;
@@ -269,7 +282,7 @@ static bool initialEGL(EGLObject &eglObject) {
     cfgs = new EGLConfig[num];
     ret = eglChooseConfig(dpy, CONFIG_ATTR, cfgs, num, &num);
     if (ret == EGL_FALSE) goto finish;
-    for (uint32_t i = 0; i < num; ++i) logConfig(dpy, cfgs[i]);
+//    for (uint32_t i = 0; i < num; ++i) logConfig(dpy, cfgs[i]);
 
     cfg = cfgs[0];
     ctx = eglCreateContext(dpy, cfg, EGL_NO_CONTEXT, CONTEXT_ATTR);
@@ -285,11 +298,9 @@ static bool initialEGL(EGLObject &eglObject) {
 static bool createEGLSurface(EGLObject &eglObject, JNIEnv *env, jobject surface) {
     EGLSurface sfc = EGL_NO_SURFACE;
     EGLint err = EGL_SUCCESS;
-    ASurfaceTexture *aSurfaceTexture = ASurfaceTexture_fromSurfaceTexture(env, surface);
-    ANativeWindow *win = ASurfaceTexture_acquireANativeWindow(aSurfaceTexture);
-    sfc = eglCreateWindowSurface(eglObject.display, eglObject.config, win, nullptr);
-    ANativeWindow_release(win);
-    ASurfaceTexture_release(aSurfaceTexture);
+    eglObject.surfaceTexture = ASurfaceTexture_fromSurfaceTexture(env, surface);
+    eglObject.window = ASurfaceTexture_acquireANativeWindow(eglObject.surfaceTexture);
+    sfc = eglCreateWindowSurface(eglObject.display, eglObject.config, eglObject.window, nullptr);
     err = eglGetError();
     eglObject.surface = sfc;
     eglObject.error = err;
@@ -304,7 +315,10 @@ static bool destroyEGLSurface(EGLObject &eglObject) {
     ret = eglDestroySurface(eglObject.display, eglObject.surface);
     if (ret == EGL_FALSE) goto finish;
     eglObject.surface = EGL_NO_SURFACE;
-
+    ANativeWindow_release(eglObject.window);
+    eglObject.window = nullptr;
+    ASurfaceTexture_release(eglObject.surfaceTexture);
+    eglObject.surfaceTexture = nullptr;
     finish:
     err = eglGetError();
     eglObject.error = err;
@@ -338,7 +352,7 @@ static const char *getRenderTypeString(EGLint renderType) {
     return "unknown";
 }
 
-static void logConfig(EGLDisplay display, EGLConfig config) {
+__unused static void logConfig(EGLDisplay display, EGLConfig config) {
     EGLint redSize, greenSize, blueSize, alphaSize, depthSize, stencilSize, renderType;
     eglGetConfigAttrib(display, config, EGL_RED_SIZE, &redSize);
     eglGetConfigAttrib(display, config, EGL_GREEN_SIZE, &greenSize);
@@ -350,17 +364,6 @@ static void logConfig(EGLDisplay display, EGLConfig config) {
     log_i("%s(): red size = %d, green size = %d, blue size = %d, alpha size = %d, depth size = %d, stencil size = %d, render type = %s",
           __FUNCTION__, redSize, greenSize, blueSize, alphaSize, depthSize, stencilSize,
           getRenderTypeString(renderType));
-}
-
-static void attachGLThread(GLThread *glThread) {
-    JNIEnv *env = nullptr;
-    jint res;
-    res = g_jvm->AttachCurrentThread(&env, nullptr);
-    assert(res == JNI_OK);
-    glThread->run(env);
-    res = g_jvm->DetachCurrentThread();
-    assert(res == JNI_OK);
-    env = nullptr;
 }
 
 static const char *getErrorMessage(EGLint error) {
@@ -398,4 +401,34 @@ static const char *getErrorMessage(EGLint error) {
         default:
             return "UNKNOWN EGL ERROR";
     }
+}
+
+static bool lifecycleVisible(LifecycleState state) {
+    return state == LifecycleState::START || state == LifecycleState::RESUME;
+}
+
+static bool lifecycleInvisible(LifecycleState state) {
+    return state == LifecycleState::IDLE || state == LifecycleState::CREATE ||
+           state == LifecycleState::PAUSE || state == LifecycleState::STOP ||
+           state == LifecycleState::DESTROY;
+}
+
+static const char *lifecycleString(LifecycleState state) {
+    switch (state) {
+        case LifecycleState::IDLE:
+            return "IDLE";
+        case LifecycleState::CREATE:
+            return "CREATE";
+        case LifecycleState::START:
+            return "START";
+        case LifecycleState::RESUME:
+            return "RESUME";
+        case LifecycleState::PAUSE:
+            return "PAUSE";
+        case LifecycleState::STOP:
+            return "STOP";
+        case LifecycleState::DESTROY:
+            return "DESTROY";
+    }
+    return "";
 }

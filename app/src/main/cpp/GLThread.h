@@ -11,15 +11,17 @@ using std::atomic;
 using std::unique_lock;
 using std::condition_variable;
 
+enum class LifecycleState {
+    IDLE, CREATE, START, RESUME, PAUSE, STOP, DESTROY
+};
+
 class GLThread {
 public:
     /**
      * 传递 view 引用和 render
-     * @param env
-     * @param view
      * @param render
      */
-    GLThread(JNIEnv *env, jobject view, GLRender *render);
+    GLThread(GLRender *render);
 
     virtual ~GLThread();
 
@@ -62,26 +64,33 @@ public:
     void surfaceUpdated(JNIEnv *env, jobject surface);
 
     /**
+     * 通知生命周期变化
+     * @param state
+     */
+    void onLifecycleChanged(LifecycleState state);
+
+    /**
      * 等待线程退出
      */
     void waitForExit();
 
 private:
-    jweak m_view;
-    thread m_thread;
+    // 线程通信交换变量
+    volatile jobject m_surface = nullptr;
+    volatile int32_t m_wait = 0;
+    volatile int32_t m_width = 0;
+    volatile int32_t m_height = 0;
+    volatile bool m_exit = false;
+    volatile bool m_alive = false;
+    volatile bool m_surfaceCreate = false;
+    volatile bool m_surfaceDestroy = false;
+    volatile bool m_surfaceSizeChange = false;
+    volatile LifecycleState m_lifecycle = LifecycleState::IDLE;
+
+    GLRender *m_render;
     mutex m_mutex;
     condition_variable m_cond;
-    GLRender *m_render;
-    // 线程通信交换变量
-    volatile jobject m_surface;
-    volatile int32_t m_wait;
-    volatile int32_t m_width;
-    volatile int32_t m_height;
-    volatile bool m_exit;
-    volatile bool m_alive;
-    volatile bool m_surfaceCreate;
-    volatile bool m_surfaceDestroy;
-    volatile bool m_surfaceSizeChange;
+    thread m_thread;
 };
 
 #endif

@@ -7,14 +7,11 @@
 
 TAG(SPLThread)
 
-SPLThread::SPLThread(SPLJNICallback *callback) : m_callback(callback), m_frame(0),
-                                                 m_size(SPL_INPUT_SIZE), m_state(STOP), m_start(0),
-                                                 m_stop(0), m_sample_count(0), m_exit(false),
-                                                 m_alive(false), m_buffer_pool(3, SPL_INPUT_SIZE),
-                                                 m_thread([this] {
-                                                     EnvHelper helper;
-                                                     this->run(helper.getEnv());
-                                                 }) {
+SPLThread::SPLThread(SPLJNICallback *callback) : m_callback(callback), m_size(SPL_INPUT_SIZE),
+                                                 m_buffer_pool(3, SPL_INPUT_SIZE), m_thread([this] {
+            EnvHelper helper;
+            this->run(helper.getEnv());
+        }) {
     m_sample_rate = SAMPLE_RATE;
     unique_lock<mutex> lock(m_mutex);
     while (!m_alive) {
@@ -36,7 +33,7 @@ void SPLThread::onStart(int64_t timestamp) {
         m_cond.notify_all();
         return;
     }
-    m_state = START;
+    m_state = DispatchState::START;
     m_start = timestamp;
     m_sample_count = 0;
     m_frame = 0;
@@ -53,7 +50,7 @@ void SPLThread::onStop(int64_t timestamp) {
         m_cond.notify_all();
         return;
     }
-    m_state = STOP;
+    m_state = DispatchState::STOP;
     m_stop = timestamp;
     m_cond.notify_all();
 }
@@ -89,7 +86,7 @@ void SPLThread::run(JNIEnv *env) {
     lock.unlock();
 
     SPLJNICallback *callback = m_callback;
-    DispatchState state = STOP;
+    DispatchState state = DispatchState::STOP;
     bool exit = false, ready = false, onStart = false, onStop = false;
     uint32_t size = m_size;
     int64_t start = 0, stop = 0, timestamp = 0;
@@ -100,16 +97,17 @@ void SPLThread::run(JNIEnv *env) {
         // sync
         lock.lock();
         while (!m_exit && !m_buffer_pool.ready() && state == m_state) {
+            m_cond.notify_all();
             m_cond.wait(lock);
         }
         exit = m_exit;
 
-        if (state != m_state && m_state == START) {
+        if (state != m_state && m_state == DispatchState::START) {
             start = m_start;
             onStart = true;
         }
 
-        if (state != m_state && m_state == STOP) {
+        if (state != m_state && m_state == DispatchState::STOP) {
             stop = m_stop;
             onStop = true;
         }

@@ -3,6 +3,7 @@ package com.scut
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -30,7 +31,33 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         mController.create()
         binding.textureView.setRender(RenderFactory.DEFAULT_RENDER)
         mController.registerNativeCallback(binding.textureView.getRender().getNativePointer())
+        Log.d(TAG, "onCreate: ")
     }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart: ")
+        binding.textureView.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume: ")
+        binding.textureView.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause: ")
+        binding.textureView.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop: ")
+        binding.textureView.onStop()
+    }
+
 
     override fun onClick(v: View?) {
         if (v == binding.start) {
@@ -56,5 +83,6 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         mController.stop()
         mController.unregisterNativeCallback(binding.textureView.getRender().getNativePointer())
         mController.destroy()
+        Log.d(TAG, "onDestroy: ")
     }
 }
