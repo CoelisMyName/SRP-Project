@@ -22,7 +22,7 @@ AudioRecord::AudioRecord(AudioDataDispatcher *dispatcher, int32_t sample_rate, i
 }
 
 AudioRecord::~AudioRecord() {
-    stop();
+    AudioRecord::stop();
 }
 
 int32_t AudioRecord::getSampleRate() {
