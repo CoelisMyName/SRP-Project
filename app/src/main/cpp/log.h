@@ -1,5 +1,5 @@
-#ifndef LOG_H
-#define LOG_H
+#ifndef SRP_PROJECT_LOG_H
+#define SRP_PROJECT_LOG_H
 
 #include <android/log.h>
 #include "config.h"

@@ -10,10 +10,13 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
     companion object {
         const val TAG = "NativeTextureView"
     }
+
     constructor(context: Context) : super(context) {
     }
+
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
     }
+
     private class NativeGLThread(view: NativeTextureView, render: NativeRender) {
         companion object {
             const val TAG = "NativeGLThread"
@@ -68,6 +71,7 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
             Log.d(TAG, "finalize: ")
         }
     }
+
     private var mFlagInit: Boolean = false
     private lateinit var mThread: NativeGLThread
     private lateinit var mRender: NativeRender

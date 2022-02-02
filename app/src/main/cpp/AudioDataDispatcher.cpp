@@ -72,6 +72,8 @@ void AudioDataDispatcher::registerCallback(AudioDataCallback *callback) {
 
 void AudioDataDispatcher::unregisterCallback(AudioDataCallback *callback) {
     unique_lock<mutex> lock(m_mutex);
+//    m_callbacks.erase(std::remove_if(m_callbacks.begin(), m_callbacks.end(), [callback](AudioDataCallback *cb){return cb == callback; }),
+//                      m_callbacks.end());
     // 迭代器删除元素
     for (auto iter = m_callbacks.begin(); iter != m_callbacks.end();) {
         if (*iter == callback) {
