@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <cassert>
 #include <snore.h>
+#include <android/asset_manager_jni.h>
 #include "log.h"
 #include "global.h"
 #include "GLThread.h"
@@ -243,5 +244,11 @@ Java_com_scut_component_RenderFactory_deleteRender(__unused JNIEnv *env, __unuse
                                                    jlong pointer) {
     auto render = (GLRender *) pointer;
     deleteRender(render);
+}
+
+JNIEXPORT void JNICALL
+Java_com_scut_utils_LibSRP_setAssetManager(JNIEnv *env, __unused jobject thiz, jobject ast) {
+    if (g_assets != nullptr) return;
+    g_assets = AAssetManager_fromJava(env, ast);
 }
 }
