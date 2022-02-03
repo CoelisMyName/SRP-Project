@@ -8,10 +8,11 @@
 TAG(SPLThread)
 
 SPLThread::SPLThread(SPLJNICallback *callback) : m_callback(callback), m_size(SPL_INPUT_SIZE),
-                                                 m_buffer_pool(3, SPL_INPUT_SIZE), m_thread([this] {
-            EnvHelper helper;
-            this->run(helper.getEnv());
-        }) {
+                                                 m_buffer(SAMPLE_RATE, SPL_INPUT_SIZE, 0),
+                                                 m_thread([this] {
+                                                     EnvHelper helper;
+                                                     this->run(helper.getEnv());
+                                                 }) {
     m_sample_rate = SAMPLE_RATE;
     unique_lock<mutex> lock(m_mutex);
     while (!m_alive) {
@@ -37,10 +38,7 @@ void SPLThread::onStart(int64_t timestamp) {
     m_start = timestamp;
     m_sample_count = 0;
     m_frame = 0;
-    m_buffer_pool.clear();
-    while (!m_timestamp.empty()) {
-        m_timestamp.pop();
-    }
+    m_buffer.clear();
     m_cond.notify_all();
 }
 
@@ -61,16 +59,12 @@ void SPLThread::onReceive(int64_t timestamp, int16_t *data, int32_t length) {
         m_cond.notify_all();
         return;
     }
-    if (m_sample_count / SNORE_INPUT_SIZE == m_frame) {
-        m_timestamp.push(timestamp);
-        m_frame += 1;
-    }
-    int32_t write = m_buffer_pool.write(data, length);
+    int32_t write = m_buffer.put(timestamp, data, length);
     m_sample_count += write;
     if (write != length) {
         log_w("%s(): discard %d samples", __FUNCTION__, length - write);
     }
-    if (m_buffer_pool.ready()) {
+    if (m_buffer.ready()) {
         m_cond.notify_all();
     }
 }
@@ -87,16 +81,17 @@ void SPLThread::run(JNIEnv *env) {
 
     SPLJNICallback *callback = m_callback;
     DispatchState state = DispatchState::STOP;
-    bool exit = false, ready = false, onStart = false, onStop = false;
-    uint32_t size = m_size;
+    bool exit, ready = false, onStart = false, onStop = false;
+    int32_t size = m_size;
+    int32_t rd = 0;
     int64_t start = 0, stop = 0, timestamp = 0;
-    auto buf1 = new int16_t[m_size];
-    auto buf2 = new double[m_size];
+    auto buf1 = new int16_t[size];
+    auto buf2 = new double[size];
 
     while (true) {
         // sync
         lock.lock();
-        while (!m_exit && !m_buffer_pool.ready() && state == m_state) {
+        while (!m_exit && !m_buffer.ready() && state == m_state) {
             m_cond.notify_all();
             m_cond.wait(lock);
         }
@@ -112,12 +107,8 @@ void SPLThread::run(JNIEnv *env) {
             onStop = true;
         }
 
-        if (m_buffer_pool.ready()) {
-            timestamp = m_timestamp.front();
-            m_timestamp.pop();
-            int16_t *ptr = m_buffer_pool.next(size);
-            assert(ptr != nullptr);
-            memcpy(buf1, ptr, size * sizeof(int16_t));
+        if (m_buffer.ready()) {
+            rd = m_buffer.next(buf1, size, timestamp);
             ready = true;
         }
         state = m_state;
@@ -138,7 +129,7 @@ void SPLThread::run(JNIEnv *env) {
             for (uint32_t i = 0; i < size; ++i) {
                 buf2[i] = buf1[i] / 32768.0;
             }
-            F64pcm dst = {buf2, size, 1, (double) m_sample_rate};
+            F64pcm dst = {buf2, (uint32_t) rd, 1, (double) m_sample_rate};
             LibSnoreSPL libSnoreSpl;
             calculateSPL(dst, libSnoreSpl);
             SPL spl;

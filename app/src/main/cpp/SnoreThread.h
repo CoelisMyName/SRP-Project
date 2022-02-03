@@ -5,13 +5,12 @@
 #include <queue>
 #include <thread>
 #include "config.h"
-#include "BufferPool.h"
+#include "AudioDataBuffer.h"
 #include "SnoreJNICallback.h"
 #include "AudioDataCallback.h"
 #include "AudioDataDispatcher.h"
 
 using std::mutex;
-using std::queue;
 using std::thread;
 using std::unique_lock;
 using std::condition_variable;
@@ -63,8 +62,7 @@ private:
 
     SnoreJNICallback *m_callback;
 
-    BufferPool<int16_t> m_buffer_pool;
-    queue<int64_t> m_timestamp;
+    AudioDataBuffer<int16_t> m_buffer;
 
     mutex m_mutex;
     condition_variable m_cond;

@@ -9,9 +9,8 @@ TAG(SnoreThread)
 
 SnoreThread::SnoreThread(SnoreJNICallback *callback) : m_callback(callback),
                                                        m_size(SNORE_BUFFER_SIZE),
-                                                       m_buffer_pool(3, SNORE_BUFFER_SIZE,
-                                                                     SNORE_BUFFER_SIZE -
-                                                                     SNORE_INPUT_SIZE),
+                                                       m_buffer(SAMPLE_RATE, SNORE_BUFFER_SIZE,
+                                                                SNORE_PADDING_SIZE),
                                                        m_thread([this] {
                                                            EnvHelper helper;
                                                            this->run(helper.getEnv());
@@ -41,10 +40,7 @@ void SnoreThread::onStart(int64_t timestamp) {
     m_start = timestamp;
     m_sample_count = 0;
     m_frame = 0;
-    m_buffer_pool.clear();
-    while (!m_timestamp.empty()) {
-        m_timestamp.pop();
-    }
+    m_buffer.clear();
     m_cond.notify_all();
 }
 
@@ -65,16 +61,12 @@ void SnoreThread::onReceive(int64_t timestamp, int16_t *data, int32_t length) {
         m_cond.notify_all();
         return;
     }
-    if (m_sample_count / SNORE_INPUT_SIZE == m_frame) {
-        m_timestamp.push(timestamp);
-        m_frame += 1;
-    }
-    int32_t write = m_buffer_pool.write(data, length);
+    int32_t write = m_buffer.put(timestamp, data, length);
     m_sample_count += write;
     if (write != length) {
         log_w("%s(): discard %d samples", __FUNCTION__, length - write);
     }
-    if (m_buffer_pool.ready()) {
+    if (m_buffer.ready()) {
         m_cond.notify_all();
     }
 }
@@ -92,9 +84,10 @@ void SnoreThread::run(JNIEnv *env) {
     SnoreJNICallback *callback = m_callback;
     int64_t start = 0, stop = 0, timestamp = 0;
     DispatchState state = DispatchState::STOP;
-    uint32_t size = m_size;
+    int32_t size = m_size;
+    int32_t rd = 0;
     int32_t frame = 0;
-    bool exit = false, ready = false, onStart = false, onStop = false;
+    bool exit, ready = false, onStart = false, onStop = false;
     auto buf1 = new int16_t[size];
     auto buf2 = new int16_t[size];
     auto buf3 = new double[size];
@@ -106,7 +99,7 @@ void SnoreThread::run(JNIEnv *env) {
         // sync state
         lock.lock();
         // 未退出，缓存池未准备好，状态未改变
-        while (!m_exit && !m_buffer_pool.ready() && state == m_state) {
+        while (!m_exit && !m_buffer.ready() && state == m_state) {
             m_cond.notify_all();
             m_cond.wait(lock);
         }
@@ -122,12 +115,8 @@ void SnoreThread::run(JNIEnv *env) {
             onStop = true;
         }
 
-        if (m_buffer_pool.ready()) {
-            timestamp = m_timestamp.front();
-            m_timestamp.pop();
-            int16_t *ptr = m_buffer_pool.next(size);
-            assert(ptr != nullptr);
-            memcpy(buf1, ptr, size * sizeof(int16_t));
+        if (m_buffer.ready()) {
+            rd = m_buffer.next(buf1, size, timestamp);
             ready = true;
         }
         state = m_state;
@@ -146,8 +135,8 @@ void SnoreThread::run(JNIEnv *env) {
         if (ready) {
             ready = false;
             // 计算工作
-            I16pcm src = {buf1, size, 1, (double) m_sample_rate};
-            I16pcm dst = {buf2, size, 1, (double) m_sample_rate};
+            I16pcm src = {buf1, (uint32_t) rd, 1, (double) m_sample_rate};
+            I16pcm dst = {buf2, (uint32_t) rd, 1, (double) m_sample_rate};
             F64pcm fds = {buf3, SNORE_INPUT_SIZE, 1, (double) m_sample_rate};
             if (frame == 0) {
                 log_i("%s(): generate initial noise profile", __FUNCTION__);

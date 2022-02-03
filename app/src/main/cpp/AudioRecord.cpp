@@ -86,8 +86,9 @@ DataCallbackResult
 AudioRecord::onAudioReady(AudioStream *audioStream, void *audioData, int32_t numFrames) {
     if (m_dispatcher != nullptr) {
         auto data = (int16_t *) audioData;
-        int64_t timestamp = audioStream->getTimestamp(CLOCK_REALTIME).value().timestamp / 1000000;
-        //TODO 时间戳还有问题
+//        int64_t timestamp = audioStream->getTimestamp(CLOCK_MONOTONIC).value().timestamp / 1000000;
+        int64_t timestamp =
+                currentTimeMillis() - (int64_t) ((1000.0 / getSampleRate()) * numFrames);
         m_dispatcher->dispatchAudioData(timestamp, data, numFrames);
         log_i("%s(): %s", __FUNCTION__, "dispatch data");
     }

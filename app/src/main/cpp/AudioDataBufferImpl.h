@@ -76,11 +76,11 @@ int32_t AudioDataBuffer<T>::put(int64_t timestamp, T *src, int32_t size) {
         memcpy(&m_buffer[head], src, (m_capacity - head) * sizeof(T));
         memcpy(m_buffer, src, (write - m_capacity + head) * sizeof(T));
     }
-    auto skew = (int32_t)(m_sample_count % (m_frame - m_overlap));
+    auto skew = (int32_t) (m_sample_count % (m_frame - m_overlap));
     skew = ((m_frame - m_overlap) - skew) % (m_frame - m_overlap);
     double interval = 1000.0 / m_sample_rate;
     for (int32_t i = skew; i < size; i += (m_frame - m_overlap)) {
-        int64_t t = timestamp + (int64_t)(i * interval);
+        int64_t t = timestamp + (int64_t) (i * interval);
         m_timestamp.push(t);
     }
     m_rear = rear;
