@@ -1,4 +1,7 @@
+#include <cstring>
+#include <android/asset_manager.h>
 #include "log.h"
+#include "global.h"
 #include "WaveRender.h"
 
 TAG(WaveRender)
@@ -40,7 +43,21 @@ void WaveRender::onDraw() {
 }
 
 void WaveRender::onChange(int32_t width, int32_t height) {
-
+    AAsset *asset;
+    off_t size;
+    int rd;
+    asset = AAssetManager_open(g_assets, "wave.vert", AASSET_MODE_STREAMING);
+    size = AAsset_getLength(asset);
+    char *vert = new char[size + 1];
+    memset(vert, 0, size + 1);
+    rd = AAsset_read(asset, vert, size);
+    AAsset_close(asset);
+    asset = AAssetManager_open(g_assets, "wave.vert", AASSET_MODE_STREAMING);
+    size = AAsset_getLength(asset);
+    char *frag = new char[size + 1];
+    memset(frag, 0, size + 1);
+    rd = AAsset_read(asset, frag, size);
+    AAsset_close(asset);
 }
 
 void WaveRender::onDestroy() {

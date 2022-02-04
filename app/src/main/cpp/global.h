@@ -14,6 +14,6 @@ extern const char *const g_cache; // cache路径
 
 extern const char *const g_audio; // 保存音频路径
 
-extern const AAssetManager *g_assets; // Asset
+extern AAssetManager *g_assets; // Asset
 
 #endif
