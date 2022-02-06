@@ -4,7 +4,7 @@
 #include <jni.h>
 #include <android/asset_manager.h>
 
-extern const JavaVM *g_jvm; // jvm虚拟机
+extern JavaVM *g_jvm; // jvm虚拟机
 
 extern jint g_version; // jni版本
 

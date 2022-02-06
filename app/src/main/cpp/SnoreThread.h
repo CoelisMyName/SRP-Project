@@ -27,15 +27,15 @@ public:
 
     virtual ~SnoreThread() override;
 
-    virtual void onAttach() override;
+    virtual void onAudioCallbackAttach() override;
 
-    virtual void onStart(int64_t timestamp) override;
+    virtual void onAudioDataStart(int64_t timestamp) override;
 
-    virtual void onStop(int64_t timestamp) override;
+    virtual void onAudioDataStop(int64_t timestamp) override;
 
-    virtual void onReceive(int64_t timestamp, int16_t *data, int32_t length) override;
+    virtual void onAudioDataReceive(int64_t timestamp, int16_t *data, int32_t length) override;
 
-    virtual void onDetach() override;
+    virtual void onAudioCallbackDetach() override;
 
     /**
      * 线程运行方法，所有运行工作在这个函数内

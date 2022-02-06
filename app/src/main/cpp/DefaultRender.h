@@ -8,42 +8,50 @@
 class DefaultRender : public GLRender, public AudioDataCallback {
 
 public:
-    virtual ~DefaultRender() = default;
+    virtual ~DefaultRender() override = default;
 
-    virtual void onAttach() {
-
-    }
-
-    virtual void onStart(int64_t timestamp) {
+    virtual void onAudioCallbackAttach() override {
 
     }
 
-    virtual void onStop(int64_t timestamp) {
+    virtual void onAudioDataStart(int64_t timestamp) override {
 
     }
 
-    virtual void onReceive(int64_t timestamp, int16_t *data, int32_t length) {
+    virtual void onAudioDataStop(int64_t timestamp) override {
 
     }
 
-    virtual void onDetach() {
+    virtual void onAudioDataReceive(int64_t timestamp, int16_t *data, int32_t length) override {
 
     }
 
-    virtual void onCreate(int32_t width, int32_t height) {
+    virtual void onAudioCallbackDetach() override {
 
     }
 
-    virtual void onDraw() {
+    virtual void onRenderAttach() override {
+
+    }
+
+    virtual void onSurfaceCreate(int32_t width, int32_t height) override {
+
+    }
+
+    virtual void onSurfaceDraw() override {
         glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    virtual void onChange(int32_t width, int32_t height) {
+    virtual void onSurfaceSizeChange(int32_t width, int32_t height) override {
 
     }
 
-    virtual void onDestroy() {
+    virtual void onSurfaceDestroy() override {
+
+    }
+
+    virtual void onRenderDetach() override {
 
     }
 };

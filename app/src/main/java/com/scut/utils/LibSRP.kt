@@ -8,7 +8,6 @@ object LibSRP {
     }
 
     external fun setAssetManager(ast: AssetManager)
-
     external fun create(controller: ModuleController): Boolean
     external fun destroy(controller: ModuleController): Boolean
     external fun start(controller: ModuleController): Boolean

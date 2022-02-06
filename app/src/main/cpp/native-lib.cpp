@@ -105,28 +105,28 @@ JNIEXPORT void JNICALL
 Java_com_scut_component_LibGLThread_onStart(__unused JNIEnv *env, __unused jobject thiz,
                                             jlong thread) {
     auto p_thread = (GLThread *) thread;
-    p_thread->onLifecycleChanged(LifecycleState::START);
+    p_thread->lifecycleChanged(LifecycleState::START);
 }
 
 JNIEXPORT void JNICALL
 Java_com_scut_component_LibGLThread_onStop(__unused JNIEnv *env, __unused jobject thiz,
                                            jlong thread) {
     auto p_thread = (GLThread *) thread;
-    p_thread->onLifecycleChanged(LifecycleState::STOP);
+    p_thread->lifecycleChanged(LifecycleState::STOP);
 }
 
 JNIEXPORT void JNICALL
 Java_com_scut_component_LibGLThread_onResume(__unused JNIEnv *env, __unused jobject thiz,
                                              jlong thread) {
     auto p_thread = (GLThread *) thread;
-    p_thread->onLifecycleChanged(LifecycleState::RESUME);
+    p_thread->lifecycleChanged(LifecycleState::RESUME);
 }
 
 JNIEXPORT void JNICALL
 Java_com_scut_component_LibGLThread_onPause(__unused JNIEnv *env, __unused jobject thiz,
                                             jlong thread) {
     auto p_thread = (GLThread *) thread;
-    p_thread->onLifecycleChanged(LifecycleState::PAUSE);
+    p_thread->lifecycleChanged(LifecycleState::PAUSE);
 }
 
 // LibSRP.kt

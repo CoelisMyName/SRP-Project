@@ -1,8 +1,8 @@
 #ifndef SRP_PROJECT_UTILS_H
 #define SRP_PROJECT_UTILS_H
 
-#include <cstdint>
 #include <jni.h>
+#include <cstdint>
 
 /**
  * JNIEnv帮助类，负责管理JNIEnv生命周期，使用这个则不建议使用AttachCurrentThread和DetachCurrentThread

@@ -67,7 +67,7 @@ public:
      * 通知生命周期变化
      * @param state
      */
-    void onLifecycleChanged(LifecycleState state);
+    void lifecycleChanged(LifecycleState state);
 
     /**
      * 等待线程退出

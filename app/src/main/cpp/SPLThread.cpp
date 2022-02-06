@@ -25,10 +25,10 @@ SPLThread::~SPLThread() {
     waitForExit();
 }
 
-void SPLThread::onAttach() {
+void SPLThread::onAudioCallbackAttach() {
 }
 
-void SPLThread::onStart(int64_t timestamp) {
+void SPLThread::onAudioDataStart(int64_t timestamp) {
     unique_lock<mutex> lock(m_mutex);
     if (m_exit || !m_alive) {
         m_cond.notify_all();
@@ -42,7 +42,7 @@ void SPLThread::onStart(int64_t timestamp) {
     m_cond.notify_all();
 }
 
-void SPLThread::onStop(int64_t timestamp) {
+void SPLThread::onAudioDataStop(int64_t timestamp) {
     unique_lock<mutex> lock(m_mutex);
     if (m_exit || !m_alive) {
         m_cond.notify_all();
@@ -53,7 +53,7 @@ void SPLThread::onStop(int64_t timestamp) {
     m_cond.notify_all();
 }
 
-void SPLThread::onReceive(int64_t timestamp, int16_t *data, int32_t length) {
+void SPLThread::onAudioDataReceive(int64_t timestamp, int16_t *data, int32_t length) {
     unique_lock<mutex> lock(m_mutex);
     if (m_exit || !m_alive) {
         m_cond.notify_all();
@@ -69,7 +69,7 @@ void SPLThread::onReceive(int64_t timestamp, int16_t *data, int32_t length) {
     }
 }
 
-void SPLThread::onDetach() {
+void SPLThread::onAudioCallbackDetach() {
 }
 
 void SPLThread::run(JNIEnv *env) {

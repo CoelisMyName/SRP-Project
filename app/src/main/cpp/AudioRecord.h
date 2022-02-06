@@ -87,5 +87,4 @@ private:
     bool openStream();
 };
 
-
 #endif

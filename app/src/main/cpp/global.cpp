@@ -1,6 +1,6 @@
 #include "global.h"
 
-const JavaVM *g_jvm = nullptr;
+JavaVM *g_jvm = nullptr;
 
 jint g_version = 0;
 

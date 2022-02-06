@@ -29,14 +29,14 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         binding.start.setOnClickListener(this)
         binding.stop.setOnClickListener(this)
         mController.create()
-        binding.textureView.setRender(RenderFactory.DEFAULT_RENDER)
+        binding.textureView.setRender(RenderFactory.WAVE_RENDER)
         mController.registerNativeCallback(binding.textureView.getRender().getNativePointer())
-        Log.d(TAG, "onCreate: ")
+        Log.d(TAG, "onSurfaceCreate: ")
     }
 
     override fun onStart() {
         super.onStart()
-        Log.d(TAG, "onStart: ")
+        Log.d(TAG, "onAudioDataStart: ")
         binding.textureView.onStart()
     }
 
@@ -54,7 +54,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onStop() {
         super.onStop()
-        Log.d(TAG, "onStop: ")
+        Log.d(TAG, "onAudioDataStop: ")
         binding.textureView.onStop()
     }
 
@@ -83,6 +83,6 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         mController.stop()
         mController.unregisterNativeCallback(binding.textureView.getRender().getNativePointer())
         mController.destroy()
-        Log.d(TAG, "onDestroy: ")
+        Log.d(TAG, "onSurfaceDestroy: ")
     }
 }

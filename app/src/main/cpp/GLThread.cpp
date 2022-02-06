@@ -86,6 +86,7 @@ void GLThread::run(JNIEnv *env) {
     int32_t width = 0, height = 0;
     LifecycleState lifecycle = LifecycleState::IDLE;
 
+    m_render->onRenderAttach();
     EGLObject eglObject;
     while (!initialEGL(eglObject)) {
         log_e("%s(): egl initial error %s", __FUNCTION__, getErrorMessage(eglObject.error));
@@ -138,7 +139,7 @@ void GLThread::run(JNIEnv *env) {
         // 开始工作
         if (exit) {
             if (hasSurface) {
-                m_render->onDestroy();
+                m_render->onSurfaceDestroy();
             }
             break;
         }
@@ -155,27 +156,30 @@ void GLThread::run(JNIEnv *env) {
             hasSurface = true;
             env->DeleteLocalRef(surface);
             surface = nullptr;
-            m_render->onCreate(width, height);
+            m_render->onSurfaceCreate(width, height);
             log_i("%s(): surface create", __FUNCTION__);
         }
         // EGL API 可能线程不安全
         // 销毁 surface
         if (destroySurface) {
             destroySurface = false;
-            m_render->onDestroy();
-            destroyEGLSurface(eglObject);
+            m_render->onSurfaceDestroy();
+            if (!destroyEGLSurface(eglObject)) {
+                log_e("%s(): egl destroy surface error %s", __FUNCTION__,
+                      getErrorMessage(eglObject.error));
+            }
             hasSurface = false;
             log_i("%s(): surface destroy", __FUNCTION__);
         }
         // 大小发生改变
         if (sizeChange) {
             sizeChange = false;
-            m_render->onChange(width, height);
+            m_render->onSurfaceSizeChange(width, height);
             log_i("%s(): surface size change width = %d, height = %d", __FUNCTION__, width, height);
         }
         // 渲染 当生命周期在 START 以前，PAUSE 以后就不绘制
         if (hasSurface && lifecycleVisible(lifecycle)) {
-            m_render->onDraw();
+            m_render->onSurfaceDraw();
 //            log_i("%s(): swap buffer", __FUNCTION__);
             EGLBoolean ret = eglSwapBuffers(eglObject.display, eglObject.surface);
             if (ret == EGL_FALSE) {
@@ -183,6 +187,8 @@ void GLThread::run(JNIEnv *env) {
             }
         }
     }
+
+    m_render->onRenderDetach();
     lock.lock();
     destroyEGLSurface(eglObject);
     destroyEGL(eglObject);
@@ -249,7 +255,7 @@ void GLThread::waitForExit() {
     m_thread.join();
 }
 
-void GLThread::onLifecycleChanged(LifecycleState state) {
+void GLThread::lifecycleChanged(LifecycleState state) {
     unique_lock<mutex> lock(m_mutex);
     m_lifecycle = state;
     m_wait += 1;
@@ -311,15 +317,21 @@ static bool destroyEGLSurface(EGLObject &eglObject) {
     EGLBoolean ret;
     EGLint err;
     ret = eglMakeCurrent(eglObject.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-    if (ret == EGL_FALSE) goto finish;
-    ret = eglDestroySurface(eglObject.display, eglObject.surface);
-    if (ret == EGL_FALSE) goto finish;
+//    if (ret == EGL_FALSE) goto finish;
+    if (eglObject.surface != EGL_NO_SURFACE) {
+        ret = eglDestroySurface(eglObject.display, eglObject.surface);
+    }
+//    if (ret == EGL_FALSE) goto finish;
     eglObject.surface = EGL_NO_SURFACE;
-    ANativeWindow_release(eglObject.window);
+    if (eglObject.window != nullptr) {
+        ANativeWindow_release(eglObject.window);
+    }
     eglObject.window = nullptr;
-    ASurfaceTexture_release(eglObject.surfaceTexture);
+    if (eglObject.surfaceTexture != nullptr) {
+        ASurfaceTexture_release(eglObject.surfaceTexture);
+    }
     eglObject.surfaceTexture = nullptr;
-    finish:
+//    finish:
     err = eglGetError();
     eglObject.error = err;
     return err == EGL_SUCCESS;

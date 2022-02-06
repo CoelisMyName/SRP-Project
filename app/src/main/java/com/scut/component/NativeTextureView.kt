@@ -81,7 +81,7 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
     }
 
     /**
-     * 必须在 onCreate 时候调用，否则不显示
+     * 必须在 onSurfaceCreate 时候调用，否则不显示
      */
     fun setRender(type: String) {
         if (mFlagInit) return

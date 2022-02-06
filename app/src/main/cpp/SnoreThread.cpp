@@ -27,10 +27,10 @@ SnoreThread::~SnoreThread() {
     waitForExit();
 }
 
-void SnoreThread::onAttach() {
+void SnoreThread::onAudioCallbackAttach() {
 }
 
-void SnoreThread::onStart(int64_t timestamp) {
+void SnoreThread::onAudioDataStart(int64_t timestamp) {
     unique_lock<mutex> lock(m_mutex);
     if (m_exit || !m_alive) {
         m_cond.notify_all();
@@ -44,7 +44,7 @@ void SnoreThread::onStart(int64_t timestamp) {
     m_cond.notify_all();
 }
 
-void SnoreThread::onStop(int64_t timestamp) {
+void SnoreThread::onAudioDataStop(int64_t timestamp) {
     unique_lock<mutex> lock(m_mutex);
     if (m_exit || !m_alive) {
         m_cond.notify_all();
@@ -55,7 +55,7 @@ void SnoreThread::onStop(int64_t timestamp) {
     m_cond.notify_all();
 }
 
-void SnoreThread::onReceive(int64_t timestamp, int16_t *data, int32_t length) {
+void SnoreThread::onAudioDataReceive(int64_t timestamp, int16_t *data, int32_t length) {
     unique_lock<mutex> lock(m_mutex);
     if (!m_alive || m_exit) {
         m_cond.notify_all();
@@ -71,7 +71,7 @@ void SnoreThread::onReceive(int64_t timestamp, int16_t *data, int32_t length) {
     }
 }
 
-void SnoreThread::onDetach() {
+void SnoreThread::onAudioCallbackDetach() {
 }
 
 void SnoreThread::run(JNIEnv *env) {

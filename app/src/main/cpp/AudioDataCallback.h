@@ -13,19 +13,19 @@ public:
     /**
      * 当对象添加到 AudioDataDispatcher 时调用一次
      */
-    virtual void onAttach() = 0;
+    virtual void onAudioCallbackAttach() = 0;
 
     /**
      * 当收到启动消息的时候调用
      * @param timestamp
      */
-    virtual void onStart(int64_t timestamp) = 0;
+    virtual void onAudioDataStart(int64_t timestamp) = 0;
 
     /**
      * 当收到停止消息的时候调用
      * @param timestamp
      */
-    virtual void onStop(int64_t timestamp) = 0;
+    virtual void onAudioDataStop(int64_t timestamp) = 0;
 
     /**
      * 当收到数据时调用
@@ -33,12 +33,12 @@ public:
      * @param data
      * @param length
      */
-    virtual void onReceive(int64_t timestamp, int16_t *data, int32_t length) = 0;
+    virtual void onAudioDataReceive(int64_t timestamp, int16_t *data, int32_t length) = 0;
 
     /**
      * 当对象从 AudioDataDispatcher 移除时调用
      */
-    virtual void onDetach() = 0;
+    virtual void onAudioCallbackDetach() = 0;
 };
 
 #endif
