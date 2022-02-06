@@ -29,7 +29,8 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         binding.start.setOnClickListener(this)
         binding.stop.setOnClickListener(this)
         mController.create()
-        binding.textureView.setRender(RenderFactory.WAVE_RENDER)
+        //TODO 这里修改Render类别
+        binding.textureView.setRender(RenderFactory.DEFAULT_RENDER)
         mController.registerNativeCallback(binding.textureView.getRender().getNativePointer())
         Log.d(TAG, "onSurfaceCreate: ")
     }
