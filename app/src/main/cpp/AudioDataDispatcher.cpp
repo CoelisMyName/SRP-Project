@@ -23,7 +23,7 @@ void AudioDataDispatcher::dispatchStart(int64_t timestamp) {
     m_state = DispatchState::START;
     m_start = timestamp;
     for (auto cb : m_callbacks) {
-        cb->onStart(timestamp);
+        cb->onAudioDataStart(timestamp);
     }
     log_i("%s(): timestamp = %lld", __FUNCTION__, timestamp);
 }
@@ -33,7 +33,7 @@ void AudioDataDispatcher::dispatchStop(int64_t timestamp) {
     m_state = DispatchState::STOP;
     m_stop = timestamp;
     for (auto cb : m_callbacks) {
-        cb->onStop(timestamp);
+        cb->onAudioDataStop(timestamp);
     }
     log_i("%s(): timestamp = %lld", __FUNCTION__, timestamp);
 }
@@ -46,7 +46,7 @@ void AudioDataDispatcher::dispatchAudioData(int64_t timestamp, int16_t *data, in
     unique_lock<mutex> lock(m_mutex);
     m_timestamp = timestamp;
     for (auto cb : m_callbacks) {
-        cb->onReceive(timestamp, data, length);
+        cb->onAudioDataReceive(timestamp, data, length);
     }
     log_i("%s(): timestamp = %lld, length = %d", __FUNCTION__, timestamp, length);
 #ifdef BENCHMARK
@@ -63,20 +63,22 @@ void AudioDataDispatcher::registerCallback(AudioDataCallback *callback) {
         if (cb == callback) return;
     }
     m_callbacks.push_back(callback);
-    callback->onAttach();
+    callback->onAudioCallbackAttach();
     if (m_state == DispatchState::START) {
-        callback->onStart(m_start);
+        callback->onAudioDataStart(m_start);
     }
     log_i("%s(): %s", __FUNCTION__, "register callback");
 }
 
 void AudioDataDispatcher::unregisterCallback(AudioDataCallback *callback) {
     unique_lock<mutex> lock(m_mutex);
+//    m_callbacks.erase(std::remove_if(m_callbacks.begin(), m_callbacks.end(), [callback](AudioDataCallback *cb){return cb == callback; }),
+//                      m_callbacks.end());
     // 迭代器删除元素
     for (auto iter = m_callbacks.begin(); iter != m_callbacks.end();) {
         if (*iter == callback) {
             m_callbacks.erase(iter);
-            callback->onDetach();
+            callback->onAudioCallbackDetach();
         } else {
             iter += 1;
         }
@@ -87,7 +89,7 @@ void AudioDataDispatcher::unregisterCallback(AudioDataCallback *callback) {
 void AudioDataDispatcher::clear() {
     unique_lock<mutex> lock(m_mutex);
     for (AudioDataCallback *cb : m_callbacks) {
-        cb->onDetach();
+        cb->onAudioCallbackDetach();
     }
     m_callbacks.clear();
 }

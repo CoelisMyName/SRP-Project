@@ -9,67 +9,67 @@ import android.view.TextureView
 open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
     companion object {
         const val TAG = "NativeTextureView"
+    }
 
-        class NativeGLThread(view: NativeTextureView, render: NativeRender) {
-            companion object {
-                const val TAG = "NativeGLThread"
-            }
-
-            private val mRender: NativeRender
-            private val mThread: Long
-
-            init {
-                if (render.getNativePointer() == 0L) {
-                    throw NullPointerException("native render pointer is nullptr")
-                }
-                mRender = render
-                mThread = LibGLThread.create(view, mRender.getNativePointer())
-            }
-
-            fun surfaceCreate(surface: SurfaceTexture, width: Int, height: Int) {
-                LibGLThread.surfaceCreate(mThread, surface, width, height)
-            }
-
-            fun surfaceSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
-                LibGLThread.surfaceSizeChanged(mThread, surface, width, height)
-            }
-
-            fun surfaceDestroyed(): Boolean {
-                return LibGLThread.surfaceDestroyed(mThread)
-            }
-
-            fun surfaceUpdated(surface: SurfaceTexture) {
-                LibGLThread.surfaceUpdated(mThread, surface)
-            }
-
-            fun onStart() {
-                LibGLThread.onStart(mThread)
-            }
-
-            fun onStop() {
-                LibGLThread.onStop(mThread)
-            }
-
-            fun onResume() {
-                LibGLThread.onResume(mThread)
-            }
-
-            fun onPause() {
-                LibGLThread.onPause(mThread)
-            }
-
-            protected fun finalize() {
-                LibGLThread.destroy(mThread)
-                RenderFactory.destroyRender(mRender)
-                Log.d(TAG, "finalize: ")
-            }
-        }
+    constructor(context: Context) : super(context) {
     }
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
     }
 
-    constructor(context: Context) : super(context) {
+    private class NativeGLThread(view: NativeTextureView, render: NativeRender) {
+        companion object {
+            const val TAG = "NativeGLThread"
+        }
+
+        private val mRender: NativeRender
+        private val mThread: Long
+
+        init {
+            if (render.getNativePointer() == 0L) {
+                throw NullPointerException("native render pointer is nullptr")
+            }
+            mRender = render
+            mThread = LibGLThread.create(view, mRender.getNativePointer())
+        }
+
+        fun surfaceCreate(surface: SurfaceTexture, width: Int, height: Int) {
+            LibGLThread.surfaceCreate(mThread, surface, width, height)
+        }
+
+        fun surfaceSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
+            LibGLThread.surfaceSizeChanged(mThread, surface, width, height)
+        }
+
+        fun surfaceDestroyed(): Boolean {
+            return LibGLThread.surfaceDestroyed(mThread)
+        }
+
+        fun surfaceUpdated(surface: SurfaceTexture) {
+            LibGLThread.surfaceUpdated(mThread, surface)
+        }
+
+        fun onStart() {
+            LibGLThread.onStart(mThread)
+        }
+
+        fun onStop() {
+            LibGLThread.onStop(mThread)
+        }
+
+        fun onResume() {
+            LibGLThread.onResume(mThread)
+        }
+
+        fun onPause() {
+            LibGLThread.onPause(mThread)
+        }
+
+        protected fun finalize() {
+            LibGLThread.destroy(mThread)
+            RenderFactory.destroyRender(mRender)
+            Log.d(TAG, "finalize: ")
+        }
     }
 
     private var mFlagInit: Boolean = false
@@ -81,7 +81,7 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
     }
 
     /**
-     * 必须在 onCreate 时候调用，否则不显示
+     * 必须在 onSurfaceCreate 时候调用，否则不显示
      */
     fun setRender(type: String) {
         if (mFlagInit) return

@@ -1,10 +1,13 @@
 package com.scut.utils
 
+import android.content.res.AssetManager
+
 object LibSRP {
     init {
         System.loadLibrary("srp")
     }
 
+    external fun setAssetManager(ast: AssetManager)
     external fun create(controller: ModuleController): Boolean
     external fun destroy(controller: ModuleController): Boolean
     external fun start(controller: ModuleController): Boolean

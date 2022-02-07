@@ -5,13 +5,12 @@
 #include <queue>
 #include <thread>
 #include "config.h"
-#include "BufferPool.h"
+#include "AudioDataBuffer.h"
 #include "SnoreJNICallback.h"
 #include "AudioDataCallback.h"
 #include "AudioDataDispatcher.h"
 
 using std::mutex;
-using std::queue;
 using std::thread;
 using std::unique_lock;
 using std::condition_variable;
@@ -28,15 +27,15 @@ public:
 
     virtual ~SnoreThread() override;
 
-    virtual void onAttach() override;
+    virtual void onAudioCallbackAttach() override;
 
-    virtual void onStart(int64_t timestamp) override;
+    virtual void onAudioDataStart(int64_t timestamp) override;
 
-    virtual void onStop(int64_t timestamp) override;
+    virtual void onAudioDataStop(int64_t timestamp) override;
 
-    virtual void onReceive(int64_t timestamp, int16_t *data, int32_t length) override;
+    virtual void onAudioDataReceive(int64_t timestamp, int16_t *data, int32_t length) override;
 
-    virtual void onDetach() override;
+    virtual void onAudioCallbackDetach() override;
 
     /**
      * 线程运行方法，所有运行工作在这个函数内
@@ -63,8 +62,7 @@ private:
 
     SnoreJNICallback *m_callback;
 
-    BufferPool<int16_t> m_buffer_pool;
-    queue<int64_t> m_timestamp;
+    AudioDataBuffer<int16_t> m_buffer;
 
     mutex m_mutex;
     condition_variable m_cond;
