@@ -53,7 +53,7 @@ public:
         m_height = height;
         if (!m_init) {
             bool ret;
-            ret = loadProgramFromAssets("shader/wave.vert", "shader/wave.frag", m_pgr);
+            ret = loadProgramFromAssets("shader/default.vert", "shader/default.frag", m_pgr);
             if (ret) {
                 m_init = true;
             }
