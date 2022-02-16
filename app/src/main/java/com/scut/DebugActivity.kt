@@ -3,6 +3,8 @@ package com.scut
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +12,8 @@ import androidx.core.content.ContextCompat
 import com.scut.component.RenderFactory
 import com.scut.databinding.ActivityDebugBinding
 import com.scut.utils.ModuleController
+import com.scut.utils.SPL
+import com.scut.utils.Snore
 
 
 class DebugActivity : AppCompatActivity(), View.OnClickListener {
@@ -22,6 +26,34 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
 
     private val mController = ModuleController
 
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val snoreCallback = object : ModuleController.SnoreCallback {
+        override fun onStart(timestamp: Long) {
+
+        }
+
+        override fun onRecognize(snore: Snore) {
+
+        }
+
+        override fun onStop(timestamp: Long) {
+
+        }
+    }
+
+    private val splCallback = object : ModuleController.SPLCallback {
+        override fun onStart(timestamp: Long) {
+
+        }
+
+        override fun onDetect(spl: SPL) {
+        }
+
+        override fun onStop(timestamp: Long) {
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDebugBinding.inflate(layoutInflater)
@@ -32,6 +64,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         //TODO 这里修改Render类别
         binding.textureView.setRender(RenderFactory.DEFAULT_RENDER)
         mController.registerNativeCallback(binding.textureView.getRender().getNativePointer())
+        mController.mSPLCallback
         Log.d(TAG, "onSurfaceCreate: ")
     }
 
@@ -82,6 +115,8 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
     override fun onDestroy() {
         super.onDestroy()
         mController.stop()
+        mController.resetSPLCallback()
+        mController.resetSnoreCallback()
         mController.unregisterNativeCallback(binding.textureView.getRender().getNativePointer())
         mController.destroy()
         Log.d(TAG, "onSurfaceDestroy: ")

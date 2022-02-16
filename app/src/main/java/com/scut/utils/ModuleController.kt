@@ -22,9 +22,9 @@ object ModuleController {
 
     private const val TAG = "ModuleController"
 
-    var mSnoreCallback = DefaultSnoreCallback()
+    var mSnoreCallback: SnoreCallback = DefaultSnoreCallback()
 
-    var mSPLCallback = DefaultSPLCallback()
+    var mSPLCallback: SPLCallback = DefaultSPLCallback()
 
     fun resetSnoreCallback() {
         mSnoreCallback = DefaultSnoreCallback()

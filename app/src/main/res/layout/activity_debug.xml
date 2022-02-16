@@ -9,7 +9,8 @@
         android:id="@+id/spl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="dauidn dwa niaw ndawi  dwan daow noa wnidndaw ndiaw \nnidawnid awn dwajwk andawndka wnd akwj "
+        android:layout_gravity="center_horizontal"
+        android:text="调试界面"
         android:textColor="@color/black"
         android:textSize="15sp" />
 
@@ -41,6 +42,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="测试 NativeTextureView" />
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="" />
+
+    </ScrollView>
 
 
 </LinearLayout>
