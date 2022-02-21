@@ -33,16 +33,26 @@ writeWav(const char *dst, int16_t *i16_pcm, uint32_t length, uint32_t channel,
          uint32_t sample_rate);
 
 /**
- * 检查目录是否存在，不存在则创建
- * @param path 目录路径
- * @return 存在为真，不存在则返回是否创建成功
- */
-extern bool checkAndMkdir(const char *path);
-
-/**
  * 获取毫秒时间戳
  * @return 毫秒时间戳
  */
 extern int64_t currentTimeMillis();
+
+extern bool isBigEndian();
+
+extern bool isLittleEndian();
+
+/**
+ * 传入 base （基目录）和 path (相对目录)，检查并递归创建目录，例如
+ * 传入 "/storage/emulated/0/Android/data/com.scut" 作为 base 参数
+ * 传入 "/cache" 作为 path 参数
+ * 首先会检查 base 是否存在，然后递归创建 "/storage/emulated/0/Android/data/com.scut/cache" 目录
+ * 最后返回是否创建成功或存在
+ * 这个函数非常有用，因为往往很多路径并没有权限读写，使用这个方法可将文件夹创建限定在指定目录
+ * @param base 基目录
+ * @param path 相对目录
+ * @return 存在即为 true，不存在即为 false
+ */
+extern bool checkAndMkdir(const char *base, const char *path);
 
 #endif

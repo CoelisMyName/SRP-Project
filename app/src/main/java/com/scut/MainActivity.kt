@@ -25,8 +25,4 @@ class MainActivity : AppCompatActivity() {
         }
         binding.button.setOnClickListener { System.gc() }
     }
-
-    override fun onResume() {
-        super.onResume()
-    }
 }

@@ -23,6 +23,7 @@ void AudioDataDispatcher::dispatchStart(int64_t timestamp) {
     m_state = DispatchState::START;
     m_start = timestamp;
     for (auto cb : m_callbacks) {
+        if (cb == nullptr) continue;
         cb->onAudioDataStart(timestamp);
     }
     log_i("%s(): timestamp = %lld", __FUNCTION__, timestamp);
@@ -33,6 +34,7 @@ void AudioDataDispatcher::dispatchStop(int64_t timestamp) {
     m_state = DispatchState::STOP;
     m_stop = timestamp;
     for (auto cb : m_callbacks) {
+        if (cb == nullptr) continue;
         cb->onAudioDataStop(timestamp);
     }
     log_i("%s(): timestamp = %lld", __FUNCTION__, timestamp);
@@ -46,6 +48,7 @@ void AudioDataDispatcher::dispatchAudioData(int64_t timestamp, int16_t *data, in
     unique_lock<mutex> lock(m_mutex);
     m_timestamp = timestamp;
     for (auto cb : m_callbacks) {
+        if (cb == nullptr) continue;
         cb->onAudioDataReceive(timestamp, data, length);
     }
     log_i("%s(): timestamp = %lld, length = %d", __FUNCTION__, timestamp, length);
@@ -58,6 +61,7 @@ void AudioDataDispatcher::dispatchAudioData(int64_t timestamp, int16_t *data, in
 }
 
 void AudioDataDispatcher::registerCallback(AudioDataCallback *callback) {
+    if (callback == nullptr) return;
     unique_lock<mutex> lock(m_mutex);
     for (auto cb : m_callbacks) {
         if (cb == callback) return;
@@ -71,6 +75,7 @@ void AudioDataDispatcher::registerCallback(AudioDataCallback *callback) {
 }
 
 void AudioDataDispatcher::unregisterCallback(AudioDataCallback *callback) {
+    if (callback == nullptr) return;
     unique_lock<mutex> lock(m_mutex);
 //    m_callbacks.erase(std::remove_if(m_callbacks.begin(), m_callbacks.end(), [callback](AudioDataCallback *cb){return cb == callback; }),
 //                      m_callbacks.end());
@@ -89,6 +94,7 @@ void AudioDataDispatcher::unregisterCallback(AudioDataCallback *callback) {
 void AudioDataDispatcher::clear() {
     unique_lock<mutex> lock(m_mutex);
     for (AudioDataCallback *cb : m_callbacks) {
+        if (cb == nullptr) continue;
         cb->onAudioCallbackDetach();
     }
     m_callbacks.clear();

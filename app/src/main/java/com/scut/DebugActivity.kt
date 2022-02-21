@@ -1,124 +1,104 @@
 package com.scut
 
 import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.scut.component.RenderFactory
 import com.scut.databinding.ActivityDebugBinding
-import com.scut.utils.ModuleController
-import com.scut.utils.SPL
-import com.scut.utils.Snore
+import com.scut.utils.PermissionManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 
 
 class DebugActivity : AppCompatActivity(), View.OnClickListener {
-
     companion object {
         const val TAG = "DebugActivity"
     }
 
-    private lateinit var binding: ActivityDebugBinding
+    private lateinit var mBinding: ActivityDebugBinding
 
-    private val mController = ModuleController
+    private lateinit var mPermissionManager: PermissionManager
 
-    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var mViewModel: DebugViewModel
 
-    private val snoreCallback = object : ModuleController.SnoreCallback {
-        override fun onStart(timestamp: Long) {
+    private var mLOGText = ""
 
-        }
-
-        override fun onRecognize(snore: Snore) {
-
-        }
-
-        override fun onStop(timestamp: Long) {
-
-        }
-    }
-
-    private val splCallback = object : ModuleController.SPLCallback {
-        override fun onStart(timestamp: Long) {
-
-        }
-
-        override fun onDetect(spl: SPL) {
-        }
-
-        override fun onStop(timestamp: Long) {
-        }
-    }
+    private val mPermissions = arrayOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.RECORD_AUDIO
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityDebugBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        binding.start.setOnClickListener(this)
-        binding.stop.setOnClickListener(this)
-        mController.create()
-        //TODO 这里修改Render类别
-        binding.textureView.setRender(RenderFactory.DEFAULT_RENDER)
-        mController.registerNativeCallback(binding.textureView.getRender().getNativePointer())
-        mController.mSPLCallback
-        Log.d(TAG, "onSurfaceCreate: ")
+        mBinding = ActivityDebugBinding.inflate(layoutInflater)
+        setContentView(mBinding.root)
+        mViewModel = ViewModelProvider(this)[DebugViewModel::class.java]
+        mBinding.start.setOnClickListener(this)
+        mBinding.stop.setOnClickListener(this)
+        mPermissionManager = PermissionManager(
+            this,
+            mPermissions,
+            { startSnoreModule() },
+            { showPermissionDeniedMessage() })
+        mBinding.textureView.setRender(mViewModel.newRender(RenderFactory.WAVE_RENDER))
+        lifecycleScope.launchWhenResumed {
+            mViewModel.getLOGFlow().onEach {
+                mLOGText = it + mLOGText
+                setLogTextView(mLOGText)
+            }.collect()
+        }
+    }
+
+    suspend fun setLogTextView(log: String) = withContext(Dispatchers.Main) {
+        mBinding.log.text = log
     }
 
     override fun onStart() {
         super.onStart()
-        Log.d(TAG, "onAudioDataStart: ")
-        binding.textureView.onStart()
+        mBinding.textureView.onStart()
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d(TAG, "onResume: ")
-        binding.textureView.onResume()
+        mBinding.textureView.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        Log.d(TAG, "onPause: ")
-        binding.textureView.onPause()
+        mBinding.textureView.onPause()
     }
 
     override fun onStop() {
         super.onStop()
-        Log.d(TAG, "onAudioDataStop: ")
-        binding.textureView.onStop()
+        mBinding.textureView.onStop()
     }
 
+    private fun showPermissionDeniedMessage() {
+        Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun startSnoreModule() = mViewModel.startSnoreModule()
+
+    private fun stopSnoreModule() = mViewModel.stopSnoreModule()
 
     override fun onClick(v: View?) {
-        if (v == binding.start) {
-            when (PackageManager.PERMISSION_GRANTED) {
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.RECORD_AUDIO
-                ) -> {
-                    mController.start()
-                }
-                else -> {
-                    requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 1)
-                }
-            }
+        if (v == mBinding.start) {
+            mPermissionManager.proceed()
         }
-        if (v == binding.stop) {
-            mController.stop()
+        if (v == mBinding.stop) {
+            stopSnoreModule()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mController.stop()
-        mController.resetSPLCallback()
-        mController.resetSnoreCallback()
-        mController.unregisterNativeCallback(binding.textureView.getRender().getNativePointer())
-        mController.destroy()
-        Log.d(TAG, "onSurfaceDestroy: ")
+        mViewModel.stopSnoreModule()
     }
 }

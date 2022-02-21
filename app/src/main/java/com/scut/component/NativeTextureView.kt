@@ -11,11 +11,9 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
         const val TAG = "NativeTextureView"
     }
 
-    constructor(context: Context) : super(context) {
-    }
+    constructor(context: Context) : super(context)
 
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-    }
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
     private class NativeGLThread(view: NativeTextureView, render: NativeRender) {
         companion object {
@@ -67,7 +65,7 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
 
         protected fun finalize() {
             LibGLThread.destroy(mThread)
-            RenderFactory.destroyRender(mRender)
+            mRender.recycle()
             Log.d(TAG, "finalize: ")
         }
     }
@@ -83,9 +81,9 @@ open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
     /**
      * 必须在 onSurfaceCreate 时候调用，否则不显示
      */
-    fun setRender(type: String) {
+    fun setRender(render: NativeRender) {
         if (mFlagInit) return
-        mRender = RenderFactory.createRender(type)
+        mRender = render
         mThread = NativeGLThread(this, mRender)
         mFlagInit = true
     }

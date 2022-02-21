@@ -91,9 +91,10 @@ void SnoreThread::run(JNIEnv *env) {
     auto buf1 = new int16_t[size];
     auto buf2 = new int16_t[size];
     auto buf3 = new double[size];
-    char s_prof[2048];
-    strcpy(s_prof, g_cache);
-    strcat(s_prof, "/noiseprof.txt");
+    char s_prof[256];
+    strcpy(s_prof, g_external_base);
+    strcat(s_prof, g_cache);
+    strcat(s_prof, "/noise.prof");
 
     while (true) {
         // sync state

@@ -1,13 +1,27 @@
 package com.scut.component
 
+interface NativeRender {
+    fun getNativePointer(): Long
+
+    /**
+     * 调用此方法，Render 将不再可用
+     */
+    fun recycle()
+}
+
 object RenderFactory {
     const val WAVE_RENDER = "wave"
     const val DEFAULT_RENDER = "default"
 
-    private class RenderImpl(pointer: Long) : NativeRender {
+    private class NativeRenderImpl(pointer: Long) : NativeRender {
         var mPointer: Long = pointer
         override fun getNativePointer(): Long {
             return mPointer
+        }
+
+        override fun recycle() {
+            deleteRender(mPointer)
+            mPointer = 0
         }
     }
 
@@ -16,13 +30,7 @@ object RenderFactory {
         if (pointer == 0L) {
             throw NullPointerException("unknown render type")
         }
-        return RenderImpl(pointer)
-    }
-
-    fun destroyRender(render: NativeRender) {
-        val r = render as RenderImpl
-        deleteRender(r.mPointer)
-        r.mPointer = 0
+        return NativeRenderImpl(pointer)
     }
 
     private external fun newRender(type: String): Long

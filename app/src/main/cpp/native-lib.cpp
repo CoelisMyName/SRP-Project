@@ -190,15 +190,14 @@ Java_com_scut_utils_LibSRP_stop(__unused JNIEnv *env, __unused jobject thiz,
 JNIEXPORT jlong JNICALL
 Java_com_scut_utils_LibSRP_getSampleRate(__unused JNIEnv *env, __unused jobject thiz,
                                          __unused jobject controller) {
-    if (!initialFlag) return false;
+    if (!initialFlag) return 0L;
     return audioSource->getSampleRate();
 }
 
 JNIEXPORT jlong JNICALL
 Java_com_scut_utils_LibSRP_getStartTime(__unused JNIEnv *env, __unused jobject thiz,
                                         __unused jobject controller) {
-    if (!initialFlag) return false;
-    // TODO delete method or implement
+    if (!initialFlag) return 0L;
     return 0L;
 }
 

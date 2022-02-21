@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <cassert>
 #include <unistd.h>
+#include <cstring>
 #include <cerrno>
 #include <cstdlib>
 #include <sys/stat.h>
@@ -66,20 +67,6 @@ writeWav(const char *dst, int16_t *i16_pcm, uint32_t length, uint32_t channel,
     quitSox();
 }
 
-bool checkAndMkdir(const char *path) {
-    DIR *dir = opendir(path);
-    if (dir != nullptr) {
-        closedir(dir);
-        return true;
-    } else if (errno == ENOENT) {
-        //TODO make it recursive
-        int res = mkdir(path, 0777);
-        return res == 0;
-    } else {
-        return false;
-    }
-}
-
 int64_t currentTimeMillis() {
     struct timeval tv{};
     gettimeofday(&tv, nullptr);
@@ -108,4 +95,92 @@ EnvHelper::~EnvHelper() {
 
 JNIEnv *EnvHelper::getEnv() {
     return m_env;
+}
+
+bool isBigEndian() {
+    static int32_t val = 0x12345678;
+    auto ptr = (int8_t *) &val;
+    return *ptr == 0x12;
+}
+
+bool isLittleEndian() {
+    static int32_t val = 0x12345678;
+    auto ptr = (int8_t *) &val;
+    return *ptr == 0x78;
+}
+
+#ifdef WIN32
+#define PATH_SEPARATOR '\\'
+#else
+#define PATH_SEPARATOR '/'
+#endif
+
+bool checkDirExist(const char *path) {
+    DIR *dir;
+    if (access(path, F_OK) == 0) {
+        dir = opendir(path);
+        if (dir == nullptr) {
+            return false;
+        }
+        closedir(dir);
+        return true;
+    }
+    return false;
+}
+
+bool isAlphabet(char ch) {
+    return ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z';
+}
+
+bool isWindowsDisk(const char *path) {
+    int32_t len = strlen(path);
+    return len == 3 && isAlphabet(path[0]) && path[1] == ':' && path[2] == PATH_SEPARATOR;
+}
+
+/**
+ * 检查目录是否存在并创建目录
+ * @param base
+ * @param path
+ * @return
+ */
+bool checkAndMkdir(const char *base, const char *path) {
+    const int32_t len_base = strlen(base);
+    const int32_t len_path = strlen(path);
+#ifdef WIN32
+    if(!checkDirExist(base) && !isWindowsDisk(base)) {
+        return false;
+    }
+#else
+    if (!checkDirExist(base)) {
+        return false;
+    }
+#endif
+    printf("base exist\n");
+    char str[len_base + len_path + 2];
+    strcpy(str, base);
+    int32_t len_str = len_base;
+    int32_t name_start = 0, name_end;
+    while (path[name_start] != 0) {
+        while (path[name_start] == PATH_SEPARATOR) name_start += 1;
+        name_end = name_start;
+        while (path[name_end] != PATH_SEPARATOR && path[name_end] != 0) name_end += 1;
+        int32_t len_name = name_end - name_start;
+        if (len_name == 0) continue;
+        str[len_str] = PATH_SEPARATOR;
+        len_str += 1;
+        memcpy(&str[len_str], &path[name_start], len_name);
+        name_start = name_end;
+        len_str += len_name;
+        str[len_str] = 0;
+        printf("now check %s\n", str);
+        if (!checkDirExist(str)) {
+#ifdef WIN32
+            int res = mkdir(str);
+#else
+            int res = mkdir(str, 0777);
+#endif
+            if (res != 0) return false;
+        }
+    }
+    return true;
 }
