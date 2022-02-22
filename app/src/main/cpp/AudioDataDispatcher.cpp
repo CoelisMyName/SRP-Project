@@ -51,7 +51,7 @@ void AudioDataDispatcher::dispatchAudioData(int64_t timestamp, int16_t *data, in
         if (cb == nullptr) continue;
         cb->onAudioDataReceive(timestamp, data, length);
     }
-    log_i("%s(): timestamp = %lld, length = %d", __FUNCTION__, timestamp, length);
+//    log_i("%s(): timestamp = %lld, length = %d", __FUNCTION__, timestamp, length);
 #ifdef BENCHMARK
     ems = currentTimeMillis();
     if (ems - sms > 40) {

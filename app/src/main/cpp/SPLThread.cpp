@@ -142,7 +142,7 @@ void SPLThread::run(JNIEnv *env) {
                 spl.c_pow[i] = libSnoreSpl.c_pow[i];
                 spl.z_pow[i] = libSnoreSpl.z_pow[i];
             }
-            log_i("%s(): spl detect", __FUNCTION__);
+//            log_i("%s(): spl detect", __FUNCTION__);
             callback->onDetect(env, spl);
         }
 

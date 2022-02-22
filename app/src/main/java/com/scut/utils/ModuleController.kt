@@ -2,6 +2,7 @@ package com.scut.utils
 
 import android.Manifest
 import android.app.Application
+import android.util.Log
 
 object ModuleController {
     interface SnoreCallback {
@@ -77,6 +78,8 @@ object ModuleController {
      */
     fun create(application: Application): Boolean {
         if (mInit) return true
+        mApplication = application
+        Log.d(TAG, "create: application $application")
         mInit = LibSRP.create(this)
         return mInit
     }

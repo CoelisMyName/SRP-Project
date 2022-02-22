@@ -50,7 +50,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         mBinding.textureView.setRender(mViewModel.newRender(RenderFactory.WAVE_RENDER))
         lifecycleScope.launchWhenResumed {
             mViewModel.getLOGFlow().onEach {
-                mLOGText = it + mLOGText
+                mLOGText = mLOGText + "\n" + it
                 setLogTextView(mLOGText)
             }.collect()
         }
