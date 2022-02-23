@@ -15,8 +15,6 @@ using std::thread;
 using std::unique_lock;
 using std::condition_variable;
 using snore::F64pcm;
-using snore::snoreInitial;
-using snore::snoreDestroy;
 using snore::calculateSPL;
 
 typedef snore::SPL LibSnoreSPL;

@@ -56,7 +56,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    suspend fun setLogTextView(log: String) = withContext(Dispatchers.Main) {
+    private suspend fun setLogTextView(log: String) = withContext(Dispatchers.Main) {
         mBinding.log.text = log
     }
 

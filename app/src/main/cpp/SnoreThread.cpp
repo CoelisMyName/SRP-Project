@@ -92,9 +92,15 @@ void SnoreThread::run(JNIEnv *env) {
     auto buf2 = new int16_t[size];
     auto buf3 = new double[size];
     char s_prof[256];
+    char s_temp[256];
+    checkAndMkdir(g_external_base, g_audio);
+
     strcpy(s_prof, g_external_base);
     strcat(s_prof, g_cache);
     strcat(s_prof, "/noise.prof");
+    strcpy(s_temp, g_external_base);
+    strcat(s_temp, g_cache);
+    strcat(s_temp, "/1min.wav");
 
     while (true) {
         // sync state
@@ -144,16 +150,18 @@ void SnoreThread::run(JNIEnv *env) {
                 generateNoiseProfile(src, 0.0, 1.0, s_prof);
             }
             reduceNoise(src, dst, s_prof, 0.21);
+            //save wav file before crash
+            writeWav(s_temp, dst.raw, dst.length, 1, 44100);
             for (uint32_t i = 0; i < SNORE_INPUT_SIZE; ++i) {
                 fds.raw[i] = dst.raw[i] / 32768.0;
             }
             ModelResult result;
             calculateModelResult(fds, result);
             for (int32_t i = 0; i < result.s_size; ++i) {
-                int64_t sms = (result.starts[i] * 1000L) / 44100L;
-                int64_t ems = (result.ends[i] * 1000L) / 44100L;
-                log_i("%s(): frame: %d, start: %lld ms, end: %lld ms, result: %s", __FUNCTION__,
-                      frame, sms, ems, result.label[i] > 0.5 ? "positive" : "negative");
+                int64_t sms = (result.starts[i] * 1000L) / m_sample_rate;
+                int64_t ems = (result.ends[i] * 1000L) / m_sample_rate;
+//                log_i("%s(): frame: %d, start: %lld ms, end: %lld ms, result: %s", __FUNCTION__,
+//                      frame, sms, ems, result.label[i] > 0.5 ? "positive" : "negative");
                 Snore snore = {timestamp + sms, ems - sms, result.label[i] > 0.5, start};
                 callback->onRecognize(env, snore);
             }
