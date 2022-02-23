@@ -7,5 +7,6 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         assets?.also { LibSRP.setAssetManager(assets) }
+        SnoreDatabase.getInstance(this)
     }
 }

@@ -3,6 +3,7 @@ package com.scut
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -11,10 +12,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.scut.component.RenderFactory
 import com.scut.databinding.ActivityDebugBinding
+import com.scut.model.SleepWithSnoreRecord
 import com.scut.utils.PermissionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
@@ -28,6 +31,8 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var mPermissionManager: PermissionManager
 
     private lateinit var mViewModel: DebugViewModel
+
+    private lateinit var mSleepWithSnoreRecord: SleepWithSnoreRecord
 
     private val mPermissions = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -52,6 +57,18 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
             mViewModel.getLOGFlow().onEach {
                 setLogTextView(it)
             }.collect()
+        }
+        lifecycleScope.launch {
+            mViewModel.getSnoreFlow().onEach { it ->
+                if (it is SnoreRepository.Message.Start) {
+                    mViewModel.query(it.timestamp).onEach { list ->
+                        if (list.isNotEmpty()) {
+                            mSleepWithSnoreRecord = list[0]
+                            Log.d(TAG, "onCreate: get SleepWithSnoreRecord $mSleepWithSnoreRecord")
+                        }
+                    }.collect()
+                }
+            }
         }
     }
 
@@ -102,9 +119,5 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         if (v == mBinding.stop) {
             stopSnoreModule()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 }

@@ -4,6 +4,7 @@ import android.app.Application
 import android.icu.text.SimpleDateFormat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.scut.model.SleepRecord
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -62,9 +63,13 @@ class DebugViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getSPLFlow() = mSnoreRepository.getSPLFlow()
 
-    fun getLOGFlow(): StateFlow<String> {
-        return mLogFlow
-    }
+    fun getLOGFlow(): StateFlow<String> = mLogFlow
 
     fun newRender(type: String) = mSnoreRepository.newRender(type)
+
+    fun deleteSleepRecord(sl: SleepRecord) = SnoreRepository.deleteSleepRecord(sl)
+
+    fun query() = SnoreRepository.query()
+
+    fun query(timestamp: Long) = SnoreRepository.query(timestamp)
 }

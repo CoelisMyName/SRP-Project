@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.TextureView
 
-open class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
+class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
     companion object {
         const val TAG = "NativeTextureView"
     }

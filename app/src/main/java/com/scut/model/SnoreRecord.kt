@@ -1,4 +1,4 @@
-package com.scut.utils
+package com.scut.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
