@@ -13,8 +13,8 @@ import androidx.core.app.NotificationCompat
 
 class MyService : Service() {
 
-    private val CHANNEL_ID = "com.scut.MyService"
-    private val CHANNEL_NAME = "com.scut.name"
+    private val CHANNEL_ID = "com.scut.MyChannel"
+    private val CHANNEL_NAME = "MyChannel"
 
     private lateinit var mManager: NotificationManager
     private lateinit var mChannel: NotificationChannel
@@ -41,8 +41,8 @@ class MyService : Service() {
         val intent = Intent(this, DebugActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
         val notification = NotificationCompat.Builder(this, CHANNEL_ID).run {
-            setContentText("this is text")
-            setContentTitle("this is title")
+            setContentText(getString(R.string.click_to_see_info))
+            setContentTitle(getString(R.string.snoring_recognition))
             setSmallIcon(R.drawable.ic_launcher_foreground)
             setContentIntent(pendingIntent)
             build()

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SRP Project</string>
+    <string name="snoring_recognition">鼾声识别</string>
+    <string name="click_to_see_info">点击查看详情</string>
 </resources>

@@ -1,10 +1,12 @@
 package com.scut
 
 import android.Manifest
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.scut.component.RenderFactory
@@ -27,8 +29,6 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var mViewModel: DebugViewModel
 
-    private var mLOGText = ""
-
     private val mPermissions = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -50,8 +50,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         mBinding.textureView.setRender(mViewModel.newRender(RenderFactory.WAVE_RENDER))
         lifecycleScope.launchWhenResumed {
             mViewModel.getLOGFlow().onEach {
-                mLOGText = mLOGText + "\n" + it
-                setLogTextView(mLOGText)
+                setLogTextView(it)
             }.collect()
         }
     }
@@ -84,9 +83,17 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
     }
 
-    private fun startSnoreModule() = mViewModel.startSnoreModule()
+    private fun startSnoreModule() {
+        val intent = Intent(this, MyService::class.java)
+        ContextCompat.startForegroundService(this, intent)
+        mViewModel.startSnoreModule()
+    }
 
-    private fun stopSnoreModule() = mViewModel.stopSnoreModule()
+    private fun stopSnoreModule() {
+        val service = Intent(this, MyService::class.java)
+        stopService(service)
+        mViewModel.stopSnoreModule()
+    }
 
     override fun onClick(v: View?) {
         if (v == mBinding.start) {
@@ -99,6 +106,5 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        mViewModel.stopSnoreModule()
     }
 }
