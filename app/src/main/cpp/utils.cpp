@@ -73,6 +73,16 @@ int64_t currentTimeMillis() {
     return tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
 
+int32_t sprintTimeMillis(char *str, int64_t millis) {
+    time_t time = millis / 1000;
+    tm result{};
+    localtime_r(&time, &result);
+    //2022-02-24 19:13:48.134
+    int32_t size = strftime(str, 50, "%F %X", &result);
+    size += sprintf(&str[size], ".%03lld", millis % 1000);
+    return size;
+}
+
 EnvHelper::EnvHelper() {
     mEnv = nullptr;
     jint res = g_jvm->GetEnv((void **) &mEnv, g_version);
