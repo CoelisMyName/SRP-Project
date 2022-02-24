@@ -185,6 +185,8 @@ void GLThread::run(JNIEnv *env) {
         }
         // 渲染 当生命周期在 START 以前，PAUSE 以后就不绘制
         if (hasSurface && lifecycleVisible(lifecycle)) {
+            eglMakeCurrent(eglObject.display, eglObject.surface, eglObject.surface,
+                           eglObject.context);
             mRender->onSurfaceDraw();
 //            log_i("%s(): swap buffer", __FUNCTION__);
             EGLBoolean ret = eglSwapBuffers(eglObject.display, eglObject.surface);
