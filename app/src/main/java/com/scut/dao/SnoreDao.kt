@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class SnoreDao {
     @Insert
-    abstract suspend fun insert(vararg sl: SleepRecord): Int
+    abstract suspend fun insert(vararg sl: SleepRecord): Array<Long>
 
     @Update
     abstract suspend fun update(vararg sl: SleepRecord): Int
@@ -21,7 +21,7 @@ abstract class SnoreDao {
     abstract suspend fun deleteSnoreRecordByStartTime(startTime: Long): Int
 
     @Transaction
-    suspend fun delete(vararg sl: SleepRecord): Int {
+    open suspend fun delete(vararg sl: SleepRecord): Int {
         var ret = deleteSleepRecord(*sl)
         for (s in sl) {
             ret += deleteSnoreRecordByStartTime(s.timestamp)
@@ -30,7 +30,7 @@ abstract class SnoreDao {
     }
 
     @Insert
-    abstract suspend fun insert(vararg sr: SnoreRecord): Int
+    abstract suspend fun insert(vararg sr: SnoreRecord): Array<Long>
 
     @Transaction
     @Query("SELECT * FROM SleepRecord")

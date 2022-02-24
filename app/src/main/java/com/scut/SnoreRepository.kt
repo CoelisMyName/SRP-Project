@@ -56,13 +56,13 @@ object SnoreRepository {
 
     fun getSPLFlow(): SharedFlow<Message<SPL>> = mSPLFlow
 
-    private suspend fun insert(vararg sl: SleepRecord): Int = mDao.insert(*sl)
+    private suspend fun insert(vararg sl: SleepRecord) = mDao.insert(*sl)
 
-    private suspend fun update(vararg sl: SleepRecord): Int = mDao.insert(*sl)
+    private suspend fun update(vararg sl: SleepRecord) = mDao.update(*sl)
 
-    private suspend fun delete(vararg sl: SleepRecord): Int = mDao.delete(*sl)
+    private suspend fun delete(vararg sl: SleepRecord) = mDao.delete(*sl)
 
-    private suspend fun insert(vararg sr: SnoreRecord): Int = mDao.insert(*sr)
+    private suspend fun insert(vararg sr: SnoreRecord) = mDao.insert(*sr)
 
     fun query() = mDao.query()
 

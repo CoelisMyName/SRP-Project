@@ -3,7 +3,6 @@ package com.scut
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,7 +16,6 @@ import com.scut.utils.PermissionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
@@ -58,23 +56,23 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
                 setLogTextView(it)
             }.collect()
         }
-        lifecycleScope.launch {
-            mViewModel.getSnoreFlow().onEach { it ->
-                if (it is SnoreRepository.Message.Start) {
-                    lifecycleScope.launch {
-                        mViewModel.query(it.timestamp).onEach { list ->
-                            if (list.isNotEmpty()) {
-                                mSleepWithSnoreRecord = list[0]
-                                Log.d(
-                                    TAG,
-                                    "onCreate: get SleepWithSnoreRecord $mSleepWithSnoreRecord"
-                                )
-                            }
-                        }.collect()
-                    }
-                }
-            }
-        }
+//        lifecycleScope.launch {
+//            mViewModel.getSnoreFlow().onEach { it ->
+//                if (it is SnoreRepository.Message.Start) {
+//                    lifecycleScope.launch {
+//                        mViewModel.query(it.timestamp).onEach { list ->
+//                            if (list.isNotEmpty()) {
+//                                mSleepWithSnoreRecord = list[0]
+//                                Log.d(
+//                                    TAG,
+//                                    "onCreate: get SleepWithSnoreRecord $mSleepWithSnoreRecord"
+//                                )
+//                            }
+//                        }.collect()
+//                    }
+//                }
+//            }.collect()
+//        }
     }
 
     private suspend fun setLogTextView(log: String) = withContext(Dispatchers.Main) {

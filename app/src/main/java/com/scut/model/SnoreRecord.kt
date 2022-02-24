@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class SnoreRecord(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val timestamp: Long = 0,
     val length: Long = 0,
