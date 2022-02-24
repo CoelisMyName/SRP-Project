@@ -4,6 +4,19 @@
 #include "config.h"
 #include "AudioRecord.h"
 
+using std::atomic;
+using std::shared_ptr;
+using oboe::Result;
+using oboe::Direction;
+using oboe::AudioStream;
+using oboe::AudioFormat;
+using oboe::SharingMode;
+using oboe::ChannelCount;
+using oboe::AudioStreamBuilder;
+using oboe::DataCallbackResult;
+using oboe::AudioStreamCallback;
+using oboe::SampleRateConversionQuality;
+
 TAG(AudioRecord)
 
 AudioRecord::AudioRecord(AudioDataDispatcher *dispatcher) : mRunning(false) {

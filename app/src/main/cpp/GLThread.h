@@ -5,12 +5,6 @@
 #include <thread>
 #include "GLRender.h"
 
-using std::thread;
-using std::mutex;
-using std::atomic;
-using std::unique_lock;
-using std::condition_variable;
-
 enum class LifecycleState {
     IDLE, CREATE, START, RESUME, PAUSE, STOP, DESTROY
 };
@@ -88,9 +82,9 @@ private:
     volatile LifecycleState mLifecycle = LifecycleState::IDLE;
 
     GLRender *mRender;
-    mutex mMutex;
-    condition_variable mCond;
-    thread mThread;
+    std::mutex mMutex;
+    std::condition_variable mCond;
+    std::thread mThread;
 };
 
 #endif

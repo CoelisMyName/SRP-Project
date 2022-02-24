@@ -10,25 +10,25 @@ public:
         if (capacity < 0) {
             capacity = 0;
         }
-        m_capacity = capacity + 1;
-        m_array = new T[m_capacity];
+        mCapacity = capacity + 1;
+        mArray = new T[mCapacity];
     }
 
     virtual ~Queue() {
-        delete[] m_array;
+        delete[] mArray;
     }
 
     bool push(T src) {
         if (full()) return false;
-        m_array[m_rear] = src;
-        m_rear = (m_rear + 1) % m_capacity;
+        mArray[mRear] = src;
+        mRear = (mRear + 1) % mCapacity;
         return true;
     }
 
     bool pop(T &dst) {
         if (empty()) return false;
-        dst = m_array[m_head];
-        m_head = (m_head + 1) % m_capacity;
+        dst = mArray[mHead];
+        mHead = (mHead + 1) % mCapacity;
         return true;
     }
 
@@ -36,42 +36,42 @@ public:
         int32_t size = Queue::size();
         if (capacity < size) return false;
         T *array = new T[capacity + 1];
-        for (int32_t i = 0, j = m_head;
-             j != m_rear; i = (i + 1) % (capacity + 1), j = (j + 1) % m_capacity) {
-            array[i] = m_array[j];
+        for (int32_t i = 0, j = mHead;
+             j != mRear; i = (i + 1) % (capacity + 1), j = (j + 1) % mCapacity) {
+            array[i] = mArray[j];
         }
-        m_head = 0;
-        m_rear = size;
-        delete[] m_array;
-        m_array = array;
-        m_capacity = capacity + 1;
+        mHead = 0;
+        mRear = size;
+        delete[] mArray;
+        mArray = array;
+        mCapacity = capacity + 1;
     }
 
     int32_t capacity() {
-        return m_capacity - 1;
+        return mCapacity - 1;
     }
 
     int32_t size() {
-        return (m_rear - m_head + m_capacity) % m_capacity;
+        return (mRear - mHead + mCapacity) % mCapacity;
     }
 
     bool empty() {
-        return m_head == m_rear;
+        return mHead == mRear;
     }
 
     bool full() {
-        return m_head == (m_rear + 1) % m_capacity;
+        return mHead == (mRear + 1) % mCapacity;
     }
 
     void clear() {
-        m_head = m_rear = 0;
+        mHead = mRear = 0;
     }
 
 private:
-    T *m_array;
-    int32_t m_capacity;
-    int32_t m_head = 0;
-    int32_t m_rear = 0;
+    T *mArray;
+    int32_t mCapacity;
+    int32_t mHead = 0;
+    int32_t mRear = 0;
 };
 
 template<typename T>

@@ -5,6 +5,17 @@
 #include "global.h"
 #include "SnoreThread.h"
 
+using std::mutex;
+using std::thread;
+using std::unique_lock;
+using std::condition_variable;
+using snore::I16pcm;
+using snore::F64pcm;
+using snore::ModelResult;
+using snore::reduceNoise;
+using snore::calculateModelResult;
+using snore::generateNoiseProfile;
+
 TAG(SnoreThread)
 
 SnoreThread::SnoreThread(SnoreJNICallback *callback) : mCallback(callback),

@@ -6,10 +6,6 @@
 #include <cstdint>
 #include "AudioDataCallback.h"
 
-using std::mutex;
-using std::thread;
-using std::vector;
-
 enum class DispatchState {
     START, STOP
 };
@@ -61,8 +57,8 @@ public:
     void clear();
 
 private:
-    vector<AudioDataCallback *> mCallbacks;
-    mutex mMutex;
+    std::vector<AudioDataCallback *> mCallbacks;
+    std::mutex mMutex;
     // 共享变量
     volatile DispatchState mState;
     volatile int64_t mStart;

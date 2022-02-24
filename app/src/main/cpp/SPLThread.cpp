@@ -5,6 +5,13 @@
 #include "SPLThread.h"
 #include "SPLJNICallback.h"
 
+using std::mutex;
+using std::thread;
+using std::unique_lock;
+using std::condition_variable;
+using snore::F64pcm;
+using snore::calculateSPL;
+
 TAG(SPLThread)
 
 SPLThread::SPLThread(SPLJNICallback *callback) : mCallback(callback), mSize(SPL_INPUT_SIZE),

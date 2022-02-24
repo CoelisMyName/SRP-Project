@@ -7,6 +7,12 @@
 #include "global.h"
 #include "GLThread.h"
 
+using std::thread;
+using std::mutex;
+using std::atomic;
+using std::unique_lock;
+using std::condition_variable;
+
 TAG(GLThread)
 
 static const EGLint DEFAULT_RENDER = EGL_OPENGL_ES3_BIT;

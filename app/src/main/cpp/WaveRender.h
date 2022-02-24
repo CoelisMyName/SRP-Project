@@ -11,7 +11,9 @@
 #include <GLES3/gl3.h>
 #endif
 
+#include <thread>
 #include "GLRender.h"
+#include "AudioDataBuffer.h"
 #include "AudioDataCallback.h"
 
 class WaveRender : public GLRender, public AudioDataCallback {
@@ -48,9 +50,17 @@ private:
     GLuint mPgr = 0;
     GLuint mVbo = 0, mVao = 0;
 
-    int32_t mAudioBufferSize;
+    std::mutex mMutex;
+
+    int32_t mAudioBufferCapacity;
+    int32_t mAudioBufferSize = 0;
     int16_t *mAudioBuffer;
 
+    Queue<int16_t> mMaxQueue;
+    Queue<int16_t> mMinQueue;
+
+    int32_t mBufferCapacity;
+    int32_t mBufferSize = 0;
     int16_t *mMaxBuffer;
     int16_t *mMinBuffer;
 };

@@ -10,17 +10,6 @@
 #include "AudioDataCallback.h"
 #include "AudioDataDispatcher.h"
 
-using std::mutex;
-using std::thread;
-using std::unique_lock;
-using std::condition_variable;
-using snore::I16pcm;
-using snore::F64pcm;
-using snore::ModelResult;
-using snore::reduceNoise;
-using snore::calculateModelResult;
-using snore::generateNoiseProfile;
-
 class SnoreThread : public AudioDataCallback {
 public:
     SnoreThread(SnoreJNICallback *callback);
@@ -64,9 +53,9 @@ private:
 
     AudioDataBuffer<int16_t> mBuffer;
 
-    mutex mMutex;
-    condition_variable mCond;
-    thread mThread;
+    std::mutex mMutex;
+    std::condition_variable mCond;
+    std::thread mThread;
 };
 
 #endif

@@ -6,23 +6,10 @@
 #include "AudioSource.h"
 #include "AudioDataDispatcher.h"
 
-using std::atomic;
-using std::shared_ptr;
-using oboe::Result;
-using oboe::Direction;
-using oboe::AudioStream;
-using oboe::AudioFormat;
-using oboe::SharingMode;
-using oboe::ChannelCount;
-using oboe::AudioStreamBuilder;
-using oboe::DataCallbackResult;
-using oboe::AudioStreamCallback;
-using oboe::SampleRateConversionQuality;
-
 /**
  * 录音类，提供音频输入源，将采样数据通过 AudioDataDispatcher 进行分发
  */
-class AudioRecord : public AudioSource, public AudioStreamCallback {
+class AudioRecord : public AudioSource, public oboe::AudioStreamCallback {
 public:
     AudioRecord(AudioDataDispatcher *dispatcher);
 
@@ -62,8 +49,8 @@ public:
      * @param numFrames
      * @return
      */
-    virtual DataCallbackResult
-    onAudioReady(AudioStream *audioStream, void *audioData, int32_t numFrames) override;
+    virtual oboe::DataCallbackResult
+    onAudioReady(oboe::AudioStream *audioStream, void *audioData, int32_t numFrames) override;
 
     /**
      * 音频流回调函数，当出现错误时调用，函数属于 Oboe 模块
@@ -71,11 +58,11 @@ public:
      * @param result
      * @return
      */
-    virtual bool onError(AudioStream *stream, Result result) override;
+    virtual bool onError(oboe::AudioStream *stream, oboe::Result result) override;
 
 private:
-    atomic<bool> mRunning;
-    shared_ptr<AudioStream> mStream{};
+    std::atomic<bool> mRunning;
+    std::shared_ptr<oboe::AudioStream> mStream{};
     int32_t mSampleRate;
     int32_t mFrameSize;
     AudioDataDispatcher *mDispatcher;

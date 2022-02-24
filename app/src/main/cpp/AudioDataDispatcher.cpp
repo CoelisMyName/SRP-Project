@@ -3,6 +3,8 @@
 #include "config.h"
 #include "AudioDataDispatcher.h"
 
+using std::mutex;
+using std::vector;
 using std::unique_lock;
 
 TAG(AudioDataDispatcher)
