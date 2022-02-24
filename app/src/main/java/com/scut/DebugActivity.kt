@@ -61,12 +61,17 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         lifecycleScope.launch {
             mViewModel.getSnoreFlow().onEach { it ->
                 if (it is SnoreRepository.Message.Start) {
-                    mViewModel.query(it.timestamp).onEach { list ->
-                        if (list.isNotEmpty()) {
-                            mSleepWithSnoreRecord = list[0]
-                            Log.d(TAG, "onCreate: get SleepWithSnoreRecord $mSleepWithSnoreRecord")
-                        }
-                    }.collect()
+                    lifecycleScope.launch {
+                        mViewModel.query(it.timestamp).onEach { list ->
+                            if (list.isNotEmpty()) {
+                                mSleepWithSnoreRecord = list[0]
+                                Log.d(
+                                    TAG,
+                                    "onCreate: get SleepWithSnoreRecord $mSleepWithSnoreRecord"
+                                )
+                            }
+                        }.collect()
+                    }
                 }
             }
         }

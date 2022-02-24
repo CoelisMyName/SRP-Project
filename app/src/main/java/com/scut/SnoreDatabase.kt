@@ -7,9 +7,9 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.scut.dao.SnoreDao
 import com.scut.model.SleepRecord
-import com.scut.utils.Snore
+import com.scut.model.SnoreRecord
 
-@Database(entities = [SleepRecord::class, Snore::class], version = 1)
+@Database(entities = [SleepRecord::class, SnoreRecord::class], version = 1)
 abstract class SnoreDatabase : RoomDatabase() {
 
     abstract fun getSnoreDao(): SnoreDao
