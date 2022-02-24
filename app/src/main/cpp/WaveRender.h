@@ -40,13 +40,19 @@ public:
 
     virtual void onSurfaceDestroy() override;
 
-    void onRenderDetach() override;
+    virtual void onRenderDetach() override;
 
 private:
-    int32_t m_width = 0, m_height = 0;
-    bool m_init = false;
-    GLuint m_pgr = 0;
-    GLuint m_vbo = 0, m_vao = 0;
+    int32_t mWidth = 0, mHeight = 0;
+    bool mInit = false;
+    GLuint mPgr = 0;
+    GLuint mVbo = 0, mVao = 0;
+
+    int32_t mAudioBufferSize;
+    int16_t *mAudioBuffer;
+
+    int16_t *mMaxBuffer;
+    int16_t *mMinBuffer;
 };
 
 #endif

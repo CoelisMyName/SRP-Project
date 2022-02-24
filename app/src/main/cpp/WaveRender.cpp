@@ -8,7 +8,7 @@
 TAG(WaveRender)
 
 WaveRender::WaveRender() {
-
+    mAudioBufferSize = WAVE_RENDER_INPUT_SIZE + FRAME_SIZE;
 }
 
 WaveRender::~WaveRender() {
@@ -40,13 +40,13 @@ void WaveRender::onRenderAttach() {
 }
 
 void WaveRender::onSurfaceCreate(int32_t width, int32_t height) {
-    m_width = width;
-    m_height = height;
-    if (!m_init) {
+    mWidth = width;
+    mHeight = height;
+    if (!mInit) {
         bool ret;
-        ret = loadProgramFromAssets("shader/wave.vert", "shader/wave.frag", m_pgr);
+        ret = loadProgramFromAssets("shader/wave.vert", "shader/wave.frag", mPgr);
         if (ret) {
-            m_init = true;
+            mInit = true;
         }
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         const static GLfloat vertices[] = {
@@ -54,12 +54,12 @@ void WaveRender::onSurfaceCreate(int32_t width, int32_t height) {
                 0.5f, -0.5f, 0.0f,
                 0.0f, 0.5f, 0.0f
         };
-        m_vbo = 0, m_vao = 0;
-        glGenVertexArrays(1, &m_vao);
-        glBindVertexArray(m_vao);
+        mVbo = 0, mVao = 0;
+        glGenVertexArrays(1, &mVao);
+        glBindVertexArray(mVao);
 
-        glGenBuffers(1, &m_vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+        glGenBuffers(1, &mVbo);
+        glBindBuffer(GL_ARRAY_BUFFER, mVbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
         glEnableVertexAttribArray(0);
@@ -67,26 +67,26 @@ void WaveRender::onSurfaceCreate(int32_t width, int32_t height) {
 }
 
 void WaveRender::onSurfaceDraw() {
-    glUseProgram(m_pgr);
+    glUseProgram(mPgr);
     glClear(GL_COLOR_BUFFER_BIT);
-    glBindVertexArray(m_vao);
+    glBindVertexArray(mVao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void WaveRender::onSurfaceSizeChange(int32_t width, int32_t height) {
-    m_width = width;
-    m_height = height;
+    mWidth = width;
+    mHeight = height;
 }
 
 void WaveRender::onSurfaceDestroy() {
-    if (m_init) {
-        glDeleteProgram(m_pgr);
-        m_pgr = 0;
-        m_init = false;
-        glDeleteBuffers(1, &m_vbo);
-        glDeleteVertexArrays(1, &m_vao);
-        m_vbo = 0;
-        m_vao = 0;
+    if (mInit) {
+        glDeleteProgram(mPgr);
+        mPgr = 0;
+        mInit = false;
+        glDeleteBuffers(1, &mVbo);
+        glDeleteVertexArrays(1, &mVao);
+        mVbo = 0;
+        mVao = 0;
     }
 }
 

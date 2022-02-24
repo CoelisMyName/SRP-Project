@@ -74,11 +74,11 @@ public:
     virtual bool onError(AudioStream *stream, Result result) override;
 
 private:
-    atomic<bool> m_running;
-    shared_ptr<AudioStream> m_stream{};
-    int32_t m_sample_rate;
-    int32_t m_frame_size;
-    AudioDataDispatcher *m_dispatcher;
+    atomic<bool> mRunning;
+    shared_ptr<AudioStream> mStream{};
+    int32_t mSampleRate;
+    int32_t mFrameSize;
+    AudioDataDispatcher *mDispatcher;
 
     /**
      * 开启录音流

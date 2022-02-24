@@ -74,27 +74,27 @@ int64_t currentTimeMillis() {
 }
 
 EnvHelper::EnvHelper() {
-    m_env = nullptr;
-    jint res = g_jvm->GetEnv((void **) &m_env, g_version);
+    mEnv = nullptr;
+    jint res = g_jvm->GetEnv((void **) &mEnv, g_version);
     if (res == JNI_OK) {
-        m_fg = false;
+        mFg = false;
     } else if (res == JNI_EDETACHED) {
-        g_jvm->AttachCurrentThread(&m_env, nullptr);
-        m_fg = true;
+        g_jvm->AttachCurrentThread(&mEnv, nullptr);
+        mFg = true;
     } else {
 
     }
-    assert(m_env != nullptr);
+    assert(mEnv != nullptr);
 }
 
 EnvHelper::~EnvHelper() {
-    if (m_fg) {
+    if (mFg) {
         g_jvm->DetachCurrentThread();
     }
 }
 
 JNIEnv *EnvHelper::getEnv() {
-    return m_env;
+    return mEnv;
 }
 
 bool isBigEndian() {

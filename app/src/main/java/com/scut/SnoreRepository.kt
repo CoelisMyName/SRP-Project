@@ -1,7 +1,6 @@
 package com.scut
 
 import android.app.Application
-import android.util.Log
 import com.scut.component.NativeRender
 import com.scut.component.RenderFactory
 import com.scut.dao.SnoreDaoWrapper
@@ -57,13 +56,13 @@ object SnoreRepository {
 
     fun getSPLFlow(): SharedFlow<Message<SPL>> = mSPLFlow
 
-    private suspend fun insert(sl: SleepRecord): Int = mDao.insert(sl)
+    private suspend fun insert(vararg sl: SleepRecord): Int = mDao.insert(*sl)
 
-    private suspend fun update(sl: SleepRecord): Int = mDao.insert(sl)
+    private suspend fun update(vararg sl: SleepRecord): Int = mDao.insert(*sl)
 
-    private suspend fun delete(sl: SleepRecord): Int = mDao.delete(sl)
+    private suspend fun delete(vararg sl: SleepRecord): Int = mDao.delete(*sl)
 
-    private suspend fun insert(sr: SnoreRecord): Int = mDao.insert(sr)
+    private suspend fun insert(vararg sr: SnoreRecord): Int = mDao.insert(*sr)
 
     fun query() = mDao.query()
 
@@ -81,10 +80,7 @@ object SnoreRepository {
                 mRepositoryScope.launch {
                     mSnoreFlow.emit(Message.Start(timestamp))
                     mSleepRecord = SleepRecord(timestamp, "", 0)
-                    val ret = insert(mSleepRecord)
-                    if (ret <= 0) {
-                        Log.d(TAG, "onStart: insert failed $mSleepRecord")
-                    }
+                    insert(mSleepRecord)
                 }
             }
 
@@ -98,25 +94,17 @@ object SnoreRepository {
                         snore.confirm,
                         snore.startTime
                     )
-                    val ret = insert(snoreRecord)
-                    if (ret <= 0) {
-                        Log.d(TAG, "onStart: insert failed $snoreRecord")
-                    }
+                    insert(snoreRecord)
+                    mSleepRecord.duration = System.currentTimeMillis() - mSleepRecord.timestamp
+                    update(mSleepRecord)
                 }
             }
 
             override fun onStop(timestamp: Long) {
                 mRepositoryScope.launch {
                     mSnoreFlow.emit(Message.Stop(timestamp))
-                    mSleepRecord = SleepRecord(
-                        mSleepRecord.timestamp,
-                        mSleepRecord.description,
-                        System.currentTimeMillis() - mSleepRecord.timestamp
-                    )
-                    val ret = update(mSleepRecord)
-                    if (ret <= 0) {
-                        Log.d(TAG, "onStart: update failed $mSleepRecord")
-                    }
+                    mSleepRecord.duration = System.currentTimeMillis() - mSleepRecord.timestamp
+                    update(mSleepRecord)
                 }
             }
         }
@@ -143,10 +131,7 @@ object SnoreRepository {
 
     fun deleteSleepRecord(sl: SleepRecord) {
         mRepositoryScope.launch {
-            val ret = delete(sl)
-            if (ret <= 0) {
-                Log.d(TAG, "onStart: delete failed $sl")
-            }
+            delete(sl)
         }
     }
 

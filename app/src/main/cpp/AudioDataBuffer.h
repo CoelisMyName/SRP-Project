@@ -116,15 +116,15 @@ public:
     void clear();
 
 private:
-    T *m_buffer;
-    Queue<int64_t> m_timestamp;
-    int32_t m_sample_rate;
-    int64_t m_sample_count = 0;
-    int32_t m_capacity;
-    int32_t m_frame;
-    int32_t m_overlap;
-    int32_t m_head = 0;
-    int32_t m_rear = 0;
+    T *mBuffer;
+    Queue<int64_t> mTimestamp;
+    int32_t mSampleRate;
+    int64_t mSampleCount = 0;
+    int32_t mCapacity;
+    int32_t mFrame;
+    int32_t mOverlap;
+    int32_t mHead = 0;
+    int32_t mRear = 0;
 };
 
 #include "AudioDataBufferImpl.h"

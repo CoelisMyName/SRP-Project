@@ -16,8 +16,8 @@ public:
     JNIEnv *getEnv();
 
 private:
-    bool m_fg;
-    JNIEnv *m_env;
+    bool mFg;
+    JNIEnv *mEnv;
 };
 
 /**
