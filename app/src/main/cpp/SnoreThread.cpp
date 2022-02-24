@@ -104,14 +104,11 @@ void SnoreThread::run(JNIEnv *env) {
     auto buf3 = new double[size];
     char s_prof[256];
     char s_temp[256];
+    char s_audio[256];
     checkAndMkdir(g_external_base, g_audio);
 
-    strcpy(s_prof, g_external_base);
-    strcat(s_prof, g_cache);
-    strcat(s_prof, "/noise.prof");
-    strcpy(s_temp, g_external_base);
-    strcat(s_temp, g_cache);
-    strcat(s_temp, "/1min.wav");
+    sprintf(s_prof, "%s/%s/%s", g_external_base, g_cache, "noise.prof");
+    sprintf(s_temp, "%s/%s/%s", g_external_base, g_cache, "1min.wav");
 
     while (true) {
         // sync state
@@ -148,6 +145,18 @@ void SnoreThread::run(JNIEnv *env) {
         if (onStart) {
             onStart = false;
             callback->onStart(env, start);
+            //创建录音目录
+            char dirname[64];
+            sprintTimeMillis(dirname, start);
+            //去掉不支持的字符
+            for (int32_t j = 0; dirname[j] != 0; ++j) {
+                if (dirname[j] == ':' || dirname[j] == '.' || dirname[j] == ' ') {
+                    dirname[j] = '-';
+                }
+            }
+            sprintf(s_audio, "%s/%s", g_audio, dirname);
+            checkAndMkdir(g_external_base, s_audio);
+            sprintf(s_audio, "%s/%s/%s", g_external_base, g_audio, dirname);
         }
 
         if (ready) {
@@ -171,23 +180,40 @@ void SnoreThread::run(JNIEnv *env) {
             for (int32_t i = 0; i < result.s_size; ++i) {
                 int64_t sms = (result.starts[i] * 1000L) / mSampleRate;
                 int64_t ems = (result.ends[i] * 1000L) / mSampleRate;
-//                log_i("%s(): frame: %d, start: %lld ms, end: %lld ms, result: %s", __FUNCTION__,
-//                      frame, sms, ems, result.label[i] > 0.5 ? "positive" : "negative");
-                Snore snore = {timestamp + sms, ems - sms, result.label[i] > 0.5, start};
-                callback->onRecognize(env, snore);
+                if (result.label[i] > 0.5) {
+//                    log_i("%s(): frame: %d, start: %lld ms, end: %lld ms, result: %s", __FUNCTION__,
+//                          frame, sms, ems, result.label[i] > 0.5 ? "positive" : "negative");
+                    Snore snore = {timestamp + sms, ems - sms, result.label[i] > 0.5, start};
+                    //保存鼾声录音
+                    char filename[64];
+                    int64_t snoreTimestamp = timestamp + sms;
+                    sprintTimeMillis(filename, snoreTimestamp);
+                    //去掉不支持的字符
+                    for (int32_t j = 0; filename[j] != 0; ++j) {
+                        if (filename[j] == ':' || filename[j] == '.' || filename[j] == ' ') {
+                            filename[j] = '-';
+                        }
+                    }
+                    strcat(filename, ".wav");
+                    char filepath[256];
+                    sprintf(filepath, "%s/%s", s_audio, filename);
+                    callback->onRecognize(env, snore);
+                    writeWav(filepath, &buf2[result.starts[i]], result.ends[i] - result.starts[i],
+                             1, mSampleRate);
+                }
             }
             if (result.n_start >= 0 && result.n_length >= 0) {
                 log_i("%s(): update noise profile", __FUNCTION__);
                 generateNoiseProfile(src, result.n_start, result.n_length, s_prof);
             }
             frame += 1;
-            //TODO save some file
         }
 
         if (onStop) {
             onStop = false;
             callback->onStop(env, stop);
         }
+        //TODO analyze data
     }
 
     delete[] buf1;
