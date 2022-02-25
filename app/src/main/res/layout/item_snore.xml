@@ -21,26 +21,24 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/date"
-                android:text="时间"
-                android:textSize="22sp"
+                android:id="@+id/duration"
+                android:layout_marginTop="15dp"
+                android:text="鼾声时长"
+                android:textSize="15sp"
                 android:textColor="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:textStyle="bold"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/duration"
+                android:id="@+id/total_of_time"
                 android:layout_marginTop="15dp"
-                android:text="时长"
-                android:textSize="22sp"
+                android:text="鼾声时间"
+                android:textSize="15sp"
                 android:textColor="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/date"
-                app:layout_constraintHorizontal_bias="0.8"
-                android:textStyle="bold"/>
+                app:layout_constraintTop_toBottomOf="@id/duration" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

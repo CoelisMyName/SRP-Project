@@ -22,16 +22,18 @@
                 android:layout_height="wrap_content"
                 android:text="日期"
                 android:layout_marginStart="20dp"
-                android:textSize="25sp"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3月28日"
                 android:layout_marginStart="120dp"
-                android:textSize="25sp"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
         </LinearLayout>
 
@@ -46,16 +48,18 @@
                 android:layout_height="wrap_content"
                 android:text="睡眠时长"
                 android:layout_marginStart="20dp"
-                android:textSize="25sp"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="6小时40分"
                 android:layout_marginStart="60dp"
-                android:textSize="25sp"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
         </LinearLayout>
 
@@ -70,16 +74,18 @@
                 android:layout_height="wrap_content"
                 android:text="鼾声总时长"
                 android:layout_marginStart="20dp"
-                android:textSize="25sp"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3小时20分"
                 android:layout_marginStart="80dp"
-                android:textSize="25sp"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
         </LinearLayout>
 
@@ -94,16 +100,18 @@
                 android:layout_height="wrap_content"
                 android:text="检测鼾声总次数"
                 android:layout_marginStart="20dp"
-                android:textSize="25sp"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="5次"
                 android:layout_marginStart="45dp"
-                android:textSize="25sp"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
         </LinearLayout>
 
@@ -117,16 +125,18 @@
                 android:layout_height="wrap_content"
                 android:text="检测是否为病人"
                 android:layout_marginStart="20dp"
-                android:textSize="25sp"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="是"
                 android:layout_marginStart="45dp"
-                android:textSize="25sp"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
 
         </LinearLayout>
 
@@ -138,6 +148,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         app:layout_constraintTop_toBottomOf="@id/info"
-        tools:listitem="@layout/item_report" />
+        tools:listitem="@layout/item_snore" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
