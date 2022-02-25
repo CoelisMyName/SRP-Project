@@ -12,28 +12,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="H,2:1">
+        app:layout_constraintDimensionRatio="H,2:1"
+        android:layout_margin="20dp">
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:src="@drawable/noise_measure"
+            android:src="@drawable/history_result"
             tools:ignore="ContentDescription" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="2dp"
-            android:gravity="center"
+            android:gravity="left"
             android:orientation="vertical"
             android:padding="20dp">
-
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:adjustViewBounds="true"
-                android:background="@drawable/vector_sleep_everyday" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -41,7 +36,8 @@
                 android:layout_marginStart="10dp"
                 android:text="历史记录"
                 android:textColor="@color/black"
-                android:textSize="25sp" />
+                android:textSize="30sp"
+                android:textStyle="bold"/>
 
         </LinearLayout>
 
@@ -54,7 +50,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="H,2:1">
+        app:layout_constraintDimensionRatio="H,2:1"
+        android:layout_margin="20dp">
 
         <ImageView
             android:layout_width="match_parent"
@@ -67,15 +64,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="2dp"
-            android:gravity="center"
+            android:gravity="left"
             android:orientation="vertical"
             android:padding="20dp">
-
-            <ImageView
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:adjustViewBounds="true"
-                android:background="@drawable/vector_sleep_look" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -83,7 +74,8 @@
                 android:layout_marginStart="10dp"
                 android:text="睡眠监测"
                 android:textColor="@color/black"
-                android:textSize="25sp" />
+                android:textSize="30sp"
+                android:textStyle="bold"/>
 
         </LinearLayout>
 
