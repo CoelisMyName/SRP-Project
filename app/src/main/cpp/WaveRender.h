@@ -11,7 +11,9 @@
 #include <GLES3/gl3.h>
 #endif
 
+#include <thread>
 #include "GLRender.h"
+#include "AudioDataBuffer.h"
 #include "AudioDataCallback.h"
 
 class WaveRender : public GLRender, public AudioDataCallback {
@@ -40,13 +42,27 @@ public:
 
     virtual void onSurfaceDestroy() override;
 
-    void onRenderDetach() override;
+    virtual void onRenderDetach() override;
 
 private:
-    int32_t m_width = 0, m_height = 0;
-    bool m_init = false;
-    GLuint m_pgr = 0;
-    GLuint m_vbo = 0, m_vao = 0;
+    int32_t mWidth = 0, mHeight = 0;
+    bool mInit = false;
+    GLuint mPgr = 0;
+    GLuint mVbo = 0, mVao = 0;
+
+    std::mutex mMutex;
+
+    int32_t mAudioBufferCapacity;
+    int32_t mAudioBufferSize = 0;
+    int16_t *mAudioBuffer;
+
+    Queue<int16_t> mMaxQueue;
+    Queue<int16_t> mMinQueue;
+
+    int32_t mBufferCapacity;
+    int32_t mBufferSize = 0;
+    int16_t *mMaxBuffer;
+    int16_t *mMinBuffer;
 };
 
 #endif

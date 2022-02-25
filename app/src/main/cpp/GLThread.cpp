@@ -7,6 +7,12 @@
 #include "global.h"
 #include "GLThread.h"
 
+using std::thread;
+using std::mutex;
+using std::atomic;
+using std::unique_lock;
+using std::condition_variable;
+
 TAG(GLThread)
 
 static const EGLint DEFAULT_RENDER = EGL_OPENGL_ES3_BIT;
@@ -60,25 +66,25 @@ static bool lifecycleInvisible(LifecycleState state);
 
 static const char *lifecycleString(LifecycleState state);
 
-GLThread::GLThread(GLRender *render) : m_render(render),
-                                       m_thread([this] {
+GLThread::GLThread(GLRender *render) : mRender(render),
+                                       mThread([this] {
                                            EnvHelper helper;
                                            this->run(helper.getEnv());
                                        }) {
-    unique_lock<mutex> lock(m_mutex);
-    while (!m_alive) {
-        m_cond.wait(lock);
+    unique_lock<mutex> lock(mMutex);
+    while (!mAlive) {
+        mCond.wait(lock);
     }
 }
 
 GLThread::~GLThread() {
-    if (m_alive) waitForExit();
+    if (mAlive) waitForExit();
 }
 
 void GLThread::run(JNIEnv *env) {
-    unique_lock<mutex> lock(m_mutex);
-    m_alive = true;
-    m_cond.notify_all();
+    unique_lock<mutex> lock(mMutex);
+    mAlive = true;
+    mCond.notify_all();
     lock.unlock();
 
     jobject surface = nullptr;
@@ -86,7 +92,7 @@ void GLThread::run(JNIEnv *env) {
     int32_t width = 0, height = 0;
     LifecycleState lifecycle = LifecycleState::IDLE;
 
-    m_render->onRenderAttach();
+    mRender->onRenderAttach();
     EGLObject eglObject;
     while (!initialEGL(eglObject)) {
         log_e("%s(): egl initial error %s", __FUNCTION__, getErrorMessage(eglObject.error));
@@ -94,52 +100,52 @@ void GLThread::run(JNIEnv *env) {
 
     while (true) {
         // 同步状态
-        if (m_wait > 0 || !hasSurface || lifecycleInvisible(lifecycle)) {
+        if (mWait > 0 || !hasSurface || lifecycleInvisible(lifecycle)) {
             lock.lock();
             // 等待条件，有请求，没有 surface，没有创建 surface 的请求，没有退出请求，生命周期没变化
             while (true) {
-                if (m_exit) break;
-                if (m_wait > 0) break;
-                if (m_lifecycle != LifecycleState::IDLE) break;
-                if (m_surfaceCreate) break;
-                if (m_surfaceDestroy) break;
-                m_cond.notify_all();
-                m_cond.wait(lock);
+                if (mExit) break;
+                if (mWait > 0) break;
+                if (mLifecycle != LifecycleState::IDLE) break;
+                if (mSurfaceCreate) break;
+                if (mSurfaceDestroy) break;
+                mCond.notify_all();
+                mCond.wait(lock);
             }
-            log_i("%s(): wait = %d", __FUNCTION__, m_wait);
-            exit = m_exit;
-            if (m_surfaceCreate) {
-                m_surfaceCreate = false;
-                width = m_width;
-                height = m_height;
+            log_i("%s(): wait = %d", __FUNCTION__, mWait);
+            exit = mExit;
+            if (mSurfaceCreate) {
+                mSurfaceCreate = false;
+                width = mWidth;
+                height = mHeight;
                 createSurface = true;
-                surface = env->NewLocalRef(m_surface);
+                surface = env->NewLocalRef(mSurface);
             }
-            if (m_surfaceSizeChange) {
-                m_surfaceSizeChange = false;
-                width = m_width;
-                height = m_height;
+            if (mSurfaceSizeChange) {
+                mSurfaceSizeChange = false;
+                width = mWidth;
+                height = mHeight;
                 sizeChange = true;
             }
-            if (m_surfaceDestroy) {
-                m_surfaceDestroy = false;
+            if (mSurfaceDestroy) {
+                mSurfaceDestroy = false;
                 width = 0;
                 height = 0;
                 destroySurface = true;
             }
-            if (m_lifecycle != LifecycleState::IDLE) {
-                lifecycle = m_lifecycle;
-                m_lifecycle = LifecycleState::IDLE;
+            if (mLifecycle != LifecycleState::IDLE) {
+                lifecycle = mLifecycle;
+                mLifecycle = LifecycleState::IDLE;
                 log_i("%s(): lifecycle change %s", __FUNCTION__, lifecycleString(lifecycle));
             }
-            m_wait = 0;
-            m_cond.notify_all();
+            mWait = 0;
+            mCond.notify_all();
             lock.unlock();
         }
         // 开始工作
         if (exit) {
             if (hasSurface) {
-                m_render->onSurfaceDestroy();
+                mRender->onSurfaceDestroy();
             }
             break;
         }
@@ -156,14 +162,14 @@ void GLThread::run(JNIEnv *env) {
             hasSurface = true;
             env->DeleteLocalRef(surface);
             surface = nullptr;
-            m_render->onSurfaceCreate(width, height);
+            mRender->onSurfaceCreate(width, height);
             log_i("%s(): surface create", __FUNCTION__);
         }
         // EGL API 可能线程不安全
         // 销毁 surface
         if (destroySurface) {
             destroySurface = false;
-            m_render->onSurfaceDestroy();
+            mRender->onSurfaceDestroy();
             if (!destroyEGLSurface(eglObject)) {
                 log_e("%s(): egl destroy surface error %s", __FUNCTION__,
                       getErrorMessage(eglObject.error));
@@ -174,12 +180,14 @@ void GLThread::run(JNIEnv *env) {
         // 大小发生改变
         if (sizeChange) {
             sizeChange = false;
-            m_render->onSurfaceSizeChange(width, height);
+            mRender->onSurfaceSizeChange(width, height);
             log_i("%s(): surface size change width = %d, height = %d", __FUNCTION__, width, height);
         }
         // 渲染 当生命周期在 START 以前，PAUSE 以后就不绘制
         if (hasSurface && lifecycleVisible(lifecycle)) {
-            m_render->onSurfaceDraw();
+            eglMakeCurrent(eglObject.display, eglObject.surface, eglObject.surface,
+                           eglObject.context);
+            mRender->onSurfaceDraw();
 //            log_i("%s(): swap buffer", __FUNCTION__);
             EGLBoolean ret = eglSwapBuffers(eglObject.display, eglObject.surface);
             if (ret == EGL_FALSE) {
@@ -188,52 +196,52 @@ void GLThread::run(JNIEnv *env) {
         }
     }
 
-    m_render->onRenderDetach();
+    mRender->onRenderDetach();
     lock.lock();
     destroyEGLSurface(eglObject);
     destroyEGL(eglObject);
-    m_alive = false;
-    m_cond.notify_all();
+    mAlive = false;
+    mCond.notify_all();
     log_i("%s(): exiting", __FUNCTION__);
     lock.unlock();
 }
 
 void GLThread::surfaceCreate(JNIEnv *env, jobject surface, int32_t width, int32_t height) {
     jobject g_surface = env->NewGlobalRef(surface);
-    unique_lock<mutex> lock(m_mutex);
-    m_width = width;
-    m_height = height;
-    m_surfaceCreate = true;
-    m_surface = g_surface;
-    while (!m_exit && m_alive && m_surfaceCreate) {
-        m_wait += 1;
-        m_cond.notify_all();
-        m_cond.wait(lock);
+    unique_lock<mutex> lock(mMutex);
+    mWidth = width;
+    mHeight = height;
+    mSurfaceCreate = true;
+    mSurface = g_surface;
+    while (!mExit && mAlive && mSurfaceCreate) {
+        mWait += 1;
+        mCond.notify_all();
+        mCond.wait(lock);
     }
     lock.unlock();
     env->DeleteGlobalRef(g_surface);
 }
 
 void GLThread::surfaceSizeChanged(JNIEnv *env, jobject surface, int32_t width, int32_t height) {
-    unique_lock<mutex> lock(m_mutex);
-    m_surfaceSizeChange = true;
-    m_width = width;
-    m_height = height;
-    while (!m_exit && m_alive && m_surfaceSizeChange) {
-        m_wait += 1;
-        m_cond.notify_all();
-        m_cond.wait(lock);
+    unique_lock<mutex> lock(mMutex);
+    mSurfaceSizeChange = true;
+    mWidth = width;
+    mHeight = height;
+    while (!mExit && mAlive && mSurfaceSizeChange) {
+        mWait += 1;
+        mCond.notify_all();
+        mCond.wait(lock);
     }
     lock.unlock();
 }
 
 bool GLThread::surfaceDestroyed(JNIEnv *env) {
-    unique_lock<mutex> lock(m_mutex);
-    m_surfaceDestroy = true;
-    while (!m_exit && m_alive && m_surfaceDestroy) {
-        m_wait += 1;
-        m_cond.notify_all();
-        m_cond.wait(lock);
+    unique_lock<mutex> lock(mMutex);
+    mSurfaceDestroy = true;
+    while (!mExit && mAlive && mSurfaceDestroy) {
+        mWait += 1;
+        mCond.notify_all();
+        mCond.wait(lock);
     }
     lock.unlock();
     return true;
@@ -243,23 +251,23 @@ void GLThread::surfaceUpdated(JNIEnv *env, jobject surface) {
 }
 
 void GLThread::waitForExit() {
-    unique_lock<mutex> lock(m_mutex);
-    if (!m_alive) return;
-    m_exit = true;
-    while (m_alive) {
-        m_wait += 1;
-        m_cond.notify_all();
-        m_cond.wait(lock);
+    unique_lock<mutex> lock(mMutex);
+    if (!mAlive) return;
+    mExit = true;
+    while (mAlive) {
+        mWait += 1;
+        mCond.notify_all();
+        mCond.wait(lock);
     }
     lock.unlock();
-    m_thread.join();
+    mThread.join();
 }
 
 void GLThread::lifecycleChanged(LifecycleState state) {
-    unique_lock<mutex> lock(m_mutex);
-    m_lifecycle = state;
-    m_wait += 1;
-    m_cond.notify_all();
+    unique_lock<mutex> lock(mMutex);
+    mLifecycle = state;
+    mWait += 1;
+    mCond.notify_all();
     // 如果主线程被阻塞，Render 调用 glClear 的时候会阻塞，原因可能是因为主线程需要处理
     lock.unlock();
 }

@@ -10,15 +10,6 @@
 #include "AudioDataCallback.h"
 #include "AudioDataDispatcher.h"
 
-using std::mutex;
-using std::thread;
-using std::unique_lock;
-using std::condition_variable;
-using snore::F64pcm;
-using snore::snoreInitial;
-using snore::snoreDestroy;
-using snore::calculateSPL;
-
 typedef snore::SPL LibSnoreSPL;
 
 class SPLThread : public AudioDataCallback {
@@ -42,23 +33,23 @@ public:
     void waitForExit();
 
 private:
-    volatile DispatchState m_state = DispatchState::STOP;
-    volatile int64_t m_start = 0, m_stop = 0;
-    volatile int64_t m_frame = 0;
-    volatile int64_t m_sample_count = 0;
-    volatile bool m_exit = false;
-    volatile bool m_alive = false;
+    volatile DispatchState mState = DispatchState::STOP;
+    volatile int64_t mStart = 0, mStop = 0;
+    volatile int64_t mFrame = 0;
+    volatile int64_t mSampleCount = 0;
+    volatile bool mExit = false;
+    volatile bool mAlive = false;
 
-    int32_t m_size;
-    int32_t m_sample_rate;
+    int32_t mSize;
+    int32_t mSampleRate;
 
-    SPLJNICallback *m_callback;
+    SPLJNICallback *mCallback;
 
-    AudioDataBuffer<int16_t> m_buffer;
+    AudioDataBuffer<int16_t> mBuffer;
 
-    mutex m_mutex;
-    condition_variable m_cond;
-    thread m_thread;
+    std::mutex mMutex;
+    std::condition_variable mCond;
+    std::thread mThread;
 };
 
 #endif

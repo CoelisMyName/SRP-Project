@@ -3,36 +3,40 @@
 #include "config.h"
 #include "AudioDataDispatcher.h"
 
+using std::mutex;
+using std::vector;
 using std::unique_lock;
 
 TAG(AudioDataDispatcher)
 
 AudioDataDispatcher::AudioDataDispatcher() {
-    m_callbacks.reserve(10);
-    m_state = DispatchState::STOP;
-    m_start = 0;
-    m_timestamp = 0;
-    m_stop = 0;
+    mCallbacks.reserve(10);
+    mState = DispatchState::STOP;
+    mStart = 0;
+    mTimestamp = 0;
+    mStop = 0;
     log_i("%s(): %s", __FUNCTION__, "initial");
 }
 
 AudioDataDispatcher::~AudioDataDispatcher() = default;
 
 void AudioDataDispatcher::dispatchStart(int64_t timestamp) {
-    unique_lock<mutex> lock(m_mutex);
-    m_state = DispatchState::START;
-    m_start = timestamp;
-    for (auto cb : m_callbacks) {
+    unique_lock<mutex> lock(mMutex);
+    mState = DispatchState::START;
+    mStart = timestamp;
+    for (auto cb : mCallbacks) {
+        if (cb == nullptr) continue;
         cb->onAudioDataStart(timestamp);
     }
     log_i("%s(): timestamp = %lld", __FUNCTION__, timestamp);
 }
 
 void AudioDataDispatcher::dispatchStop(int64_t timestamp) {
-    unique_lock<mutex> lock(m_mutex);
-    m_state = DispatchState::STOP;
-    m_stop = timestamp;
-    for (auto cb : m_callbacks) {
+    unique_lock<mutex> lock(mMutex);
+    mState = DispatchState::STOP;
+    mStop = timestamp;
+    for (auto cb : mCallbacks) {
+        if (cb == nullptr) continue;
         cb->onAudioDataStop(timestamp);
     }
     log_i("%s(): timestamp = %lld", __FUNCTION__, timestamp);
@@ -43,12 +47,13 @@ void AudioDataDispatcher::dispatchAudioData(int64_t timestamp, int16_t *data, in
     int64_t sms, ems;
     sms = currentTimeMillis();
 #endif
-    unique_lock<mutex> lock(m_mutex);
-    m_timestamp = timestamp;
-    for (auto cb : m_callbacks) {
+    unique_lock<mutex> lock(mMutex);
+    mTimestamp = timestamp;
+    for (auto cb : mCallbacks) {
+        if (cb == nullptr) continue;
         cb->onAudioDataReceive(timestamp, data, length);
     }
-    log_i("%s(): timestamp = %lld, length = %d", __FUNCTION__, timestamp, length);
+//    log_i("%s(): timestamp = %lld, length = %d", __FUNCTION__, timestamp, length);
 #ifdef BENCHMARK
     ems = currentTimeMillis();
     if (ems - sms > 40) {
@@ -58,26 +63,28 @@ void AudioDataDispatcher::dispatchAudioData(int64_t timestamp, int16_t *data, in
 }
 
 void AudioDataDispatcher::registerCallback(AudioDataCallback *callback) {
-    unique_lock<mutex> lock(m_mutex);
-    for (auto cb : m_callbacks) {
+    if (callback == nullptr) return;
+    unique_lock<mutex> lock(mMutex);
+    for (auto cb : mCallbacks) {
         if (cb == callback) return;
     }
-    m_callbacks.push_back(callback);
+    mCallbacks.push_back(callback);
     callback->onAudioCallbackAttach();
-    if (m_state == DispatchState::START) {
-        callback->onAudioDataStart(m_start);
+    if (mState == DispatchState::START) {
+        callback->onAudioDataStart(mStart);
     }
     log_i("%s(): %s", __FUNCTION__, "register callback");
 }
 
 void AudioDataDispatcher::unregisterCallback(AudioDataCallback *callback) {
-    unique_lock<mutex> lock(m_mutex);
-//    m_callbacks.erase(std::remove_if(m_callbacks.begin(), m_callbacks.end(), [callback](AudioDataCallback *cb){return cb == callback; }),
-//                      m_callbacks.end());
+    if (callback == nullptr) return;
+    unique_lock<mutex> lock(mMutex);
+//    mCallbacks.erase(std::remove_if(mCallbacks.begin(), mCallbacks.end(), [callback](AudioDataCallback *cb){return cb == callback; }),
+//                      mCallbacks.end());
     // 迭代器删除元素
-    for (auto iter = m_callbacks.begin(); iter != m_callbacks.end();) {
+    for (auto iter = mCallbacks.begin(); iter != mCallbacks.end();) {
         if (*iter == callback) {
-            m_callbacks.erase(iter);
+            mCallbacks.erase(iter);
             callback->onAudioCallbackDetach();
         } else {
             iter += 1;
@@ -87,9 +94,10 @@ void AudioDataDispatcher::unregisterCallback(AudioDataCallback *callback) {
 }
 
 void AudioDataDispatcher::clear() {
-    unique_lock<mutex> lock(m_mutex);
-    for (AudioDataCallback *cb : m_callbacks) {
+    unique_lock<mutex> lock(mMutex);
+    for (AudioDataCallback *cb : mCallbacks) {
+        if (cb == nullptr) continue;
         cb->onAudioCallbackDetach();
     }
-    m_callbacks.clear();
+    mCallbacks.clear();
 }

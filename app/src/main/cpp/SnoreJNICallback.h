@@ -16,20 +16,20 @@ typedef struct {
 class SnoreJNICallback {
 public:
     SnoreJNICallback(JNIEnv *env, jobject obj) {
-        m_env = env;
+        mEnv = env;
         // 全局共享引用
-        m_obj = env->NewGlobalRef(obj);
+        mObj = env->NewGlobalRef(obj);
         jclass local_class = env->FindClass("com/scut/utils/ModuleController");
-        m_cls = (jclass) env->NewGlobalRef(local_class);
+        mCls = (jclass) env->NewGlobalRef(local_class);
         env->DeleteLocalRef(local_class);
         local_class = env->FindClass("com/scut/utils/Snore");
-        m_snore = (jclass) env->NewGlobalRef(local_class);
+        mSnore = (jclass) env->NewGlobalRef(local_class);
         env->DeleteLocalRef(local_class);
         // 方法 id
-        m_constructor = env->GetMethodID(m_snore, "<init>", "(JJZJ)V");
-        m_onStart = env->GetMethodID(m_cls, "onSnoreStart", "(J)V");
-        m_onRecognize = env->GetMethodID(m_cls, "onSnoreRecognize", "(Lcom/scut/utils/Snore;)V");
-        m_onStop = env->GetMethodID(m_cls, "onSnoreStop", "(J)V");
+        mConstructor = env->GetMethodID(mSnore, "<init>", "(JJZJ)V");
+        mOnStart = env->GetMethodID(mCls, "onSnoreStart", "(J)V");
+        mOnRecognize = env->GetMethodID(mCls, "onSnoreRecognize", "(Lcom/scut/utils/Snore;)V");
+        mOnStop = env->GetMethodID(mCls, "onSnoreStop", "(J)V");
     }
 
     /**
@@ -37,39 +37,39 @@ public:
      * @param env
      */
     void updateEnv(JNIEnv *env) {
-        m_env = env;
+        mEnv = env;
     }
 
     ~SnoreJNICallback() {
-        m_env->DeleteGlobalRef(m_cls);
-        m_env->DeleteGlobalRef(m_snore);
+        mEnv->DeleteGlobalRef(mCls);
+        mEnv->DeleteGlobalRef(mSnore);
     }
 
     void onStart(JNIEnv *env, jlong timestamp) {
-        env->CallVoidMethod(m_obj, m_onStart, timestamp);
+        env->CallVoidMethod(mObj, mOnStart, timestamp);
     }
 
     void onRecognize(JNIEnv *env, Snore &snore) {
-        jobject obj = env->NewObject(m_snore, m_constructor, snore.timestamp, snore.length,
+        jobject obj = env->NewObject(mSnore, mConstructor, snore.timestamp, snore.length,
                                      snore.confirm, snore.startTime);
-        env->CallVoidMethod(m_obj, m_onRecognize, obj);
+        env->CallVoidMethod(mObj, mOnRecognize, obj);
         env->DeleteLocalRef(obj);
     }
 
     void onStop(JNIEnv *env, jlong timestamp) {
-        env->CallVoidMethod(m_obj, m_onStop, timestamp);
+        env->CallVoidMethod(mObj, mOnStop, timestamp);
     }
 
 private:
-    JNIEnv *m_env;
+    JNIEnv *mEnv;
     // 全局引用类型
-    jobject m_obj;
-    jclass m_cls;
-    jclass m_snore;
-    jmethodID m_onStart;
-    jmethodID m_onRecognize;
-    jmethodID m_onStop;
-    jmethodID m_constructor;
+    jobject mObj;
+    jclass mCls;
+    jclass mSnore;
+    jmethodID mOnStart;
+    jmethodID mOnRecognize;
+    jmethodID mOnStop;
+    jmethodID mConstructor;
 };
 
 

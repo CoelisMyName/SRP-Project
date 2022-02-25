@@ -6,10 +6,11 @@
     android:padding="10dp">
 
     <TextView
-        android:id="@+id/spl"
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="dauidn dwa niaw ndawi  dwan daow noa wnidndaw ndiaw \nnidawnid awn dwajwk andawndka wnd akwj "
+        android:layout_gravity="center_horizontal"
+        android:text="调试界面"
         android:textColor="@color/black"
         android:textSize="15sp" />
 
@@ -35,12 +36,68 @@
     <com.scut.component.NativeTextureView
         android:id="@+id/textureView"
         android:layout_width="match_parent"
-        android:layout_height="200dp" />
+        android:layout_height="100dp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="测试 NativeTextureView" />
 
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:columnCount="4"
+        android:orientation="vertical">
 
+        <Button
+            android:id="@+id/insertSleep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="0"
+            android:layout_column="0"
+            android:layout_columnSpan="2"
+            android:text="插入睡眠数据" />
+
+        <Button
+            android:id="@+id/updateSleep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="0"
+            android:layout_column="2"
+            android:layout_columnSpan="2"
+            android:text="更新睡眠时长" />
+
+        <Button
+            android:id="@+id/deleteSleep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="1"
+            android:layout_column="2"
+            android:layout_columnSpan="2"
+            android:text="删除睡眠数据" />
+
+        <Button
+            android:id="@+id/insertSnore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_row="1"
+            android:layout_column="0"
+            android:layout_columnSpan="2"
+            android:text="插入鼾声数据" />
+
+    </GridLayout>
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="" />
+
+    </ScrollView>
 </LinearLayout>

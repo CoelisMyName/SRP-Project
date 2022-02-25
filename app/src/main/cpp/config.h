@@ -3,7 +3,7 @@
 
 #define SAMPLE_RATE 44100 // 设定采样率
 
-#define FRAME_MILLISECOND 50 // 50ms 采样周期
+#define FRAME_CYCLE 50 // 50ms 采样周期
 
 #define FRAME_SIZE 2205 // 44100 * (50ms / 1000ms) 采样数大小
 
@@ -13,7 +13,7 @@
 
 #define SNORE_BUFFER_SIZE 2648205 // 2646000 + 2205 鼾声识别缓存大小
 
-#define SPL_MILLISECOND 200 // 200ms SPL 计算周期
+#define SPL_CYCLE 200 // 200ms SPL 计算周期
 
 #define SPL_INPUT_SIZE 8820 // 44100 * (50ms / 1000ms) SPL 输入大小
 
@@ -30,5 +30,11 @@
 #ifdef ENABLE_LOG
 #define BENCHMARK // 启用耗时计算
 #endif
+
+#define WAVE_RENDER_INPUT_SIZE 735 //每多少采样，产生一个波形值
+
+#define WAVE_RENDER_RATIO 0.8 //guess
+
+#define WAVE_RENDER_POINT_NUM 2000 //绘制多少个波形线
 
 #endif

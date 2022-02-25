@@ -5,12 +5,6 @@
 #include <thread>
 #include "GLRender.h"
 
-using std::thread;
-using std::mutex;
-using std::atomic;
-using std::unique_lock;
-using std::condition_variable;
-
 enum class LifecycleState {
     IDLE, CREATE, START, RESUME, PAUSE, STOP, DESTROY
 };
@@ -76,21 +70,21 @@ public:
 
 private:
     // 线程通信交换变量
-    volatile jobject m_surface = nullptr;
-    volatile int32_t m_wait = 0;
-    volatile int32_t m_width = 0;
-    volatile int32_t m_height = 0;
-    volatile bool m_exit = false;
-    volatile bool m_alive = false;
-    volatile bool m_surfaceCreate = false;
-    volatile bool m_surfaceDestroy = false;
-    volatile bool m_surfaceSizeChange = false;
-    volatile LifecycleState m_lifecycle = LifecycleState::IDLE;
+    volatile jobject mSurface = nullptr;
+    volatile int32_t mWait = 0;
+    volatile int32_t mWidth = 0;
+    volatile int32_t mHeight = 0;
+    volatile bool mExit = false;
+    volatile bool mAlive = false;
+    volatile bool mSurfaceCreate = false;
+    volatile bool mSurfaceDestroy = false;
+    volatile bool mSurfaceSizeChange = false;
+    volatile LifecycleState mLifecycle = LifecycleState::IDLE;
 
-    GLRender *m_render;
-    mutex m_mutex;
-    condition_variable m_cond;
-    thread m_thread;
+    GLRender *mRender;
+    std::mutex mMutex;
+    std::condition_variable mCond;
+    std::thread mThread;
 };
 
 #endif
