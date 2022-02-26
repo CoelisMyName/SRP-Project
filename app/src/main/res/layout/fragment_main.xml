@@ -6,14 +6,15 @@
     android:layout_height="match_parent">
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card1"
+        android:id="@+id/card_report"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="20dp"
         app:layout_constraintDimensionRatio="H,2:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:cardCornerRadius="30dp">
 
         <ImageView
             android:layout_width="match_parent"
@@ -22,36 +23,29 @@
             android:src="@drawable/history_result"
             tools:ignore="ContentDescription" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            android:gravity="start"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="历史记录"
-                android:textColor="@color/black"
-                android:textSize="30sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
+            android:layout_marginStart="10dp"
+            android:text="历史记录"
+            android:textColor="@color/black"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:padding="20dp"
+            android:layout_marginTop="100dp"/>
 
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card5"
+        android:id="@+id/card_monitor"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="20dp"
         app:layout_constraintDimensionRatio="H,2:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/card1">
+        app:layout_constraintTop_toBottomOf="@id/card_report"
+        app:cardCornerRadius="30dp">
 
         <ImageView
             android:layout_width="match_parent"
@@ -60,24 +54,16 @@
             android:src="@drawable/noise_measure"
             tools:ignore="ContentDescription" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="2dp"
-            android:gravity="start"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="睡眠监测"
-                android:textColor="@color/black"
-                android:textSize="30sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
+            android:layout_marginStart="10dp"
+            android:text="睡眠监测"
+            android:textColor="@color/black"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:padding="20dp"
+            android:layout_marginTop="100dp"/>
 
     </com.google.android.material.card.MaterialCardView>
 

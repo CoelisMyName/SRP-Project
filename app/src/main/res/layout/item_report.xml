@@ -11,7 +11,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_min="50dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:cardElevation="8dp"
+        app:cardCornerRadius="8dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
