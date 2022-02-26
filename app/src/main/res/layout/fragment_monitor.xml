@@ -17,7 +17,7 @@
         android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:text="2020"
         android:textColor="@color/black"
         android:textSize="25sp"
@@ -28,15 +28,18 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/begin"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="50dp"
+        app:srcCompat="@drawable/play_icon"
+        app:fabCustomSize="90dp"
+        app:maxImageSize="90dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
+        android:id="@+id/show_details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
@@ -44,6 +47,7 @@
         app:layout_constraintBottom_toBottomOf="@id/begin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/begin"
-        app:layout_constraintTop_toTopOf="@id/begin" />
+        app:layout_constraintTop_toTopOf="@id/begin"
+        android:text="显示详情"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
