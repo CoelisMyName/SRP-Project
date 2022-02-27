@@ -8,13 +8,13 @@
 
 TAG(WaveRender)
 
-using std::mutex;
-using std::unique_lock;
+#define MIN(x, y) ((x < y) ? x : y)
+#define MIN3(x, y, z) ((MIN(x, y) < z) ? MIN(x, y) : z)
 
 /**
  * @brief 波形强度映射.
  * 该函数应当保证（非严格）单调递增.
- * 在receieve获取到端点值后使用.
+ * 在receive获取到端点值后使用.
  *
  * @param origin 原强度
  * @return int16_t
@@ -24,13 +24,8 @@ int16_t strength_map(int16_t origin)
     return origin;
 }
 
-WaveRender::WaveRender() : mMaxQueue(WAVE_RENDER_POINT_NUM), mMinQueue(WAVE_RENDER_POINT_NUM)
+WaveRender::WaveRender()
 {
-    mAudioBufferCapacity = WAVE_RENDER_INPUT_SIZE + FRAME_SIZE;
-    mAudioBuffer = new int16_t[mAudioBufferCapacity];
-    mBufferCapacity = WAVE_RENDER_POINT_NUM;
-    mMaxBuffer = new int16_t[mBufferCapacity];
-    mMinBuffer = new int16_t[mBufferCapacity];
     // 清理接收缓冲区
     this->_recv_dataReinit();
     // 清理绘制缓冲区
@@ -39,9 +34,6 @@ WaveRender::WaveRender() : mMaxQueue(WAVE_RENDER_POINT_NUM), mMinQueue(WAVE_REND
 
 WaveRender::~WaveRender()
 {
-    delete[] mAudioBuffer;
-    delete[] mMaxBuffer;
-    delete[] mMinBuffer;
 }
 
 void WaveRender::onAudioCallbackAttach()
@@ -68,6 +60,8 @@ void WaveRender::onAudioDataReceive(int64_t timestamp, int16_t *data, int32_t le
     // 读取上次运行结果，避免一直全局访存
     uint32_t group_pos = this->_m_recvDatas.cur_pos;
     int16_t group_max = 0, group_min = 0;
+    // 读取插入点，避免频繁对插入点进行++
+    size_t local_next_pos = this->_m_recvDatas.next_pos;
     if (group_pos)
     {
         group_max = this->_m_recvDatas.cur_max;
@@ -102,9 +96,9 @@ void WaveRender::onAudioDataReceive(int64_t timestamp, int16_t *data, int32_t le
             {
                 // 一组数据已满，此时向缓冲区队尾插入并更新队尾坐标.
                 // 在输入前进行强度映射
-                this->_m_recvDatas.buffer[this->_m_recvDatas.next_pos].maximun = strength_map(group_max);
-                this->_m_recvDatas.buffer[this->_m_recvDatas.next_pos].minimun = strength_map(group_min);
-                ++this->_m_recvDatas.next_pos;
+                this->_m_recvDatas.buffer[local_next_pos].maximun = strength_map(group_max);
+                this->_m_recvDatas.buffer[local_next_pos].minimun = strength_map(group_min);
+                ++local_next_pos;
                 // 清理各局部状态变量，这些状态的写回在外层循环进行
                 group_max = group_min = group_pos = 0;
                 // 写入次数自增
@@ -121,41 +115,19 @@ void WaveRender::onAudioDataReceive(int64_t timestamp, int16_t *data, int32_t le
         this->_m_recvDatas.cur_pos = group_pos;
         this->_m_recvDatas.cur_max = group_max;
         this->_m_recvDatas.cur_min = group_min;
-        // 计算新的 available_length 与 start_pos
+        // 计算新的 available_length
         // 由于数据只由本接口写，此时仍不必上锁
-        size_t new_al = this->_m_recvDatas.available_length,
-               new_sp = this->_m_recvDatas.start_pos;
-        // 根据 len_increase 计算 start_pos的移动
-        // 需要注意的是，如果队列未满，len_increase不一定导致队首移动一样的距离
+        size_t new_al = this->_m_recvDatas.available_length + len_increase;
+        if (new_al > WAVERENDER_MAX_WIDTH)
         {
-            // 由于mWidth可能改变因此需要缓存
-            const int32_t mw = this->mWidth;
-            // 计算宽度上限
-            const size_t upper_bound = (mw > WAVERENDER_MAX_WIDTH) ? WAVERENDER_MAX_WIDTH : mw;
-            // 计算长度是否需要增长.
-            // overflow 为非负值时，sp向前移动overflow单位，al增加至upper_bound
-            // overflow 为负时，al增加len_increase
-            const size_t overflow = new_al + len_increase - upper_bound;
-            if (overflow >= 0)
-            {
-                new_sp += overflow;
-                if (new_sp >= WAVERENDER_BUFFER_SIZE)
-                {
-                    new_sp -= WAVERENDER_BUFFER_SIZE;
-                }
-                new_al = upper_bound;
-            }
-            else
-            {
-                new_al += len_increase;
-            }
+            new_al = WAVERENDER_MAX_WIDTH;
         }
-        // 带锁操作，更新关键的 available_length 与 start_pos
+        // 带锁操作，更新关键的 available_length 与 next_pos
         // 此处不锁定也可在大部分情况下安全同步，但不锁定时两处赋值顺序不可交换
 #ifndef WAVERENDER_SYNC_RISK
         this->mMutex.lock();
 #endif
-        this->_m_recvDatas.start_pos = new_sp;
+        this->_m_recvDatas.next_pos = local_next_pos;
         this->_m_recvDatas.available_length = new_al;
 #ifndef WAVERENDER_SYNC_RISK
         this->mMutex.unlock();
@@ -187,19 +159,20 @@ void WaveRender::onSurfaceCreate(int32_t width, int32_t height)
         {
             mInit = true;
         }
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-        const static GLfloat vertices[] = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f, 0.5f, 0.0f};
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        // const static GLfloat vertices[] = {
+        //     -0.5f, -0.5f, 0.0f,
+        //     0.5f, -0.5f, 0.0f,
+        //     0.0f, 0.5f, 0.0f};
         mVbo = 0, mVao = 0;
         glGenVertexArrays(1, &mVao);
         glBindVertexArray(mVao);
 
         glGenBuffers(1, &mVbo);
         glBindBuffer(GL_ARRAY_BUFFER, mVbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
+        // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
         glEnableVertexAttribArray(0);
     }
 }
@@ -207,12 +180,27 @@ void WaveRender::onSurfaceCreate(int32_t width, int32_t height)
 void WaveRender::onSurfaceDraw()
 {
     // 复制数据
-    this->_copy_from_receiever();
-    // 还没改
+    this->_copy_from_receiver();
+    // 清屏
     glUseProgram(mPgr);
+    glClearColor(0.5f, 0.5f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+    // 如果没有可用绘制数据，直接返回
+    if (0 == this->_m_renderDatas.size)
+    {
+        return;
+    }
+    // 对波形高度再次进行处理
+    this->_render_convert();
+    // 将波形映射到绘制用的数组
+    this->_render_genPoints();
+    // 配置缓冲区
     glBindVertexArray(mVao);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindBuffer(GL_ARRAY_BUFFER, mVbo);
+    glBufferData(GL_ARRAY_BUFFER, 6 * this->_m_renderDatas.size * sizeof(GLfloat), this->_m_renderDatas.output_buffer, GL_STREAM_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
+    glEnableVertexAttribArray(0);
+    glDrawArrays(GL_LINES, 0, 2 * this->_m_renderDatas.size);
 }
 
 void WaveRender::onSurfaceSizeChange(int32_t width, int32_t height)
@@ -241,14 +229,13 @@ void WaveRender::onRenderDetach()
 
 void WaveRender::_recv_dataReinit()
 {
+    this->_m_recvDatas.available_length = 0;
+    this->_m_recvDatas.next_pos = 0;
     for (size_t i = 0; i < WAVERENDER_BUFFER_SIZE; ++i)
     {
         this->_m_recvDatas.buffer[i].maximun = 0;
         this->_m_recvDatas.buffer[i].minimun = 0;
     }
-    this->_m_recvDatas.available_length = 0;
-    this->_m_recvDatas.start_pos = 0;
-    this->_m_recvDatas.next_pos = 0;
     // 重置统计信息
     this->_m_recvDatas.cur_max = 0;
     this->_m_recvDatas.cur_min = 0;
@@ -256,30 +243,40 @@ void WaveRender::_recv_dataReinit()
 }
 void WaveRender::_render_dataReinit()
 {
-    for (size_t i = 0; i < WAVERENDER_MAX_WIDTH; ++I)
+    for (size_t i = 0; i < WAVERENDER_MAX_WIDTH; ++i)
     {
         this->_m_renderDatas.buffer[i].maximun = 0;
         this->_m_renderDatas.buffer[i].minimun = 0;
     }
     this->_m_renderDatas.size = 0;
-    this->_m_renderDatas.last_minmax = 0;
+    this->_m_renderDatas.last_minmax = WAVERENDER_SCALE_PROTECTED_HEIGHT;
 }
 
-void WaveRender::_copy_from_receiever()
+void WaveRender::_copy_from_receiver()
 {
 #ifndef WAVERENDER_SYNC_RISK
     // 上锁准备复制
     this->mMutex.lock();
 #endif
     // 保存变量到本地
-    size_t pos = this->_m_recvDatas.start_pos;
-    const size_t len = this->_m_recvDatas.available_length;
+    size_t pos = this->_m_recvDatas.next_pos;
+    const int32_t localw = this->mWidth;
+    const size_t max_len = this->_m_recvDatas.available_length;
     // 安全检查
-    if ((len <= 0) || (pos <= 0) || (len > WAVERENDER_MAX_WIDTH) || (pos >= WAVERENDER_BUFFER_SIZE) || (len > this->mWidth))
+    if ((max_len <= 0) || (pos <= 0) || (max_len > WAVERENDER_MAX_WIDTH) || (pos >= WAVERENDER_BUFFER_SIZE))
     {
         this->_render_dataReinit();
         return;
     }
+    // 计算真正需要复制的宽度数量: localw WAVERENDER_MAX_WIDTH 与 max_len 中的最小值
+    const size_t len = MIN3(localw, WAVERENDER_MAX_WIDTH, max_len);
+    // 计算复制起点
+    pos = pos + WAVERENDER_BUFFER_SIZE - len;
+    if (pos >= WAVERENDER_BUFFER_SIZE)
+    {
+        pos -= WAVERENDER_BUFFER_SIZE;
+    }
+
     // 复制动作
     for (size_t i = 0; i < len; ++i, ++pos)
     {
@@ -298,4 +295,112 @@ void WaveRender::_copy_from_receiever()
     // 复制结束，解锁
     this->mMutex.unlock();
 #endif
+}
+
+void WaveRender::_render_convert()
+{
+    // 提取出最值，用于缩放变动. max2只是临时值（用于保存负值）
+    int16_t max = 0;
+    {
+        int16_t max2 = 0;
+        // 遍历取当前区间最值
+        for (size_t i = 0; i < this->_m_renderDatas.size; ++i)
+        {
+            // 最大
+            if (this->_m_renderDatas.buffer[i].maximun > max)
+            {
+                max = this->_m_renderDatas.buffer[i].maximun;
+            }
+            // 最小
+            max2 = MIN(max2, this->_m_renderDatas.buffer[i].minimun);
+        }
+        // 将max2取反与max比较得到较大的峰值
+        max2 = -max2;
+        max = (max > max2) ? max : max2;
+    }
+    // 当 max 未达到 INT16_MAX 时，接下来的代码用于尝试控制视图内 y_max 为 max + step，对波形进行缩放
+    // 期望值的计算，并使 max + step 位于区间 [protected, INT16_MAX] 内
+    int16_t hope = INT16_MAX;
+    // 防止溢出的上限比较
+    // 本次比较后 hope 的取值范围在 [max + step, INT16_MAX]
+    if (max < (INT16_MAX - WAVERENDER_SCALE_MAX_STEP))
+    {
+        // 期望y_max低于上限，改为上限
+        hope = max + WAVERENDER_SCALE_MAX_STEP;
+    }
+    // 比较下限
+    if (hope < WAVERENDER_SCALE_PROTECTED_HEIGHT)
+    {
+        hope = WAVERENDER_SCALE_PROTECTED_HEIGHT;
+    }
+    // 计算偏差值
+    int16_t delta = hope - this->_m_renderDatas.last_minmax;
+    // 对偏差值进行修正，避免缩放过快
+    if (delta < 0)
+    {
+        if ((-delta) > WAVERENDER_SCALE_MAX_STEP)
+        {
+            delta = -WAVERENDER_SCALE_MAX_STEP;
+        }
+    }
+    else
+    {
+        delta = MIN(delta, WAVERENDER_SCALE_MAX_STEP);
+    }
+    // 得到最终应当取得的渲染区上限
+    const int16_t real_max = hope + delta;
+    // 存回
+    this->_m_renderDatas.last_minmax = real_max;
+    // 过滤
+    for (size_t i = 0; i < this->_m_renderDatas.size; ++i)
+    {
+        // 防止溢出，溢出置为INT16_MAX/MIN
+        int32_t i1 = this->_m_renderDatas.buffer[i].maximun * ((int32_t)INT16_MAX) / real_max;
+        int32_t i2 = this->_m_renderDatas.buffer[i].minimun * ((int32_t)INT16_MAX) / real_max;
+        // 对溢出值削峰
+        this->_m_renderDatas.buffer[i].maximun = (int16_t)(MIN(INT16_MAX, i1));
+        this->_m_renderDatas.buffer[i].minimun = (i2 < INT16_MIN) ? INT16_MIN : (int16_t(i2));
+    }
+}
+
+#define IN(i) (this->_m_renderDatas.buffer[i])
+#define X1(i) (this->_m_renderDatas.output_buffer[6 * i])
+#define Y1(i) (this->_m_renderDatas.output_buffer[6 * i + 1])
+#define Z1(i) (this->_m_renderDatas.output_buffer[6 * i + 2])
+#define X2(i) (this->_m_renderDatas.output_buffer[6 * i + 3])
+#define Y2(i) (this->_m_renderDatas.output_buffer[6 * i + 4])
+#define Z2(i) (this->_m_renderDatas.output_buffer[6 * i + 5])
+
+void WaveRender::_render_genPoints()
+{
+    // 保存宽高
+    const int32_t localw = this->mWidth;
+    // 坐标映射规则为：
+    // y轴范围由 [INT16_MIN, INT16_MAX] 映射至 [-1.0f, 1.0f]
+    // x轴范围由 [0, size] 映射至 [-1.0f, 1.0f]
+    // x轴方向上，div 内波形向右对齐，div最大宽度 max_width，div在窗口内水平居中
+    // 因此，x方向步进为 step = 2.0/localw;
+    // x0取值为 -1.0f 或 -1.0f + (maxw-localw)/2*step
+
+    // 计算x0相关内容
+    const GLfloat stepx = 2.0f / localw;
+    GLfloat x0 = -1.0f + stepx;
+    if (localw > WAVERENDER_MAX_WIDTH)
+    {
+        x0 += (GLfloat)(WAVERENDER_MAX_WIDTH - localw) / 2.0f * stepx;
+    }
+    // 进行变换
+    for (size_t i = 0; i < this->_m_renderDatas.size; ++i)
+    {
+        // x1与x2取值与当前x0相同
+        X1(i) = X2(i) = x0;
+        // y1与y2的运算非常简单, 除以最大值即可
+        Y1(i) = IN(i).maximun / (GLfloat(INT16_MAX));
+        Y2(i) = IN(i).minimun / (GLfloat(INT16_MAX));
+        // z1与z2置0即可
+        Z1(i) = 0.0f;
+        Z2(i) = 0.0f;
+        // 更新 x0
+        x0 += stepx;
+    }
 }
