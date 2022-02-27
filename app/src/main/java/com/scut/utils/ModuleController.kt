@@ -57,9 +57,10 @@ object ModuleController {
         mSPLCallback = DefaultSPLCallback()
     }
 
-    fun registerNativeCallback(pointer: Long): Boolean = LibSRP.registerCallback(this, pointer)
+    fun registerNativeCallback(pointer: Long): Boolean = LibSRP.registerAudioGLRender(this, pointer)
 
-    fun unregisterNativeCallback(pointer: Long): Boolean = LibSRP.unregisterCallback(this, pointer)
+    fun unregisterNativeCallback(pointer: Long): Boolean =
+        LibSRP.unregisterAudioGLRender(this, pointer)
 
     private fun onSnoreStart(timestamp: Long) = mSnoreCallback.onStart(timestamp)
 

@@ -207,20 +207,20 @@ Java_com_scut_utils_LibSRP_isRunning(__unused JNIEnv *env, __unused jobject thiz
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_scut_utils_LibSRP_registerCallback(__unused JNIEnv *env, __unused jobject thiz,
-                                            __unused jobject controller,
-                                            jlong pointer) {
+Java_com_scut_utils_LibSRP_registerAudioGLRender(__unused JNIEnv *env, __unused jobject thiz,
+                                                 __unused jobject controller,
+                                                 jlong pointer) {
     if (!initialFlag) return false;
-    auto callback = (AudioDataCallback *) pointer;
+    auto callback = (AudioGLRender *) pointer;
     if (callback == nullptr) return false;
     dispatcher->registerCallback(callback);
     return true;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_scut_utils_LibSRP_unregisterCallback(__unused JNIEnv *env, __unused jobject thiz,
-                                              __unused jobject controller,
-                                              jlong pointer) {
+Java_com_scut_utils_LibSRP_unregisterAudioGLRender(__unused JNIEnv *env, __unused jobject thiz,
+                                                   __unused jobject controller,
+                                                   jlong pointer) {
     if (!initialFlag) return false;
     auto callback = (AudioDataCallback *) pointer;
     if (callback == nullptr) return false;
@@ -231,7 +231,7 @@ Java_com_scut_utils_LibSRP_unregisterCallback(__unused JNIEnv *env, __unused job
 JNIEXPORT jlong JNICALL
 Java_com_scut_component_RenderFactory_newRender(JNIEnv *env, __unused jobject thiz, jstring type) {
     auto str = env->GetStringUTFChars(type, nullptr);
-    GLRender *render = newRender(str);
+    AudioGLRender *render = newRender(str);
     env->ReleaseStringUTFChars(type, str);
     return (jlong) render;
 }
@@ -239,7 +239,7 @@ Java_com_scut_component_RenderFactory_newRender(JNIEnv *env, __unused jobject th
 JNIEXPORT void JNICALL
 Java_com_scut_component_RenderFactory_deleteRender(__unused JNIEnv *env, __unused jobject thiz,
                                                    jlong pointer) {
-    auto render = (GLRender *) pointer;
+    auto render = (AudioGLRender *) pointer;
     deleteRender(render);
 }
 

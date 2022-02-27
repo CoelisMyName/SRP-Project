@@ -19,7 +19,7 @@
 #include "glesUtils.h"
 #include "AudioDataCallback.h"
 
-class DefaultRender : public GLRender, public AudioDataCallback {
+class DefaultRender : public AudioGLRender {
 
 public:
     virtual ~DefaultRender() override = default;

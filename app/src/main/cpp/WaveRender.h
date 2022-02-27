@@ -12,11 +12,10 @@
 #endif
 
 #include <thread>
-#include "GLRender.h"
+#include "AudioGLRender.h"
 #include "AudioDataBuffer.h"
-#include "AudioDataCallback.h"
 
-class WaveRender : public GLRender, public AudioDataCallback {
+class WaveRender : public AudioGLRender {
 public:
     WaveRender();
 
