@@ -5,29 +5,29 @@
 
 namespace snore {
 
-#define DEFAULT_PRECISION 16
+#define SNORE_UNUSED __attribute__((unused))
 
-/**
- * PCM结构体
- */
-    typedef struct I16pcm {
+    /**
+     * PCM结构体
+     */
+    typedef struct {
         int16_t *raw /* 数据 */;
-        uint32_t length /* 数据长度 */;
-        uint32_t channel; /* 通道数 */
+        int64_t length /* 数据长度 */;
+        int32_t channel /* 通道数 */;
         double fs /* 采样率 */;
-    } I16pcm;
+    } SNORE_I16pcm;
 
-    typedef struct F64pcm {
+    typedef struct {
         double *raw; /* 归一化数据 */;
-        uint32_t length /* 数据长度 */;
-        uint32_t channel; /* 通道数 */
+        int64_t length /* 数据长度 */;
+        int32_t channel; /* 通道数 */
         double fs /* 采样率 */;
-    } F64pcm;
+    } SNORE_F64pcm;
 
-/**
- * SPL结构体，存储声压级测量数据
- */
-    typedef struct SPL {
+    /**
+     * SNORE_SPL结构体，存储声压级测量数据
+     */
+    typedef struct {
         double a_sum /* A计权总和 */;
         double c_sum /* C计权总和 */;
         double z_sum /* Z计权总和 */;
@@ -35,57 +35,83 @@ namespace snore {
         double a_pow[8] /* A计权 */;
         double c_pow[8] /* C计权 */;
         double z_pow[8] /* Z计权 */;
-    } SPL;
+    } SNORE_SPL;
 
-/**
- * 模型返回结果
- */
-    class ModelResult {
+    /**
+     * 模型返回结果
+     */
+    class SNORE_ModelResult {
     public:
-        ModelResult();
+        virtual ~SNORE_ModelResult() = default;
 
-        ~ModelResult();
+        virtual SNORE_UNUSED void print() const = 0;
 
-        void print() const;
+        virtual SNORE_UNUSED void clear() = 0;
 
-        uint32_t *starts = nullptr /* 声音起始下标 */, *ends = nullptr /* 声音结束下标 */;
-        double *label = nullptr /* 分类器检测结果 */;
-        uint32_t s_size = 0, e_size = 0, l_size = 0; /* 数据大小 */
-        double n_start = -1, n_length = -1; /* 有声段起始位置和长度（单位：秒） */
+        virtual SNORE_UNUSED int64_t getSignalIndexSize() = 0;
+
+        virtual SNORE_UNUSED int64_t getSignalStart(int64_t index) = 0;
+
+        virtual SNORE_UNUSED int64_t getSignalEnd(int64_t index) = 0;
+
+        virtual SNORE_UNUSED double getSignalLabel(int64_t index) = 0;
+
+        virtual SNORE_UNUSED double getNoiseStart() = 0;
+
+        virtual SNORE_UNUSED double getNoiseEnd() = 0;
     };
 
-/**
- * 模型入口函数
- * @param src 输入音频数据
- * @param modelResult 输出模型运算结果
- */
-    extern void calculateModelResult(F64pcm &src, ModelResult &modelResult);
+    class SNORE_PatientModel {
+    public:
+        virtual ~SNORE_PatientModel() = default;
 
-/**
- * 生成噪声特征文件
- * @param src 输入音频数据
- * @param start 裁剪起始位置（单位：秒）
- * @param duration 裁剪长度（单位：秒）
- * @param filename noiseprof输出文件路径
- */
-    extern void
-    generateNoiseProfile(I16pcm &src, double start, double duration, const char *filename);
+        virtual SNORE_UNUSED void digest(SNORE_F64pcm &src) = 0;
 
-/**
- * 降噪
- * @param src 输入音频数据
- * @param dst 输出音频数据
- * @param filename 噪声文件名
- * @param coefficient 降噪系数
- */
-    extern void reduceNoise(I16pcm &src, I16pcm &dst, const char *filename, double coefficient);
+        virtual SNORE_UNUSED double getResult() = 0;
+    };
 
-/**
- * 计算声压级，只支持44.1k
- * @param src 输入音频数据
- * @param spl 输出声压级
- */
-    extern void calculateSPL(F64pcm &src, SPL &spl);
+    /**
+     * 模型入口函数
+     * @param src 输入音频数据
+     * @param modelResult 输出模型运算结果
+     */
+    SNORE_UNUSED extern void
+    calculateModelResult(SNORE_F64pcm &src, SNORE_ModelResult &modelResult);
+
+    /**
+     * 生成噪声特征文件
+     * @param src 输入音频数据
+     * @param start 裁剪起始位置（单位：秒）
+     * @param duration 裁剪长度（单位：秒）
+     * @param filename noiseprof输出文件路径
+     */
+    SNORE_UNUSED extern void
+    generateNoiseProfile(SNORE_I16pcm &src, double start, double duration, const char *filename);
+
+    /**
+     * 降噪
+     * @param src 输入音频数据
+     * @param dst 输出音频数据
+     * @param filename 噪声文件名
+     * @param coefficient 降噪系数
+     */
+    SNORE_UNUSED extern void
+    reduceNoise(SNORE_I16pcm &src, SNORE_I16pcm &dst, const char *filename, double coefficient);
+
+    /**
+     * 计算声压级，只支持44.1k
+     * @param src 输入音频数据
+     * @param spl 输出声压级
+     */
+    SNORE_UNUSED extern void calculateSPL(SNORE_F64pcm &src, SNORE_SPL &spl);
+
+    SNORE_UNUSED extern SNORE_ModelResult *newModelResult();
+
+    SNORE_UNUSED extern void deleteModelResult(SNORE_ModelResult *ptr);
+
+    SNORE_UNUSED extern SNORE_PatientModel *newPatientModel();
+
+    SNORE_UNUSED extern void deletePatientModel(SNORE_PatientModel *ptr);
 }
 
 #endif
