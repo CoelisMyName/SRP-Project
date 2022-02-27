@@ -29,8 +29,8 @@ private:
  * @param sample_rate 采样率
  */
 extern void
-writeWav(const char *dst, int16_t *i16_pcm, uint32_t length, uint32_t channel,
-         uint32_t sample_rate);
+writeWav(const char *dst, int16_t *i16_pcm, int64_t length, uint32_t channel,
+         int32_t sample_rate);
 
 /**
  * 获取毫秒时间戳

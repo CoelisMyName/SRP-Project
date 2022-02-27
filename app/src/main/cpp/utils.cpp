@@ -31,8 +31,8 @@ void quitSox() {
 }
 
 void
-writeWav(const char *dst, int16_t *i16_pcm, uint32_t length, uint32_t channel,
-         uint32_t sample_rate) {
+writeWav(const char *dst, int16_t *i16_pcm, int64_t length, uint32_t channel,
+         int32_t sample_rate) {
     initSox();
     sox_signalinfo_t sig_info_i = {(sox_rate_t) sample_rate, channel, 16, 0, nullptr};
     sox_encodinginfo_t enc_info_i = {SOX_ENCODING_SIGN2, 16, 1 / 0.0, sox_option_no, sox_option_no,
@@ -41,7 +41,8 @@ writeWav(const char *dst, int16_t *i16_pcm, uint32_t length, uint32_t channel,
     sox_encodinginfo_t enc_info_o = {SOX_ENCODING_SIGN2, 16, 1 / 0.0, sox_option_no, sox_option_no,
                                      sox_option_no, sox_false};
 
-    sox_format_t *fmt_i = sox_open_mem_read(i16_pcm, length * 2, &sig_info_i, &enc_info_i, "raw");
+    sox_format_t *fmt_i = sox_open_mem_read(i16_pcm, length * sizeof(int16_t), &sig_info_i,
+                                            &enc_info_i, "raw");
     sox_format_t *fmt_o = sox_open_write(dst, &sig_info_o, &enc_info_o, "wav", nullptr, nullptr);
 
     sox_effects_chain_t *chain = sox_create_effects_chain(&fmt_i->encoding, &fmt_o->encoding);
