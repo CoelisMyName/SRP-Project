@@ -12,6 +12,35 @@ TAG(WaveRender)
 #define MIN3(x, y, z) ((MIN(x, y) < z) ? MIN(x, y) : z)
 
 /**
+ * @brief 将 int16_t 型输入按对数规则映射。最大最小值仍为 [INT16_MIN, INT16_MAX]
+ *
+ * @param origin
+ * @return int16_t
+ */
+int16_t log10_map(int16_t origin)
+{
+    // 避免0异常
+    if (origin == 0)
+    {
+        return 0;
+    }
+    const bool flip = origin < 0;
+    if (flip)
+        origin = -origin;
+
+    double r = log10(origin) * INT16_MAX / 4.515;
+    if (r > INT16_MAX)
+    {
+        r = INT16_MAX;
+    }
+    if (flip)
+    {
+        r = -r;
+    }
+    return (int16_t)r;
+}
+
+/**
  * @brief 波形强度映射.
  * 该函数应当保证（非严格）单调递增.
  * 在receive获取到端点值后使用.
@@ -21,7 +50,7 @@ TAG(WaveRender)
  */
 int16_t strength_map(int16_t origin)
 {
-    return origin;
+    return int16_t((int32_t(origin) * 5 + int32_t(log10_map(origin))) / 6);
 }
 
 WaveRender::WaveRender()
@@ -92,13 +121,17 @@ void WaveRender::onAudioDataReceive(int64_t timestamp, int16_t *data, int32_t le
                 group_min = (group_min <= data[in_pos]) ? group_min : data[in_pos];
             }
             // 检查是因为一组已满还是输入用完
-            if (group_max == WAVE_RENDER_INPUT_SIZE)
+            if (group_pos == WAVE_RENDER_INPUT_SIZE)
             {
                 // 一组数据已满，此时向缓冲区队尾插入并更新队尾坐标.
                 // 在输入前进行强度映射
                 this->_m_recvDatas.buffer[local_next_pos].maximun = strength_map(group_max);
                 this->_m_recvDatas.buffer[local_next_pos].minimun = strength_map(group_min);
                 ++local_next_pos;
+                if (local_next_pos == WAVERENDER_BUFFER_SIZE)
+                {
+                    local_next_pos = 0;
+                }
                 // 清理各局部状态变量，这些状态的写回在外层循环进行
                 group_max = group_min = group_pos = 0;
                 // 写入次数自增
@@ -159,7 +192,7 @@ void WaveRender::onSurfaceCreate(int32_t width, int32_t height)
         {
             mInit = true;
         }
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(WAVERENDER_BACKGROUND_COLOR);
         glClear(GL_COLOR_BUFFER_BIT);
         // const static GLfloat vertices[] = {
         //     -0.5f, -0.5f, 0.0f,
@@ -183,7 +216,7 @@ void WaveRender::onSurfaceDraw()
     this->_copy_from_receiver();
     // 清屏
     glUseProgram(mPgr);
-    glClearColor(0.5f, 0.5f, 1.0f, 1.0f);
+    glClearColor(WAVERENDER_BACKGROUND_COLOR);
     glClear(GL_COLOR_BUFFER_BIT);
     // 如果没有可用绘制数据，直接返回
     if (0 == this->_m_renderDatas.size)
@@ -336,20 +369,23 @@ void WaveRender::_render_convert()
     // 计算偏差值
     int16_t delta = hope - this->_m_renderDatas.last_minmax;
     // 对偏差值进行修正，避免缩放过快
+    // 并得到最终应当取得的渲染区上限
     if (delta < 0)
     {
         if ((-delta) > WAVERENDER_SCALE_MAX_STEP)
         {
-            delta = -WAVERENDER_SCALE_MAX_STEP;
+            hope = this->_m_renderDatas.last_minmax - WAVERENDER_SCALE_MAX_STEP;
         }
     }
     else
     {
-        delta = MIN(delta, WAVERENDER_SCALE_MAX_STEP);
+        if (delta > WAVERENDER_SCALE_MAX_STEP)
+        {
+            hope = this->_m_renderDatas.last_minmax + WAVERENDER_SCALE_MAX_STEP;
+        }
     }
-    // 得到最终应当取得的渲染区上限
-    const int16_t real_max = hope + delta;
     // 存回
+    const int16_t real_max = hope;
     this->_m_renderDatas.last_minmax = real_max;
     // 过滤
     for (size_t i = 0; i < this->_m_renderDatas.size; ++i)
@@ -378,7 +414,7 @@ void WaveRender::_render_genPoints()
     // 坐标映射规则为：
     // y轴范围由 [INT16_MIN, INT16_MAX] 映射至 [-1.0f, 1.0f]
     // x轴范围由 [0, size] 映射至 [-1.0f, 1.0f]
-    // x轴方向上，div 内波形向右对齐，div最大宽度 max_width，div在窗口内水平居中
+    // x轴方向上，div 内波形向左对齐，div最大宽度 max_width，div在窗口内水平居中
     // 因此，x方向步进为 step = 2.0/localw;
     // x0取值为 -1.0f 或 -1.0f + (maxw-localw)/2*step
 

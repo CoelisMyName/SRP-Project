@@ -28,9 +28,11 @@
 #define WAVERENDER_MAX_WIDTH 7500
 // _render_convert() 会对视图内的波形进行缩放，视图的Y轴范围是动态的 [-y,y] 区间. 
 // 该宏控制y的最小取值
-#define WAVERENDER_SCALE_PROTECTED_HEIGHT 8191
+#define WAVERENDER_SCALE_PROTECTED_HEIGHT 4095
 // 该宏控制 y 在相邻两帧内的最大变化量
-#define WAVERENDER_SCALE_MAX_STEP 1200
+#define WAVERENDER_SCALE_MAX_STEP 600
+// 该宏控制区域背景颜色
+#define WAVERENDER_BACKGROUND_COLOR 0.9f, 0.9f, 0.9f, 1.0f
 
 
 class WaveRender : public AudioGLRender {
