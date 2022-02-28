@@ -228,6 +228,7 @@ void SnoreThread::run(JNIEnv *env) {
         if (onStop) {
             onStop = false;
             double patientResult = patientModel->getResult();
+            //TODO send patient model result message
             callback->onStop(env, stop);
         }
         //TODO analyze data
