@@ -56,7 +56,8 @@ JNIEXPORT jlong JNICALL
 Java_com_scut_component_LibGLThread_create(__unused JNIEnv *env, __unused jobject thiz,
                                            __unused jobject view,
                                            jlong render) {
-    auto p_render = (GLRender *) render;
+    //change to AudioGLRender
+    auto p_render = (AudioGLRender *) render;
     auto p_thread = new GLThread(p_render);
     auto thread = (jlong) p_thread;
     return thread;
