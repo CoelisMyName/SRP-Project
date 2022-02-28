@@ -9,4 +9,5 @@ data class SleepRecord(
     val timestamp: Long = 0,
     var description: String = "",
     var duration: Long = 0,
+    var label: Double = -1.0,
 )

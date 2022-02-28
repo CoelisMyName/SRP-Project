@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.scut.component.RenderFactory
 import com.scut.databinding.ActivityDebugBinding
-import com.scut.model.SleepWithSnoreRecord
 import com.scut.utils.PermissionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -29,8 +28,6 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var mPermissionManager: PermissionManager
 
     private lateinit var mViewModel: DebugViewModel
-
-    private lateinit var mSleepWithSnoreRecord: SleepWithSnoreRecord
 
     private val mPermissions = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -56,23 +53,6 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
                 setLogTextView(it)
             }.collect()
         }
-//        lifecycleScope.launch {
-//            mViewModel.getSnoreFlow().onEach { it ->
-//                if (it is SnoreRepository.Message.Start) {
-//                    lifecycleScope.launch {
-//                        mViewModel.query(it.timestamp).onEach { list ->
-//                            if (list.isNotEmpty()) {
-//                                mSleepWithSnoreRecord = list[0]
-//                                Log.d(
-//                                    TAG,
-//                                    "onCreate: get SleepWithSnoreRecord $mSleepWithSnoreRecord"
-//                                )
-//                            }
-//                        }.collect()
-//                    }
-//                }
-//            }.collect()
-//        }
     }
 
     private suspend fun setLogTextView(log: String) = withContext(Dispatchers.Main) {

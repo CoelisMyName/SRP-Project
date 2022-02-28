@@ -41,6 +41,7 @@ public:
     }
 
     ~SnoreJNICallback() {
+        mEnv->DeleteGlobalRef(mObj);
         mEnv->DeleteGlobalRef(mCls);
         mEnv->DeleteGlobalRef(mSnore);
     }

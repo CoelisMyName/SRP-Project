@@ -6,15 +6,21 @@ import com.scut.model.SnoreRecord
 class SnoreDaoWrapper(dao: SnoreDao) {
     private val mDao = dao
 
-    suspend fun insert(vararg sl: SleepRecord) = mDao.insert(*sl)
+    suspend fun insertSleepRecord(vararg sl: SleepRecord) = mDao.insertSleepRecord(*sl)
 
-    suspend fun update(vararg sl: SleepRecord) = mDao.update(*sl)
+    suspend fun deleteSleepRecord(vararg sl: SleepRecord) = mDao.deleteSleepRecord(*sl)
 
-    suspend fun delete(vararg sl: SleepRecord) = mDao.delete(*sl)
+    suspend fun insertSnoreRecord(vararg sr: SnoreRecord) = mDao.insertSnoreRecord(*sr)
 
-    suspend fun insert(vararg sr: SnoreRecord) = mDao.insert(*sr)
+    fun queryAllSleepRecord() = mDao.queryAllSleepRecord()
 
-    fun query() = mDao.query()
+    fun querySleepRecordByTimestamp(timestamp: Long) = mDao.querySleepRecordByTimestamp(timestamp)
 
-    fun query(timestamp: Long) = mDao.query(timestamp)
+    fun querySnoreRecordByStartTime(startTime: Long) = mDao.querySnoreRecordByStartTime(startTime)
+
+    suspend fun updateSleepRecordDuration(timestamp: Long, duration: Long) =
+        mDao.updateSleepRecordDuration(timestamp, duration)
+
+    suspend fun updateSleepRecordLabel(timestamp: Long, label: Double) =
+        mDao.updateSleepRecordLabel(timestamp, label)
 }

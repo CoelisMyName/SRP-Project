@@ -69,7 +69,8 @@ class DebugViewModel(application: Application) : AndroidViewModel(application) {
 
     fun deleteSleepRecord(sl: SleepRecord) = SnoreRepository.deleteSleepRecord(sl)
 
-    fun query() = SnoreRepository.query()
+    fun queryAllSleepRecord() = SnoreRepository.queryAllSleepRecord()
 
-    fun query(timestamp: Long) = SnoreRepository.query(timestamp)
+    fun querySleepRecordByTimestamp(timestamp: Long) =
+        SnoreRepository.querySleepRecordByTimestamp(timestamp)
 }

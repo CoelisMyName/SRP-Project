@@ -6,15 +6,30 @@ import android.util.Log
 
 object ModuleController {
     interface SnoreCallback {
+        //启动时间戳
         fun onStart(timestamp: Long) {}
+
+        //鼾声数据
         fun onRecognize(snore: Snore) {}
+
+        //停止时间戳
         fun onStop(timestamp: Long) {}
     }
 
     interface SPLCallback {
+        //启动时间戳
         fun onStart(timestamp: Long) {}
+
+        //SPL 声压级数据
         fun onDetect(spl: SPL) {}
+
+        //停止时间戳
         fun onStop(timestamp: Long) {}
+    }
+
+    interface PatientCallback {
+        //timestamp 音频开始时间戳，label 识别
+        fun onPatientResult(timestamp: Long, label: Double) {}
     }
 
     data class SnoreConfig(
@@ -26,6 +41,7 @@ object ModuleController {
 
     class DefaultSnoreCallback : SnoreCallback
     class DefaultSPLCallback : SPLCallback
+    class DefaultPatientCallback : PatientCallback
 
     init {
         System.loadLibrary("srp")
@@ -49,12 +65,18 @@ object ModuleController {
 
     var mSPLCallback: SPLCallback = DefaultSPLCallback()
 
+    var mPatientCallback: PatientCallback = DefaultPatientCallback()
+
     fun resetSnoreCallback() {
         mSnoreCallback = DefaultSnoreCallback()
     }
 
     fun resetSPLCallback() {
         mSPLCallback = DefaultSPLCallback()
+    }
+
+    fun resetPatientCallback() {
+        mPatientCallback = DefaultPatientCallback()
     }
 
     fun registerNativeCallback(pointer: Long): Boolean = LibSRP.registerAudioGLRender(this, pointer)
@@ -73,6 +95,9 @@ object ModuleController {
     private fun onSnoreRecognize(snore: Snore) = mSnoreCallback.onRecognize(snore)
 
     private fun onSPLDetect(spl: SPL) = mSPLCallback.onDetect(spl)
+
+    private fun onPatientResult(timestamp: Long, label: Double) =
+        mPatientCallback.onPatientResult(timestamp, label)
 
     /**
      * 调用会检查权限，如果没有权限则返回 false，如果本地初始化没有成功也会返回 false

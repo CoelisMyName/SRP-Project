@@ -56,17 +56,41 @@ object SnoreRepository {
 
     fun getSPLFlow(): SharedFlow<Message<SPL>> = mSPLFlow
 
-    private suspend fun insert(vararg sl: SleepRecord) = mDao.insert(*sl)
+    fun insertSleepRecord(vararg sl: SleepRecord) {
+        mRepositoryScope.launch {
+            mDao.insertSleepRecord(*sl)
+        }
+    }
 
-    private suspend fun update(vararg sl: SleepRecord) = mDao.update(*sl)
+    fun deleteSleepRecord(vararg sl: SleepRecord) {
+        mRepositoryScope.launch {
+            mDao.deleteSleepRecord(*sl)
+        }
+    }
 
-    private suspend fun delete(vararg sl: SleepRecord) = mDao.delete(*sl)
+    suspend fun insertSnoreRecord(vararg sr: SnoreRecord) {
+        mRepositoryScope.launch {
+            mDao.insertSnoreRecord(*sr)
+        }
+    }
 
-    private suspend fun insert(vararg sr: SnoreRecord) = mDao.insert(*sr)
+    fun queryAllSleepRecord() = mDao.queryAllSleepRecord()
 
-    fun query() = mDao.query()
+    fun querySleepRecordByTimestamp(timestamp: Long) = mDao.querySleepRecordByTimestamp(timestamp)
 
-    fun query(timestamp: Long) = mDao.query(timestamp)
+    fun querySnoreRecordByStartTime(startTime: Long) = mDao.querySnoreRecordByStartTime(startTime)
+
+    fun updateSleepRecordDuration(timestamp: Long, duration: Long) {
+        mRepositoryScope.launch {
+            mDao.updateSleepRecordDuration(timestamp, duration)
+        }
+    }
+
+    fun updateSleepRecordLabel(timestamp: Long, label: Double) {
+        mRepositoryScope.launch {
+            mDao.updateSleepRecordLabel(timestamp, label)
+        }
+    }
 
     /**
      * 用其他方法前调用
@@ -80,7 +104,7 @@ object SnoreRepository {
                 mRepositoryScope.launch {
                     mSnoreFlow.emit(Message.Start(timestamp))
                     mSleepRecord = SleepRecord(timestamp, "", 0)
-                    insert(mSleepRecord)
+                    insertSleepRecord(mSleepRecord)
                 }
             }
 
@@ -94,9 +118,9 @@ object SnoreRepository {
                         snore.confirm,
                         snore.startTime
                     )
-                    insert(snoreRecord)
+                    insertSnoreRecord(snoreRecord)
                     mSleepRecord.duration = System.currentTimeMillis() - mSleepRecord.timestamp
-                    update(mSleepRecord)
+                    updateSleepRecordDuration(mSleepRecord.timestamp, mSleepRecord.duration)
                 }
             }
 
@@ -104,7 +128,7 @@ object SnoreRepository {
                 mRepositoryScope.launch {
                     mSnoreFlow.emit(Message.Stop(timestamp))
                     mSleepRecord.duration = System.currentTimeMillis() - mSleepRecord.timestamp
-                    update(mSleepRecord)
+                    updateSleepRecordDuration(mSleepRecord.timestamp, mSleepRecord.duration)
                 }
             }
         }
@@ -127,11 +151,10 @@ object SnoreRepository {
                 }
             }
         }
-    }
-
-    fun deleteSleepRecord(sl: SleepRecord) {
-        mRepositoryScope.launch {
-            delete(sl)
+        mModuleController.mPatientCallback = object : ModuleController.PatientCallback {
+            override fun onPatientResult(timestamp: Long, label: Double) {
+                updateSleepRecordLabel(timestamp, label)
+            }
         }
     }
 

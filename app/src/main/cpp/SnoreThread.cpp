@@ -23,14 +23,15 @@ using snore::deletePatientModel;
 
 TAG(SnoreThread)
 
-SnoreThread::SnoreThread(SnoreJNICallback *callback) : mCallback(callback),
-                                                       mSize(SNORE_BUFFER_SIZE),
-                                                       mBuffer(SAMPLE_RATE, SNORE_BUFFER_SIZE,
-                                                               SNORE_PADDING_SIZE),
-                                                       mThread([this] {
-                                                           EnvHelper helper;
-                                                           this->run(helper.getEnv());
-                                                       }) {
+SnoreThread::SnoreThread(SnoreJNICallback *callback, PatientThread *patientThread) : mCallback(
+        callback), mPatientThread(patientThread), mSize(SNORE_BUFFER_SIZE), mBuffer(SAMPLE_RATE,
+                                                                                    SNORE_BUFFER_SIZE,
+                                                                                    SNORE_PADDING_SIZE),
+                                                                                     mThread([this] {
+                                                                                         EnvHelper helper;
+                                                                                         this->run(
+                                                                                                 helper.getEnv());
+                                                                                     }) {
     mSampleRate = SAMPLE_RATE;
     unique_lock<mutex> lock(mMutex);
     while (!mAlive) {
@@ -98,7 +99,7 @@ void SnoreThread::run(JNIEnv *env) {
     lock.unlock();
 
     SnoreJNICallback *callback = mCallback;
-    int64_t start = 0, stop = 0, timestamp = 0;
+    int64_t audioStartTime = 0, audioStopTime = 0, frameTimestamp = 0;
     DispatchState state = DispatchState::STOP;
     int32_t size = mSize;
     int32_t rd = 0;
@@ -127,18 +128,18 @@ void SnoreThread::run(JNIEnv *env) {
         }
         exit = mExit;
         if (state != mState && mState == DispatchState::START) {
-            start = mStart;
+            audioStartTime = mStart;
             onStart = true;
             frame = 0;
         }
 
         if (state != mState && mState == DispatchState::STOP) {
-            stop = mStop;
+            audioStopTime = mStop;
             onStop = true;
         }
 
         if (mBuffer.ready()) {
-            rd = mBuffer.next(buf1, size, timestamp);
+            rd = mBuffer.next(buf1, size, frameTimestamp);
             ready = true;
         }
         state = mState;
@@ -151,10 +152,10 @@ void SnoreThread::run(JNIEnv *env) {
 
         if (onStart) {
             onStart = false;
-            callback->onStart(env, start);
+            callback->onStart(env, audioStartTime);
             //创建录音目录
             char dirname[64];
-            sprintTimeMillis(dirname, start);
+            sprintTimeMillis(dirname, audioStartTime);
             //去掉不支持的字符
             for (int32_t j = 0; dirname[j] != 0; ++j) {
                 if (dirname[j] == ':' || dirname[j] == '.' || dirname[j] == ' ') {
@@ -164,7 +165,12 @@ void SnoreThread::run(JNIEnv *env) {
             sprintf(s_audio, "%s/%s", g_audio, dirname);
             checkAndMkdir(g_external_base, s_audio);
             sprintf(s_audio, "%s/%s/%s", g_external_base, g_audio, dirname);
-            patientModel->clear();
+            //清除之前存储数据
+            if (patientModel != nullptr) {
+                patientModel->clear();
+            } else {
+                patientModel = newPatientModel();
+            }
         }
 
         if (ready) {
@@ -192,11 +198,11 @@ void SnoreThread::run(JNIEnv *env) {
                 int64_t sms = (startIndex * 1000L) / mSampleRate;
                 int64_t ems = (endIndex * 1000L) / mSampleRate;
                 if (snoreResult->getSignalLabel(i) > 0.5) {
-//                    log_i("%s(): frame: %d, start: %lld ms, end: %lld ms, snoreResult: %s", __FUNCTION__,
+//                    log_i("%s(): frame: %d, audioStartTime: %lld ms, end: %lld ms, snoreResult: %s", __FUNCTION__,
 //                          frame, sms, ems, snoreResult.label[i] > 0.5 ? "positive" : "negative");
-                    int64_t snoreTimestamp = timestamp + sms;
+                    int64_t snoreTimestamp = frameTimestamp + sms;
                     Snore snore = {snoreTimestamp, ems - sms, snoreResult->getSignalLabel(i) > 0.5,
-                                   start};
+                                   audioStartTime};
                     //保存鼾声录音
                     char filename[64];
                     sprintTimeMillis(filename, snoreTimestamp);
@@ -227,17 +233,24 @@ void SnoreThread::run(JNIEnv *env) {
 
         if (onStop) {
             onStop = false;
-            double patientResult = patientModel->getResult();
-            //TODO send patient model result message
-            callback->onStop(env, stop);
+            callback->onStop(env, audioStopTime);
+            //提交数据
+            if (patientModel != nullptr) {
+                if (mPatientThread->submitTask(audioStartTime, patientModel)) {
+                    patientModel = newPatientModel();
+                } else {
+                    patientModel->clear();
+                }
+            } else {
+                patientModel = newPatientModel();
+            }
         }
-        //TODO analyze data
     }
 
-    deletePatientModel(patientModel);
     delete[] buf1;
     delete[] buf2;
     delete[] buf3;
+    deletePatientModel(patientModel);
     lock.lock();
     mAlive = false;
     mCond.notify_all();
