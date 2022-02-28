@@ -12,8 +12,9 @@
 #endif
 
 #include "GLRender.h"
+#include <thread>
+#include "AudioGLRender.h"
 #include "AudioDataBuffer.h"
-#include "AudioDataCallback.h"
 
 #define WAVERENDER_SYNC_RISK true
 
@@ -32,9 +33,7 @@
 #define WAVERENDER_SCALE_MAX_STEP 1200
 
 
-
-class WaveRender : public GLRender, public AudioDataCallback
-{
+class WaveRender : public AudioGLRender {
 public:
     WaveRender();
 

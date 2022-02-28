@@ -9,7 +9,8 @@ using std::mutex;
 using std::thread;
 using std::unique_lock;
 using std::condition_variable;
-using snore::F64pcm;
+using snore::SNORE_SPL;
+using snore::SNORE_F64pcm;
 using snore::calculateSPL;
 
 TAG(SPLThread)
@@ -136,8 +137,8 @@ void SPLThread::run(JNIEnv *env) {
             for (uint32_t i = 0; i < size; ++i) {
                 buf2[i] = buf1[i] / 32768.0;
             }
-            F64pcm dst = {buf2, (uint32_t) rd, 1, (double) mSampleRate};
-            LibSnoreSPL libSnoreSpl;
+            SNORE_F64pcm dst = {buf2, (uint32_t) rd, 1, (double) mSampleRate};
+            SNORE_SPL libSnoreSpl;
             calculateSPL(dst, libSnoreSpl);
             SPL spl;
             spl.timestamp = timestamp;

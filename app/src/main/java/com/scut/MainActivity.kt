@@ -18,6 +18,5 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, DebugActivity::class.java)
             startActivity(intent)
         }
-        binding.button.setOnClickListener { System.gc() }
     }
 }

@@ -10,8 +10,6 @@
 #include "AudioDataCallback.h"
 #include "AudioDataDispatcher.h"
 
-typedef snore::SPL LibSnoreSPL;
-
 class SPLThread : public AudioDataCallback {
 public:
     SPLThread(SPLJNICallback *callback);

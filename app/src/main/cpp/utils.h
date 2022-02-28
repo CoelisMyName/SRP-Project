@@ -29,14 +29,23 @@ private:
  * @param sample_rate 采样率
  */
 extern void
-writeWav(const char *dst, int16_t *i16_pcm, uint32_t length, uint32_t channel,
-         uint32_t sample_rate);
+writeWav(const char *dst, int16_t *i16_pcm, int64_t length, uint32_t channel,
+         int32_t sample_rate);
 
 /**
  * 获取毫秒时间戳
  * @return 毫秒时间戳
  */
 extern int64_t currentTimeMillis();
+
+/**
+ * 打印时间戳
+ * 起码需要大小为24的缓冲区
+ * @param str 输出字符串
+ * @param millis 毫秒数
+ * @return 字符串长度
+ */
+extern int32_t sprintTimeMillis(char *str, int64_t millis);
 
 extern bool isBigEndian();
 
