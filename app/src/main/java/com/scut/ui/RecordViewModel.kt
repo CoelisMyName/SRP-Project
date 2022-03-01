@@ -6,6 +6,4 @@ import com.scut.SnoreRepository
 
 class RecordViewModel(application: Application) : BaseViewModel(application) {
     fun queryAllSleepRecord() = SnoreRepository.queryAllSleepRecord()
-
-    fun getSnoreFlow() = SnoreRepository.getSnoreFlow()
 }
