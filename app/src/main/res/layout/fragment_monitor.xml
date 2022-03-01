@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -18,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:text="2020"
+        android:text="19:20"
         android:textColor="@color/black"
         android:textSize="25sp"
         android:textStyle="bold"
@@ -31,23 +32,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="50dp"
-        app:srcCompat="@drawable/play_icon"
         app:fabCustomSize="90dp"
-        app:maxImageSize="90dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:maxImageSize="90dp"
+        app:srcCompat="@drawable/ic_baseline_play_arrow_24"
+        tools:ignore="ContentDescription" />
 
     <Button
-        android:id="@+id/show_details"
+        android:id="@+id/show_detail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:layout_marginEnd="20dp"
+        android:text="显示详情"
         app:layout_constraintBottom_toBottomOf="@id/begin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/begin"
-        app:layout_constraintTop_toTopOf="@id/begin"
-        android:text="显示详情"/>
+        app:layout_constraintTop_toTopOf="@id/begin" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

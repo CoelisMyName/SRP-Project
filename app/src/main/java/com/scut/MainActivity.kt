@@ -1,23 +1,47 @@
 package com.scut
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.scut.Config.DEBUG
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.ViewModelProvider
 import com.scut.databinding.ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var mBinding: ActivityMainBinding
+    private lateinit var mFragmentManger: FragmentManager
+    private lateinit var mMainFragment: MainFragment
+    private lateinit var mViewModel: MainViewModel
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        if (DEBUG) {
-            val intent = Intent(this, DebugActivity::class.java)
-            startActivity(intent)
+        mBinding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(mBinding.root)
+        mViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        //if (DEBUG) {
+        //    val intent = Intent(this, DebugActivity::class.java)
+        //    startActivity(intent)
+        //}
+
+        mFragmentManger = supportFragmentManager
+        var fragment = mFragmentManger.getFragment(mViewModel.mBundle, "MainFragment")
+        if (fragment == null) {
+            mMainFragment = MainFragment()
+            mFragmentManger.beginTransaction().add(mBinding.container.id, mMainFragment!!).commit()
+            mFragmentManger.putFragment(mViewModel.mBundle, "MainFragment", mMainFragment!!)
+        } else {
+            mMainFragment = fragment as MainFragment
         }
-        binding.button.setOnClickListener { System.gc() }
+
     }
+
+    fun toFragment(fragment: Fragment) {
+        mFragmentManger.beginTransaction().replace(mBinding.container.id, fragment)
+            .addToBackStack(null).commit()
+    }
+
+
 }

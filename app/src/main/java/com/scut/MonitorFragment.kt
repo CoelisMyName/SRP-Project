@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.scut.databinding.FragmentMonitorBinding
 
+
 class MonitorFragment : Fragment() {
 
     private lateinit var mBinding: FragmentMonitorBinding

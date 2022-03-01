@@ -17,6 +17,19 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         mBinding = FragmentMainBinding.inflate(inflater, container, false)
+        mBinding.cardMonitor.setOnClickListener { onClick(it) }
+        mBinding.cardReport.setOnClickListener { onClick(it) }
         return mBinding.root
+    }
+
+    private fun onClick(view: View) {
+        if (view == mBinding.cardMonitor) {
+            var activity = requireActivity() as MainActivity
+            activity.toFragment(MonitorFragment())
+
+        } else if (view == mBinding.cardReport) {
+            var activity = requireActivity() as MainActivity
+            activity.toFragment(ReportFragment())
+        }
     }
 }
