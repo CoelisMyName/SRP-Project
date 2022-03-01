@@ -13,10 +13,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 object SnoreRepository {
+    enum class AudioRecordState {
+        AudioRecordIDLE, AudioRecordSTART, AudioRecordSTOP
+    }
+
     private val mModuleController = ModuleController
 
     private val mRepositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -52,9 +58,19 @@ object SnoreRepository {
 
     private val mSPLFlow = MutableSharedFlow<Message<SPL>>()
 
+    private val mAudioRecordStateFlow = MutableStateFlow(AudioRecordState.AudioRecordIDLE)
+
+    fun resetAudioRecordStateFlow() {
+        mRepositoryScope.launch {
+            mAudioRecordStateFlow.emit(AudioRecordState.AudioRecordIDLE)
+        }
+    }
+
     fun getSnoreFlow(): SharedFlow<Message<Snore>> = mSnoreFlow
 
     fun getSPLFlow(): SharedFlow<Message<SPL>> = mSPLFlow
+
+    fun getAudioRecordStateFlow(): StateFlow<AudioRecordState> = mAudioRecordStateFlow
 
     fun insertSleepRecord(vararg sl: SleepRecord) {
         mRepositoryScope.launch {
@@ -164,7 +180,27 @@ object SnoreRepository {
         return render
     }
 
-    fun startSnoreModule(): Boolean = mModuleController.start()
+    fun startSnoreModule(): Boolean {
+        val ret = mModuleController.start()
+        mRepositoryScope.launch {
+            if (ret) {
+                mAudioRecordStateFlow.emit(AudioRecordState.AudioRecordSTART)
+            } else {
+                mAudioRecordStateFlow.emit(AudioRecordState.AudioRecordSTOP)
+            }
+        }
+        return ret
+    }
 
-    fun stopSnoreModule(): Boolean = mModuleController.stop()
+    fun stopSnoreModule(): Boolean {
+        val ret = mModuleController.stop()
+        mRepositoryScope.launch {
+            if (ret) {
+                mAudioRecordStateFlow.emit(AudioRecordState.AudioRecordSTOP)
+            } else {
+                mAudioRecordStateFlow.emit(AudioRecordState.AudioRecordSTART)
+            }
+        }
+        return ret
+    }
 }
