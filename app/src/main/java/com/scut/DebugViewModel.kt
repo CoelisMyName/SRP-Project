@@ -2,7 +2,6 @@ package com.scut
 
 import android.app.Application
 import android.icu.text.SimpleDateFormat
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.scut.model.SleepRecord
 import kotlinx.coroutines.Dispatchers
@@ -10,10 +9,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 
-class DebugViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val mSnoreRepository = SnoreRepository
-
+class DebugViewModel(application: Application) : BaseViewModel(application) {
     private val mDateFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault())
 
     private var mLog = ""
@@ -21,9 +17,8 @@ class DebugViewModel(application: Application) : AndroidViewModel(application) {
     private var mLogFlow = MutableStateFlow(mLog)
 
     init {
-        mSnoreRepository.init(application)
         viewModelScope.launch(Dispatchers.Main) {
-            mSnoreRepository.getSnoreFlow().transform {
+            SnoreRepository.getSnoreFlow().transform {
                 val current = Date()
                 val msg = when (it) {
                     is SnoreRepository.Message.Start -> {
@@ -55,17 +50,17 @@ class DebugViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun startSnoreModule() = mSnoreRepository.startSnoreModule()
+    fun startSnoreModule() = SnoreRepository.startSnoreModule()
 
-    fun stopSnoreModule() = mSnoreRepository.stopSnoreModule()
+    fun stopSnoreModule() = SnoreRepository.stopSnoreModule()
 
-    fun getSnoreFlow() = mSnoreRepository.getSnoreFlow()
+    fun getSnoreFlow() = SnoreRepository.getSnoreFlow()
 
-    fun getSPLFlow() = mSnoreRepository.getSPLFlow()
+    fun getSPLFlow() = SnoreRepository.getSPLFlow()
 
     fun getLOGFlow(): StateFlow<String> = mLogFlow
 
-    fun newRender(type: String) = mSnoreRepository.newRender(type)
+    fun newRender(type: String) = SnoreRepository.newRender(type)
 
     fun deleteSleepRecord(sl: SleepRecord) = SnoreRepository.deleteSleepRecord(sl)
 

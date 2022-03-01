@@ -1,14 +1,8 @@
 package com.scut
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.os.Bundle
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
-    private val mRepository = SnoreRepository
-
-    init {
-        mRepository.init(application)
-    }
-
-
+class MainViewModel(application: Application) : BaseViewModel(application) {
+    val mBundle = Bundle()
 }

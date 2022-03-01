@@ -32,6 +32,7 @@ class MonitorFragment : Fragment() {
         mBinding.wave.setRender(mViewModel.newRender(RenderFactory.WAVE_RENDER))
         mBinding.begin.setOnClickListener { onClick(it) }
         mBinding.showDetail.setOnClickListener { onClick(it) }
+        mBinding.showDetail.visibility = View.GONE
         lifecycleScope.launchWhenResumed {
             mViewModel.getAudioRecordStateFlow().onEach {
                 withContext(Dispatchers.Main) {
@@ -76,13 +77,6 @@ class MonitorFragment : Fragment() {
         }
         if (view == mBinding.showDetail) {
             //TODO show detail
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (mAudioRecordState == SnoreRepository.AudioRecordState.AudioRecordIDLE || mAudioRecordState == SnoreRepository.AudioRecordState.AudioRecordSTOP) {
-            mViewModel.resetAudioRecordStateFlow()
         }
     }
 }

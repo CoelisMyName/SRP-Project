@@ -35,6 +35,8 @@ object SnoreRepository {
 
     private const val TAG = "SnoreRepository"
 
+    private var mInitFlag = false
+
     private class NativeRenderWrapper(render: NativeRender) : NativeRender {
         private val mRender = render
         override fun getNativePointer(): Long {
@@ -112,6 +114,7 @@ object SnoreRepository {
      * 用其他方法前调用
      */
     fun init(application: Application) {
+        if (mInitFlag) return
         mDatabase = SnoreDatabase.getInstance(application)
         mDao = SnoreDaoWrapper(mDatabase.getSnoreDao())
         mModuleController.create(application)
@@ -172,6 +175,7 @@ object SnoreRepository {
                 updateSleepRecordLabel(timestamp, label)
             }
         }
+        mInitFlag = true
     }
 
     fun newRender(type: String): NativeRender {

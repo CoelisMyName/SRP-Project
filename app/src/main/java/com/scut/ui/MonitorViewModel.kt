@@ -1,8 +1,8 @@
 package com.scut.ui
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.scut.BaseViewModel
 import com.scut.SnoreRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -13,13 +13,11 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-class MonitorViewModel(application: Application) : AndroidViewModel(application) {
-    private val mSnoreRepository = SnoreRepository
-
+class MonitorViewModel(application: Application) : BaseViewModel(application) {
     private var mDurationJob: Job? = null
+    private var mAudioRecordState = SnoreRepository.AudioRecordState.AudioRecordIDLE
 
     init {
-        mSnoreRepository.init(application)
         viewModelScope.launch {
             getAudioRecordStateFlow().onEach {
                 if (it == SnoreRepository.AudioRecordState.AudioRecordSTART) {
@@ -32,19 +30,24 @@ class MonitorViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        if (mAudioRecordState == SnoreRepository.AudioRecordState.AudioRecordIDLE) {
+            SnoreRepository.resetAudioRecordStateFlow()
+        }
+    }
+
     private val mDurationFlow = MutableStateFlow<Long>(0)
 
-    fun getAudioRecordStateFlow() = mSnoreRepository.getAudioRecordStateFlow()
+    fun getAudioRecordStateFlow() = SnoreRepository.getAudioRecordStateFlow()
 
-    fun newRender(type: String) = mSnoreRepository.newRender(type)
+    fun newRender(type: String) = SnoreRepository.newRender(type)
 
     fun getDurationFlow(): StateFlow<Long> = mDurationFlow
 
-    fun resetAudioRecordStateFlow() = mSnoreRepository.resetAudioRecordStateFlow()
+    fun startSnoreModule() = SnoreRepository.startSnoreModule()
 
-    fun startSnoreModule() = mSnoreRepository.startSnoreModule()
-
-    fun stopSnoreModule() = mSnoreRepository.stopSnoreModule()
+    fun stopSnoreModule() = SnoreRepository.stopSnoreModule()
 
     private fun startDurationTask() {
         mDurationJob?.cancel()
