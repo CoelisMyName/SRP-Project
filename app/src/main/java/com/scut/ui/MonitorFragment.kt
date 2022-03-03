@@ -111,9 +111,8 @@ class MonitorFragment : Fragment() {
     }
 
     private fun stopSnoreModule() {
-        //TODO fix restart foreground service crash
-//        val service = Intent(requireActivity() as MainActivity, MyService::class.java)
-//        (requireActivity() as MainActivity).stopService(service)
+        val service = Intent(requireActivity() as MainActivity, MyService::class.java)
+        (requireActivity() as MainActivity).stopService(service)
         mViewModel.stopSnoreModule()
     }
 

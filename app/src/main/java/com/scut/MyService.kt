@@ -37,31 +37,6 @@ class MyService : Service() {
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        Log.d(TAG, "onBind: ")
-        return null
-    }
-
-    override fun onDestroy() {
-        Log.d(TAG, "onDestroy: ")
-        super.onDestroy()
-    }
-
-    override fun onUnbind(intent: Intent?): Boolean {
-        Log.d(TAG, "onUnbind: ")
-        return super.onUnbind(intent)
-    }
-
-    override fun onRebind(intent: Intent?) {
-        Log.d(TAG, "onRebind: ")
-        super.onRebind(intent)
-    }
-
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        Log.d(TAG, "onTaskRemoved: ")
-        super.onTaskRemoved(rootIntent)
-    }
-
     @SuppressLint("UnspecifiedImmutableFlag")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.d(TAG, "onStartCommand: ")
@@ -77,5 +52,9 @@ class MyService : Service() {
         }
         startForeground(1, notification)
         return START_NOT_STICKY
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
     }
 }
