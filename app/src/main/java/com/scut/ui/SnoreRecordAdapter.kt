@@ -10,7 +10,7 @@ import com.scut.databinding.ItemSnoreBinding
 import com.scut.model.SnoreRecord
 import java.util.*
 
-class SnoreRecordAdapter() : RecyclerView.Adapter<SnoreRecordAdapter.SnoreRecordViewHolder>() {
+class SnoreRecordAdapter : RecyclerView.Adapter<SnoreRecordAdapter.SnoreRecordViewHolder>() {
     var mList = emptyList<SnoreRecord>()
 
     class SnoreRecordViewHolder(binding: ItemSnoreBinding) : RecyclerView.ViewHolder(binding.root) {

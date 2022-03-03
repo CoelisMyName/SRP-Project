@@ -12,4 +12,6 @@
     <string name="snore_date">鼾声时间：%s</string>
     <string name="snore_duration">鼾声时长：%s</string>
     <string name="show_detail">显示详情</string>
+    <string name="sleep_record">睡眠记录</string>
+    <string name="sleep_monitor">睡眠监测</string>
 </resources>

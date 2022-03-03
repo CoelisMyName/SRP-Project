@@ -93,7 +93,7 @@ object SnoreRepository {
     private val mRepositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val mSnoreFlow = MutableSharedFlow<Message<Snore>>()
     private val mSPLFlow = MutableSharedFlow<Message<SPL>>()
-    private val mAudioStateFlow = MutableSharedFlow<Message<Long>>(2)
+    private val mAudioStateFlow = MutableSharedFlow<Message<Long>>(1)
     private lateinit var mDatabase: SnoreDatabase
     private lateinit var mDao: SnoreDaoWrapper
     private var mInitFlag = false

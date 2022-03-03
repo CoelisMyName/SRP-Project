@@ -41,7 +41,9 @@
 
         <activity
             android:name=".DebugActivity"
+            android:alwaysRetainTaskState="true"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|layoutDirection|screenLayout|smallestScreenSize|uiMode"
+            android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan"

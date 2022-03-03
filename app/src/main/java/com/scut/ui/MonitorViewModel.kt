@@ -7,10 +7,10 @@ import com.scut.BaseViewModel
 import com.scut.SnoreRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class MonitorViewModel(application: Application) : BaseViewModel(application) {
@@ -19,6 +19,8 @@ class MonitorViewModel(application: Application) : BaseViewModel(application) {
     private val mDetailVisibilityFlow = MutableStateFlow(View.GONE)
 
     private var mStartTimestamp = 0L
+
+    private val mDurationFlow = MutableStateFlow<Long>(0)
 
     init {
         viewModelScope.launch {
@@ -31,6 +33,7 @@ class MonitorViewModel(application: Application) : BaseViewModel(application) {
                     mDetailVisibilityFlow.emit(View.GONE)
                 }
                 if (it is SnoreRepository.Message.Start) {
+                    mStartTimestamp = it.timestamp
                     startDurationTask()
                 }
                 if (it is SnoreRepository.Message.Stop) {
@@ -40,8 +43,6 @@ class MonitorViewModel(application: Application) : BaseViewModel(application) {
             }
         }
     }
-
-    private val mDurationFlow = MutableStateFlow<Long>(0)
 
     fun getAudioStateFlow() = SnoreRepository.getAudioStateFlow()
 
@@ -58,7 +59,8 @@ class MonitorViewModel(application: Application) : BaseViewModel(application) {
     private fun startDurationTask() {
         mDurationJob?.cancel()
         mDurationJob = viewModelScope.launch {
-            while (isActive) {
+            while (true) {
+                coroutineContext.ensureActive()
                 val duration = System.currentTimeMillis() - mStartTimestamp
                 mDurationFlow.emit(duration)
                 delay(200)

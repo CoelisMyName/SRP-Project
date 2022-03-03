@@ -71,7 +71,7 @@ void WaveRender::onAudioDataStop(int64_t timestamp) {
 
 void WaveRender::onAudioDataReceive(int64_t timestamp, int16_t *data, int32_t length) {
     // 无效参数保护
-    if ((length <= 0) || (NULL == data)) {
+    if ((length <= 0) || (nullptr == data)) {
         return;
     }
     // 读取上次运行结果，避免一直全局访存

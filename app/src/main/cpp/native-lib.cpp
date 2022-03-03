@@ -230,7 +230,7 @@ Java_com_scut_utils_LibSRP_unregisterAudioGLRender(__unused JNIEnv *env, __unuse
                                                    __unused jobject controller,
                                                    jlong pointer) {
     if (!initialFlag) return false;
-    auto callback = (AudioDataCallback *) pointer;
+    auto callback = (AudioGLRender *) pointer;
     if (callback == nullptr) return false;
     dispatcher->unregisterCallback(callback);
     return true;

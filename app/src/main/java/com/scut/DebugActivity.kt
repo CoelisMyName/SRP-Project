@@ -42,11 +42,7 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         mViewModel = ViewModelProvider(this)[DebugViewModel::class.java]
         mBinding.start.setOnClickListener(this)
         mBinding.stop.setOnClickListener(this)
-        mPermissionManager = PermissionManager(
-            this,
-            mPermissions,
-            { startSnoreModule() },
-            { showPermissionDeniedMessage() })
+        mPermissionManager = PermissionManager(this)
         mBinding.textureView.setRender(mViewModel.newRender(RenderFactory.WAVE_RENDER))
         lifecycleScope.launchWhenResumed {
             mViewModel.getLOGFlow().onEach {
@@ -97,7 +93,10 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         if (v == mBinding.start) {
-            mPermissionManager.proceed()
+            mPermissionManager.goCheckPermission(
+                mPermissions,
+                { startSnoreModule() },
+                { showPermissionDeniedMessage() })
         }
         if (v == mBinding.stop) {
             stopSnoreModule()
