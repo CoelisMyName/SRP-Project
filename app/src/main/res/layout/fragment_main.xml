@@ -29,10 +29,10 @@
             android:layout_gravity="bottom"
             android:layout_marginStart="10dp"
             android:layout_marginBottom="10dp"
-            android:text="历史记录"
             android:textColor="@color/black"
             android:textSize="30sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="历史记录" />
 
     </com.google.android.material.card.MaterialCardView>
 
@@ -60,12 +60,11 @@
             android:layout_gravity="bottom"
             android:layout_marginStart="10dp"
             android:layout_marginBottom="10dp"
-            android:text="睡眠监测"
             android:textColor="@color/black"
             android:textSize="30sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="睡眠监测" />
 
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

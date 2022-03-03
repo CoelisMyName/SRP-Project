@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -20,24 +21,24 @@
             android:padding="5dp">
 
             <TextView
-                android:id="@+id/duration"
+                android:id="@+id/snoreDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="鼾声时间：01时23分"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="鼾声时间：01时23分" />
 
             <TextView
-                android:id="@+id/total_of_time"
+                android:id="@+id/snoreDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="鼾声时长：5秒"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/duration" />
+                app:layout_constraintTop_toBottomOf="@id/snoreDate"
+                tools:text="鼾声时长：5秒" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

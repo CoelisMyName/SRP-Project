@@ -2,4 +2,14 @@
     <string name="app_name">SRP Project</string>
     <string name="snoring_recognition">鼾声识别</string>
     <string name="click_to_see_info">点击查看详情</string>
+    <string name="sleep_test_date">测试睡眠时间：%s</string>
+    <string name="sleep_duration">睡眠时长：%s</string>
+    <string name="snore_times">鼾声次数：%d</string>
+    <string name="is_patient_or_not">是否检测为病人：%s</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
+    <string name="calculating">正在计算</string>
+    <string name="snore_date">鼾声时间：%s</string>
+    <string name="snore_duration">鼾声时长：%s</string>
+    <string name="show_detail">显示详情</string>
 </resources>

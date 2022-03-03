@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -20,54 +21,54 @@
             android:padding="5dp">
 
             <TextView
-                android:id="@+id/date"
+                android:id="@+id/sleepDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="测试日期：2020年12月12日"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="测试日期：2020年12月12日" />
 
             <TextView
-                android:id="@+id/duration"
+                android:id="@+id/sleepDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="睡眠时长：6小时32分"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.8"
-                app:layout_constraintStart_toEndOf="@id/date"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toEndOf="@id/sleepDate"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="睡眠时长：6小时32分" />
 
             <TextView
-                android:id="@+id/times"
+                android:id="@+id/snoreTimes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="鼾声检测次数：200次"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/date" />
+                app:layout_constraintTop_toBottomOf="@id/sleepDate"
+                tools:text="鼾声检测次数：200次" />
 
             <TextView
-                android:id="@+id/weak"
+                android:id="@+id/isPatient"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="是否检测为病人：是"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.8"
-                app:layout_constraintStart_toEndOf="@id/times"
-                app:layout_constraintTop_toBottomOf="@id/duration" />
+                app:layout_constraintStart_toEndOf="@id/snoreTimes"
+                app:layout_constraintTop_toBottomOf="@id/sleepDuration"
+                tools:text="是否检测为病人：是" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

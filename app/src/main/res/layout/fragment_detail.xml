@@ -6,64 +6,64 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/date"
+        android:id="@+id/sleepDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:text="日期"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="日期" />
 
     <TextView
-        android:id="@+id/duration"
+        android:id="@+id/sleepDuration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:text="睡眠时长"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/date" />
+        app:layout_constraintTop_toBottomOf="@id/sleepDate"
+        tools:text="睡眠时长" />
 
     <TextView
-        android:id="@+id/snore_time"
+        android:id="@+id/snoreTotalDuration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:text="鼾声总时长"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/duration" />
+        app:layout_constraintTop_toBottomOf="@id/sleepDuration"
+        tools:text="鼾声总时长" />
 
     <TextView
-        android:id="@+id/snore_num"
+        android:id="@+id/snoreTimes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:text="检测鼾声总次数"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/snore_time" />
+        app:layout_constraintTop_toBottomOf="@id/snoreTotalDuration"
+        tools:text="检测鼾声总次数" />
 
     <TextView
-        android:id="@+id/patient"
+        android:id="@+id/isPatient"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:text="检测是否为病人"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/snore_num" />
+        app:layout_constraintTop_toBottomOf="@id/snoreTimes"
+        tools:text="检测是否为病人" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
@@ -72,7 +72,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/patient"
+        app:layout_constraintTop_toBottomOf="@id/isPatient"
         tools:itemCount="10"
         tools:listitem="@layout/item_snore" />
 

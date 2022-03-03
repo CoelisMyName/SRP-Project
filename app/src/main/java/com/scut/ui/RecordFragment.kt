@@ -9,12 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.scut.MainActivity
 import com.scut.databinding.FragmentRecordBinding
+import com.scut.model.SleepRecord
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
 class RecordFragment : Fragment() {
-
     private lateinit var mBinding: FragmentRecordBinding
     private lateinit var mAdapter: SleepRecordAdapter
     private lateinit var mViewModel: RecordViewModel
@@ -28,7 +29,11 @@ class RecordFragment : Fragment() {
         mBinding = FragmentRecordBinding.inflate(inflater, container, false)
         mViewModel = ViewModelProvider(this)[RecordViewModel::class.java]
         mBinding.recycler.setHasFixedSize(true)
-        mAdapter = SleepRecordAdapter()
+        mAdapter = SleepRecordAdapter(object : SleepRecordAdapter.SleepRecordCallback {
+            override fun showDetail(sl: SleepRecord) {
+                showDetail(sl.timestamp)
+            }
+        })
         val layoutManager = LinearLayoutManager(requireContext())
         mBinding.recycler.layoutManager = layoutManager
         mBinding.recycler.adapter = mAdapter
@@ -39,5 +44,14 @@ class RecordFragment : Fragment() {
             }.collect()
         }
         return mBinding.root
+    }
+
+    fun showDetail(timestamp: Long) {
+        val activity = requireActivity() as MainActivity
+        val fragment = DetailFragment()
+        val bundle = Bundle()
+        bundle.putLong("timestamp", timestamp)
+        fragment.arguments = bundle
+        activity.toFragment(fragment)
     }
 }

@@ -1,6 +1,7 @@
 package com.scut.ui
 
 import android.app.Application
+import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.scut.BaseViewModel
 import com.scut.SnoreRepository
@@ -8,38 +9,41 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class MonitorViewModel(application: Application) : BaseViewModel(application) {
     private var mDurationJob: Job? = null
-    private var mAudioRecordState = SnoreRepository.AudioRecordState.AudioRecordIDLE
+
+    private val mDetailVisibilityFlow = MutableStateFlow(View.GONE)
+
+    private var mStartTimestamp = 0L
 
     init {
         viewModelScope.launch {
-            getAudioRecordStateFlow().onEach {
-                if (it == SnoreRepository.AudioRecordState.AudioRecordSTART) {
+            var state: SnoreRepository.Message<Long> = SnoreRepository.Message.Void()
+            getAudioStateFlow().collectLatest {
+                if (state is SnoreRepository.Message.Start && it is SnoreRepository.Message.Stop) {
+                    mDetailVisibilityFlow.emit(View.VISIBLE)
+                }
+                if (state is SnoreRepository.Message.Stop && it is SnoreRepository.Message.Start) {
+                    mDetailVisibilityFlow.emit(View.GONE)
+                }
+                if (it is SnoreRepository.Message.Start) {
                     startDurationTask()
                 }
-                if (it == SnoreRepository.AudioRecordState.AudioRecordSTART) {
+                if (it is SnoreRepository.Message.Stop) {
                     stopDurationTask()
                 }
-            }.collect()
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        if (mAudioRecordState == SnoreRepository.AudioRecordState.AudioRecordIDLE) {
-            SnoreRepository.resetAudioRecordStateFlow()
+                state = it
+            }
         }
     }
 
     private val mDurationFlow = MutableStateFlow<Long>(0)
 
-    fun getAudioRecordStateFlow() = SnoreRepository.getAudioRecordStateFlow()
+    fun getAudioStateFlow() = SnoreRepository.getAudioStateFlow()
 
     fun newRender(type: String) = SnoreRepository.newRender(type)
 
@@ -49,12 +53,13 @@ class MonitorViewModel(application: Application) : BaseViewModel(application) {
 
     fun stopSnoreModule() = SnoreRepository.stopSnoreModule()
 
+    fun getDetailVisibilityFlow(): StateFlow<Int> = mDetailVisibilityFlow
+
     private fun startDurationTask() {
         mDurationJob?.cancel()
         mDurationJob = viewModelScope.launch {
-            val startTime = System.currentTimeMillis()
             while (isActive) {
-                val duration = System.currentTimeMillis() - startTime
+                val duration = System.currentTimeMillis() - mStartTimestamp
                 mDurationFlow.emit(duration)
                 delay(200)
             }

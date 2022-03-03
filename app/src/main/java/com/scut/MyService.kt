@@ -12,9 +12,10 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 
 class MyService : Service() {
-
-    private val CHANNEL_ID = "com.scut.MyChannel"
-    private val CHANNEL_NAME = "MyChannel"
+    companion object {
+        const val CHANNEL_ID = "com.scut.MyChannel"
+        const val CHANNEL_NAME = "MyChannel"
+    }
 
     private lateinit var mManager: NotificationManager
     private lateinit var mChannel: NotificationChannel
@@ -37,9 +38,12 @@ class MyService : Service() {
         return null
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val intent = Intent(this, DebugActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+//        val intent = Intent(this, DebugActivity::class.java)
+        val toActivityIntent = Intent(this, DebugActivity::class.java)
+        val pendingIntent =
+            PendingIntent.getActivity(this, 0, toActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         val notification = NotificationCompat.Builder(this, CHANNEL_ID).run {
             setContentText(getString(R.string.click_to_see_info))
             setContentTitle(getString(R.string.snoring_recognition))

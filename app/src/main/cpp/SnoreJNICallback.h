@@ -73,5 +73,4 @@ private:
     jmethodID mConstructor;
 };
 
-
 #endif

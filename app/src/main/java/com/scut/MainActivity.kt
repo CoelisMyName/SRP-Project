@@ -10,12 +10,10 @@ import com.scut.ui.MainFragment
 
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var mBinding: ActivityMainBinding
     private lateinit var mFragmentManger: FragmentManager
     private lateinit var mMainFragment: MainFragment
     private lateinit var mViewModel: MainViewModel
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +41,4 @@ class MainActivity : AppCompatActivity() {
         mFragmentManger.beginTransaction().replace(mBinding.container.id, fragment)
             .addToBackStack(null).commit()
     }
-
-
 }

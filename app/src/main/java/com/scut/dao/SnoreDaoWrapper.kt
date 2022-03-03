@@ -23,4 +23,10 @@ class SnoreDaoWrapper(dao: SnoreDao) {
 
     suspend fun updateSleepRecordLabel(timestamp: Long, label: Double) =
         mDao.updateSleepRecordLabel(timestamp, label)
+
+    suspend fun updateSleepRecordSnoreTimesIncrement(timestamp: Long, snoreTimes: Long) =
+        mDao.updateSleepRecordSnoreTimesIncrement(timestamp, snoreTimes)
+
+    suspend fun updateSleepRecordSnoreTotalDurationIncrement(timestamp: Long, duration: Long) =
+        mDao.updateSleepRecordSnoreTimesIncrement(timestamp, duration)
 }
