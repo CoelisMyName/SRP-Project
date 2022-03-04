@@ -73,7 +73,7 @@ void AudioDataDispatcher::registerCallback(AudioDataCallback *callback) {
     if (mState == DispatchState::START) {
         callback->onAudioDataStart(mStart);
     }
-    log_i("%s(): %s", __FUNCTION__, "register callback");
+    log_i("%s(): %s, %p", __FUNCTION__, "register callback", callback);
 }
 
 void AudioDataDispatcher::unregisterCallback(AudioDataCallback *callback) {
@@ -90,7 +90,7 @@ void AudioDataDispatcher::unregisterCallback(AudioDataCallback *callback) {
             iter += 1;
         }
     }
-    log_i("%s(): %s", __FUNCTION__, "unregister callback");
+    log_i("%s(): %s, %p", __FUNCTION__, "unregister callback", callback);
 }
 
 void AudioDataDispatcher::clear() {

@@ -7,12 +7,9 @@
 #include "GLThread.h"
 #include "SPLThread.h"
 #include "SnoreThread.h"
-#include "AudioSource.h"
 #include "AudioRecord.h"
+#include "PatientThread.h"
 #include "RenderFactory.h"
-#include "SPLJNICallback.h"
-#include "SnoreJNICallback.h"
-#include "AudioDataDispatcher.h"
 
 TAG(libsrp)
 
@@ -20,8 +17,10 @@ static AudioSource *audioSource = nullptr;
 static AudioDataDispatcher *dispatcher = nullptr;
 static SnoreThread *snoreThread = nullptr;
 static SPLThread *splThread = nullptr;
+static PatientThread *patientThread = nullptr;
 static SnoreJNICallback *snoreJNICallback = nullptr;
 static SPLJNICallback *splJNICallback = nullptr;
+static PatientJNICallback *patientJNICallback = nullptr;
 static bool initialFlag = false;
 
 extern "C" {
@@ -56,7 +55,8 @@ JNIEXPORT jlong JNICALL
 Java_com_scut_component_LibGLThread_create(__unused JNIEnv *env, __unused jobject thiz,
                                            __unused jobject view,
                                            jlong render) {
-    auto p_render = (GLRender *) render;
+    //change to AudioGLRender
+    auto p_render = (AudioGLRender *) render;
     auto p_thread = new GLThread(p_render);
     auto thread = (jlong) p_thread;
     return thread;
@@ -135,9 +135,11 @@ Java_com_scut_utils_LibSRP_create(JNIEnv *env, __unused jobject thiz, jobject co
     if (initialFlag) return true;
     dispatcher = new AudioDataDispatcher();
     audioSource = new AudioRecord(dispatcher, SAMPLE_RATE, FRAME_SIZE);
+    patientJNICallback = new PatientJNICallback(env, controller);
+    patientThread = new PatientThread(patientJNICallback);
     snoreJNICallback = new SnoreJNICallback(env, controller);
     splJNICallback = new SPLJNICallback(env, controller);
-    snoreThread = new SnoreThread(snoreJNICallback);
+    snoreThread = new SnoreThread(snoreJNICallback, patientThread);
     splThread = new SPLThread(splJNICallback);
     dispatcher->registerCallback(splThread);
     dispatcher->registerCallback(snoreThread);
@@ -153,20 +155,26 @@ Java_com_scut_utils_LibSRP_destroy(JNIEnv *env, __unused jobject thiz,
     dispatcher->clear();
     snoreThread->waitForExit();
     splThread->waitForExit();
+    patientThread->waitForExit();
     delete audioSource;
     delete dispatcher;
     delete snoreThread;
+    delete patientThread;
     delete splThread;
     audioSource = nullptr;
     dispatcher = nullptr;
     snoreThread = nullptr;
+    patientThread = nullptr;
     splThread = nullptr;
     snoreJNICallback->updateEnv(env);
     splJNICallback->updateEnv(env);
+    patientJNICallback->updateEnv(env);
     delete snoreJNICallback;
     delete splJNICallback;
+    delete patientJNICallback;
     snoreJNICallback = nullptr;
     splJNICallback = nullptr;
+    patientJNICallback = nullptr;
     initialFlag = false;
     return true;
 }
@@ -207,22 +215,22 @@ Java_com_scut_utils_LibSRP_isRunning(__unused JNIEnv *env, __unused jobject thiz
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_scut_utils_LibSRP_registerCallback(__unused JNIEnv *env, __unused jobject thiz,
-                                            __unused jobject controller,
-                                            jlong pointer) {
+Java_com_scut_utils_LibSRP_registerAudioGLRender(__unused JNIEnv *env, __unused jobject thiz,
+                                                 __unused jobject controller,
+                                                 jlong pointer) {
     if (!initialFlag) return false;
-    auto callback = (AudioDataCallback *) pointer;
+    auto callback = (AudioGLRender *) pointer;
     if (callback == nullptr) return false;
     dispatcher->registerCallback(callback);
     return true;
 }
 
 JNIEXPORT jboolean JNICALL
-Java_com_scut_utils_LibSRP_unregisterCallback(__unused JNIEnv *env, __unused jobject thiz,
-                                              __unused jobject controller,
-                                              jlong pointer) {
+Java_com_scut_utils_LibSRP_unregisterAudioGLRender(__unused JNIEnv *env, __unused jobject thiz,
+                                                   __unused jobject controller,
+                                                   jlong pointer) {
     if (!initialFlag) return false;
-    auto callback = (AudioDataCallback *) pointer;
+    auto callback = (AudioGLRender *) pointer;
     if (callback == nullptr) return false;
     dispatcher->unregisterCallback(callback);
     return true;
@@ -231,7 +239,7 @@ Java_com_scut_utils_LibSRP_unregisterCallback(__unused JNIEnv *env, __unused job
 JNIEXPORT jlong JNICALL
 Java_com_scut_component_RenderFactory_newRender(JNIEnv *env, __unused jobject thiz, jstring type) {
     auto str = env->GetStringUTFChars(type, nullptr);
-    GLRender *render = newRender(str);
+    AudioGLRender *render = newRender(str);
     env->ReleaseStringUTFChars(type, str);
     return (jlong) render;
 }
@@ -239,7 +247,7 @@ Java_com_scut_component_RenderFactory_newRender(JNIEnv *env, __unused jobject th
 JNIEXPORT void JNICALL
 Java_com_scut_component_RenderFactory_deleteRender(__unused JNIEnv *env, __unused jobject thiz,
                                                    jlong pointer) {
-    auto render = (GLRender *) pointer;
+    auto render = (AudioGLRender *) pointer;
     deleteRender(render);
 }
 

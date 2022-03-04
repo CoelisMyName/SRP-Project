@@ -5,6 +5,7 @@
 #include <queue>
 #include <thread>
 #include "config.h"
+#include "PatientThread.h"
 #include "AudioDataBuffer.h"
 #include "SnoreJNICallback.h"
 #include "AudioDataCallback.h"
@@ -12,7 +13,7 @@
 
 class SnoreThread : public AudioDataCallback {
 public:
-    SnoreThread(SnoreJNICallback *callback);
+    SnoreThread(SnoreJNICallback *callback, PatientThread *patientThread);
 
     virtual ~SnoreThread() override;
 
@@ -50,6 +51,7 @@ private:
     int32_t mSampleRate;
 
     SnoreJNICallback *mCallback;
+    PatientThread *mPatientThread;
 
     AudioDataBuffer<int16_t> mBuffer;
 

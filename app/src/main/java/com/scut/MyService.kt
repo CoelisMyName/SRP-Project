@@ -9,18 +9,22 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 
 class MyService : Service() {
-
-    private val CHANNEL_ID = "com.scut.MyChannel"
-    private val CHANNEL_NAME = "MyChannel"
+    companion object {
+        const val CHANNEL_ID = "com.scut.MyChannel"
+        const val CHANNEL_NAME = "MyChannel"
+        const val TAG = "MyService"
+    }
 
     private lateinit var mManager: NotificationManager
     private lateinit var mChannel: NotificationChannel
 
     @SuppressLint("ObsoleteSdkInt")
     override fun onCreate() {
+        Log.d(TAG, "onCreate: ")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             mManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             mChannel = mManager.getNotificationChannel(CHANNEL_ID) ?: NotificationChannel(
@@ -33,13 +37,12 @@ class MyService : Service() {
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
-
+    @SuppressLint("UnspecifiedImmutableFlag")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val intent = Intent(this, DebugActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+        Log.d(TAG, "onStartCommand: ")
+        val toActivityIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent =
+            PendingIntent.getActivity(this, 1000, toActivityIntent, 0)
         val notification = NotificationCompat.Builder(this, CHANNEL_ID).run {
             setContentText(getString(R.string.click_to_see_info))
             setContentTitle(getString(R.string.snoring_recognition))
@@ -49,5 +52,9 @@ class MyService : Service() {
         }
         startForeground(1, notification)
         return START_NOT_STICKY
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
     }
 }

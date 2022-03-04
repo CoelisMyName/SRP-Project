@@ -1,3 +1,5 @@
+#include <__bit_reference>
+
 #ifndef SRP_PROJECT_SPLBUILDER_H
 #define SRP_PROJECT_SPLBUILDER_H
 
@@ -49,7 +51,7 @@ public:
      * @param env
      * @return SPL
      */
-    jobject getNewSPL(JNIEnv *env) {
+    __unused jobject getNewSPL(JNIEnv *env) {
         return env->NewObject(mClass, mInit);
     }
 

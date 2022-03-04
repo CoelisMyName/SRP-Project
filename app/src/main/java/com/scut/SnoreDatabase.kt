@@ -17,7 +17,16 @@ abstract class SnoreDatabase : RoomDatabase() {
     companion object {
         private val callback = object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
-                //TODO
+                database?.run {
+//                    //假数据
+//                    val sleepRecord = SleepRecord(1646150831653L, "test", 60 * 60 * 1000L, 1.0)
+//                    val snoreRecord = SnoreRecord(0, 1646150841653L, 1000, true, 1646150831653L)
+//                    val dao = SnoreDaoWrapper(getSnoreDao())
+//                    GlobalScope.launch {
+//                        dao.insertSleepRecord(sleepRecord)
+//                        dao.insertSnoreRecord(snoreRecord)
+//                    }
+                }
             }
         }
 

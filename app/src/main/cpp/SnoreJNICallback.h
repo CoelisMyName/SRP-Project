@@ -41,6 +41,7 @@ public:
     }
 
     ~SnoreJNICallback() {
+        mEnv->DeleteGlobalRef(mObj);
         mEnv->DeleteGlobalRef(mCls);
         mEnv->DeleteGlobalRef(mSnore);
     }
@@ -71,6 +72,5 @@ private:
     jmethodID mOnStop;
     jmethodID mConstructor;
 };
-
 
 #endif

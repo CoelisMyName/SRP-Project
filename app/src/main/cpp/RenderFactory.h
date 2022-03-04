@@ -8,8 +8,8 @@
 static const char *const WAVE_RENDER = "wave";
 static const char *const DEFAULT_RENDER = "default";
 
-GLRender *newRender(const char *s) {
-    GLRender *render = nullptr;
+AudioGLRender *newRender(const char *s) {
+    AudioGLRender *render = nullptr;
     if (strcmp(s, WAVE_RENDER) == 0) {
         render = new WaveRender();
     }
@@ -19,7 +19,7 @@ GLRender *newRender(const char *s) {
     return render;
 }
 
-void deleteRender(GLRender *render) {
+void deleteRender(AudioGLRender *render) {
     delete render;
 }
 

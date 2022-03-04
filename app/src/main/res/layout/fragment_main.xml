@@ -26,10 +26,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="100dp"
-            android:padding="20dp"
-            android:text="历史记录"
+            android:layout_marginBottom="10dp"
+            android:text="@string/sleep_record"
             android:textColor="@color/black"
             android:textSize="30sp"
             android:textStyle="bold" />
@@ -57,10 +57,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="100dp"
-            android:padding="20dp"
-            android:text="睡眠监测"
+            android:layout_marginBottom="10dp"
+            android:text="@string/sleep_monitor"
             android:textColor="@color/black"
             android:textSize="30sp"
             android:textStyle="bold" />
@@ -68,4 +68,3 @@
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

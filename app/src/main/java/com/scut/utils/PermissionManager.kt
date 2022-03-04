@@ -2,28 +2,36 @@ package com.scut.utils
 
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 
-class PermissionManager(
-    activity: AppCompatActivity,
-    permissions: Array<String>,
-    onGranted: () -> Unit,
-    onDenied: (Array<String>) -> Unit
-) {
+class PermissionManager(activity: FragmentActivity) {
     private val mPermissionLauncher: ActivityResultLauncher<Array<String>> =
         activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            callback(it)
+            checkResult(it)
         }
 
     private val mActivity = activity
 
-    private val mOnGranted = onGranted
+    private var mOnGranted: () -> Unit = {}
 
-    private val mOnDenied = onDenied
+    private var mOnDenied: (Array<String>) -> Unit = {}
 
-    private val mPermissions = permissions
+    fun goCheckPermission(
+        permissions: Array<String>,
+        onGranted: () -> Unit = {},
+        onDenied: (Array<String>) -> Unit = {}
+    ) {
+        mOnGranted = onGranted
+        mOnDenied = onDenied
+        val denied = Utils.deniedPermissions(mActivity, permissions)
+        if (denied.isEmpty()) {
+            onGranted()
+        } else {
+            mPermissionLauncher.launch(denied)
+        }
+    }
 
-    private fun callback(it: Map<String, Boolean>) {
+    private fun checkResult(it: Map<String, Boolean>) {
         val denied = mutableListOf<String>()
         for ((k, v) in it) {
             if (!v) {
@@ -31,18 +39,21 @@ class PermissionManager(
             }
         }
         if (denied.isEmpty()) {
-            mOnGranted()
+            onGranted()
         } else {
-            mOnDenied(denied.toTypedArray())
+            onDenied(denied.toTypedArray())
         }
     }
 
-    fun proceed() {
-        val denied = Utils.deniedPermissions(mActivity, mPermissions)
-        if (denied.isEmpty()) {
-            mOnGranted()
-        } else {
-            mPermissionLauncher.launch(denied)
-        }
+    private fun onGranted() {
+        mOnGranted()
+        mOnGranted = {}
+        mOnDenied = {}
+    }
+
+    private fun onDenied(denied: Array<String>) {
+        mOnDenied(denied)
+        mOnGranted = {}
+        mOnDenied = {}
     }
 }

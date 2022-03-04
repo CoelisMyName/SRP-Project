@@ -193,6 +193,10 @@ void GLThread::run(JNIEnv *env) {
             if (ret == EGL_FALSE) {
                 log_e("%s(): swap buffer error %s", __FUNCTION__, getErrorMessage(eglGetError()));
             }
+            if (ret == EGL_BAD_SURFACE) {
+                destroyEGLSurface(eglObject);
+                hasSurface = false;
+            }
         }
     }
 
@@ -238,11 +242,12 @@ void GLThread::surfaceSizeChanged(JNIEnv *env, jobject surface, int32_t width, i
 bool GLThread::surfaceDestroyed(JNIEnv *env) {
     unique_lock<mutex> lock(mMutex);
     mSurfaceDestroy = true;
-    while (!mExit && mAlive && mSurfaceDestroy) {
-        mWait += 1;
-        mCond.notify_all();
-        mCond.wait(lock);
-    }
+    mWait += 1;
+//    while (!mExit && mAlive && mSurfaceDestroy) {
+//        mWait += 1;
+//        mCond.notify_all();
+//        mCond.wait(lock);
+//    }
     lock.unlock();
     return true;
 }

@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.scut.component.RenderFactory
 import com.scut.databinding.ActivityDebugBinding
-import com.scut.model.SleepWithSnoreRecord
 import com.scut.utils.PermissionManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -30,8 +29,6 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var mViewModel: DebugViewModel
 
-    private lateinit var mSleepWithSnoreRecord: SleepWithSnoreRecord
-
     private val mPermissions = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -45,34 +42,13 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
         mViewModel = ViewModelProvider(this)[DebugViewModel::class.java]
         mBinding.start.setOnClickListener(this)
         mBinding.stop.setOnClickListener(this)
-        mPermissionManager = PermissionManager(
-            this,
-            mPermissions,
-            { startSnoreModule() },
-            { showPermissionDeniedMessage() })
+        mPermissionManager = PermissionManager(this)
         mBinding.textureView.setRender(mViewModel.newRender(RenderFactory.WAVE_RENDER))
         lifecycleScope.launchWhenResumed {
             mViewModel.getLOGFlow().onEach {
                 setLogTextView(it)
             }.collect()
         }
-//        lifecycleScope.launch {
-//            mViewModel.getSnoreFlow().onEach { it ->
-//                if (it is SnoreRepository.Message.Start) {
-//                    lifecycleScope.launch {
-//                        mViewModel.query(it.timestamp).onEach { list ->
-//                            if (list.isNotEmpty()) {
-//                                mSleepWithSnoreRecord = list[0]
-//                                Log.d(
-//                                    TAG,
-//                                    "onCreate: get SleepWithSnoreRecord $mSleepWithSnoreRecord"
-//                                )
-//                            }
-//                        }.collect()
-//                    }
-//                }
-//            }.collect()
-//        }
     }
 
     private suspend fun setLogTextView(log: String) = withContext(Dispatchers.Main) {
@@ -117,7 +93,10 @@ class DebugActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         if (v == mBinding.start) {
-            mPermissionManager.proceed()
+            mPermissionManager.goCheckPermission(
+                mPermissions,
+                { startSnoreModule() },
+                { showPermissionDeniedMessage() })
         }
         if (v == mBinding.stop) {
             stopSnoreModule()

@@ -32,6 +32,7 @@ public:
      */
     void updateEnv(JNIEnv *env) {
         mEnv = env;
+        mBuilder.updateEnv(env);
     }
 
     ~SPLJNICallback() {

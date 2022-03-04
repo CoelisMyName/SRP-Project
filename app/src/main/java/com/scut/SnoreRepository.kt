@@ -17,17 +17,86 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
 object SnoreRepository {
-    private val mModuleController = ModuleController
+    private val mSnoreCallback = object : ModuleController.SnoreCallback {
+        override fun onStart(timestamp: Long) {
+            mRepositoryScope.launch {
+                mSnoreFlow.emit(Message.Start(timestamp))
+            }
+        }
 
+        override fun onRecognize(snore: Snore) {
+            mRepositoryScope.launch {
+                if (!snore.confirm) return@launch
+                mSnoreFlow.emit(Message.Package(snore))
+                val snoreRecord = SnoreRecord(
+                    0,
+                    snore.timestamp,
+                    snore.length,
+                    snore.confirm,
+                    snore.startTime
+                )
+                mDao.insertSnoreRecord(snoreRecord)
+                mDao.updateSleepRecordSnoreTimesIncrement(snoreRecord.startTime, 1L)
+                mDao.updateSleepRecordSnoreTotalDurationIncrement(
+                    snoreRecord.startTime,
+                    snoreRecord.length
+                )
+            }
+        }
+
+        override fun onStop(timestamp: Long) {
+            mRepositoryScope.launch {
+                mSnoreFlow.emit(Message.Stop(timestamp))
+            }
+        }
+    }
+    private val mSPLCallback = object : ModuleController.SPLCallback {
+        private var mStartTimestamp: Long = 0
+        private var mLastUpdate: Long = 0
+        override fun onStart(timestamp: Long) {
+            mStartTimestamp = timestamp
+            mLastUpdate = timestamp
+            mRepositoryScope.launch {
+                mSPLFlow.emit(Message.Start(timestamp))
+                mAudioStateFlow.emit(Message.Start(timestamp))
+                mDao.insertSleepRecord(SleepRecord(timestamp, ""))
+            }
+        }
+
+        override fun onDetect(spl: SPL) {
+            val startTimestamp = mStartTimestamp
+            val duration = spl.timestamp - mStartTimestamp
+            mRepositoryScope.launch {
+                mSPLFlow.emit(Message.Package(spl))
+                mDao.updateSleepRecordDuration(startTimestamp, duration)
+            }
+        }
+
+        override fun onStop(timestamp: Long) {
+            mLastUpdate = timestamp
+            val startTimestamp = mStartTimestamp
+            val duration = timestamp - startTimestamp
+            mRepositoryScope.launch {
+                mSPLFlow.emit(Message.Stop(timestamp))
+                mAudioStateFlow.emit(Message.Stop(timestamp))
+                mDao.updateSleepRecordDuration(startTimestamp, duration)
+            }
+        }
+    }
+    private val mPatientCallback = object : ModuleController.PatientCallback {
+        override fun onPatientResult(timestamp: Long, label: Double) {
+            mRepositoryScope.launch {
+                mDao.updateSleepRecordLabel(timestamp, label)
+            }
+        }
+    }
     private val mRepositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
+    private val mSnoreFlow = MutableSharedFlow<Message<Snore>>()
+    private val mSPLFlow = MutableSharedFlow<Message<SPL>>()
+    private val mAudioStateFlow = MutableSharedFlow<Message<Long>>(1)
     private lateinit var mDatabase: SnoreDatabase
-
     private lateinit var mDao: SnoreDaoWrapper
-
-    private var mSleepRecord = SleepRecord()
-
-    private const val TAG = "SnoreRepository"
+    private var mInitFlag = false
 
     private class NativeRenderWrapper(render: NativeRender) : NativeRender {
         private val mRender = render
@@ -36,7 +105,7 @@ object SnoreRepository {
         }
 
         override fun recycle() {
-            mModuleController.unregisterNativeCallback(mRender.getNativePointer())
+            ModuleController.unregisterNativeCallback(mRender.getNativePointer())
             mRender.recycle()
         }
     }
@@ -48,100 +117,46 @@ object SnoreRepository {
         class Void<T> : Message<T>()
     }
 
-    private val mSnoreFlow = MutableSharedFlow<Message<Snore>>()
-
-    private val mSPLFlow = MutableSharedFlow<Message<SPL>>()
-
     fun getSnoreFlow(): SharedFlow<Message<Snore>> = mSnoreFlow
 
     fun getSPLFlow(): SharedFlow<Message<SPL>> = mSPLFlow
 
-    private suspend fun insert(vararg sl: SleepRecord) = mDao.insert(*sl)
+    fun getAudioStateFlow(): SharedFlow<Message<Long>> = mAudioStateFlow
 
-    private suspend fun update(vararg sl: SleepRecord) = mDao.update(*sl)
+    fun deleteSleepRecord(vararg sl: SleepRecord) {
+        mRepositoryScope.launch {
+            mDao.deleteSleepRecord(*sl)
+        }
+    }
 
-    private suspend fun delete(vararg sl: SleepRecord) = mDao.delete(*sl)
+    fun queryAllSleepRecord() = mDao.queryAllSleepRecord()
 
-    private suspend fun insert(vararg sr: SnoreRecord) = mDao.insert(*sr)
+    fun querySleepRecordByTimestamp(timestamp: Long) = mDao.querySleepRecordByTimestamp(timestamp)
 
-    fun query() = mDao.query()
-
-    fun query(timestamp: Long) = mDao.query(timestamp)
+    fun querySnoreRecordByStartTime(startTime: Long) = mDao.querySnoreRecordByStartTime(startTime)
 
     /**
      * 用其他方法前调用
      */
     fun init(application: Application) {
+        if (mInitFlag) return
         mDatabase = SnoreDatabase.getInstance(application)
         mDao = SnoreDaoWrapper(mDatabase.getSnoreDao())
-        mModuleController.create(application)
-        mModuleController.mSnoreCallback = object : ModuleController.SnoreCallback {
-            override fun onStart(timestamp: Long) {
-                mRepositoryScope.launch {
-                    mSnoreFlow.emit(Message.Start(timestamp))
-                    mSleepRecord = SleepRecord(timestamp, "", 0)
-                    insert(mSleepRecord)
-                }
-            }
-
-            override fun onRecognize(snore: Snore) {
-                mRepositoryScope.launch {
-                    mSnoreFlow.emit(Message.Package(snore))
-                    val snoreRecord = SnoreRecord(
-                        0,
-                        snore.timestamp,
-                        snore.length,
-                        snore.confirm,
-                        snore.startTime
-                    )
-                    insert(snoreRecord)
-                    mSleepRecord.duration = System.currentTimeMillis() - mSleepRecord.timestamp
-                    update(mSleepRecord)
-                }
-            }
-
-            override fun onStop(timestamp: Long) {
-                mRepositoryScope.launch {
-                    mSnoreFlow.emit(Message.Stop(timestamp))
-                    mSleepRecord.duration = System.currentTimeMillis() - mSleepRecord.timestamp
-                    update(mSleepRecord)
-                }
-            }
-        }
-        mModuleController.mSPLCallback = object : ModuleController.SPLCallback {
-            override fun onStart(timestamp: Long) {
-                mRepositoryScope.launch {
-                    mSPLFlow.emit(Message.Start(timestamp))
-                }
-            }
-
-            override fun onDetect(spl: SPL) {
-                mRepositoryScope.launch {
-                    mSPLFlow.emit(Message.Package(spl))
-                }
-            }
-
-            override fun onStop(timestamp: Long) {
-                mRepositoryScope.launch {
-                    mSPLFlow.emit(Message.Stop(timestamp))
-                }
-            }
-        }
-    }
-
-    fun deleteSleepRecord(sl: SleepRecord) {
-        mRepositoryScope.launch {
-            delete(sl)
-        }
+        ModuleController.create(application)
+        //注册监听器
+        ModuleController.mSnoreCallback = mSnoreCallback
+        ModuleController.mSPLCallback = mSPLCallback
+        ModuleController.mPatientCallback = mPatientCallback
+        mInitFlag = true
     }
 
     fun newRender(type: String): NativeRender {
         val render = NativeRenderWrapper(RenderFactory.createRender(type))
-        mModuleController.registerNativeCallback(render.getNativePointer())
+        ModuleController.registerNativeCallback(render.getNativePointer())
         return render
     }
 
-    fun startSnoreModule(): Boolean = mModuleController.start()
+    fun startSnoreModule() = ModuleController.start()
 
-    fun stopSnoreModule(): Boolean = mModuleController.stop()
+    fun stopSnoreModule() = ModuleController.stop()
 }
