@@ -193,6 +193,10 @@ void GLThread::run(JNIEnv *env) {
             if (ret == EGL_FALSE) {
                 log_e("%s(): swap buffer error %s", __FUNCTION__, getErrorMessage(eglGetError()));
             }
+            if (ret == EGL_BAD_SURFACE) {
+                destroyEGLSurface(eglObject);
+                hasSurface = false;
+            }
         }
     }
 
