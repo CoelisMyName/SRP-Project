@@ -8,8 +8,8 @@
 
 TAG(WaveRender)
 
-#define MIN(x, y) ((x < y) ? x : y)
-#define MIN3(x, y, z) ((MIN(x, y) < z) ? MIN(x, y) : z)
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+#define MIN3(x, y, z) ((MIN((x), (y)) < (z)) ? MIN((x), (y)) : (z))
 
 /**
  * @brief 将 int16_t 型输入按对数规则映射。最大最小值仍为 [INT16_MIN, INT16_MAX]
@@ -352,13 +352,13 @@ void WaveRender::_render_convert() {
     }
 }
 
-#define IN(i) (this->_m_renderDatas.buffer[i])
-#define X1(i) (this->_m_renderDatas.output_buffer[6 * i])
-#define Y1(i) (this->_m_renderDatas.output_buffer[6 * i + 1])
-#define Z1(i) (this->_m_renderDatas.output_buffer[6 * i + 2])
-#define X2(i) (this->_m_renderDatas.output_buffer[6 * i + 3])
-#define Y2(i) (this->_m_renderDatas.output_buffer[6 * i + 4])
-#define Z2(i) (this->_m_renderDatas.output_buffer[6 * i + 5])
+#define IN(i) (this->_m_renderDatas.buffer[(i)])
+#define X1(i) (this->_m_renderDatas.output_buffer[(6 * (i))])
+#define Y1(i) (this->_m_renderDatas.output_buffer[(6 * (i) + 1)])
+#define Z1(i) (this->_m_renderDatas.output_buffer[(6 * (i) + 2)])
+#define X2(i) (this->_m_renderDatas.output_buffer[(6 * (i) + 3)])
+#define Y2(i) (this->_m_renderDatas.output_buffer[(6 * (i) + 4)])
+#define Z2(i) (this->_m_renderDatas.output_buffer[(6 * (i) + 5)])
 
 void WaveRender::_render_genPoints() {
     // 保存宽高
