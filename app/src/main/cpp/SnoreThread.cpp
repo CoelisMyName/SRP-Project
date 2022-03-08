@@ -236,6 +236,7 @@ void SnoreThread::run(JNIEnv *env) {
             callback->onStop(env, audioStopTime);
             //提交数据
             if (patientModel != nullptr) {
+                log_i("%s(): submit task", __FUNCTION__);
                 if (mPatientThread->submitTask(audioStartTime, patientModel)) {
                     patientModel = newPatientModel();
                 } else {

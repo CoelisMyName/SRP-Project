@@ -1,5 +1,8 @@
+#include "log.h"
 #include "utils.h"
 #include "PatientThread.h"
+
+TAG(PatientThread)
 
 using std::mutex;
 using std::thread;
@@ -53,6 +56,7 @@ void PatientThread::run(JNIEnv *env) {
 
         if (hasTask) {
             hasTask = false;
+            log_i("%s(): get task", __FUNCTION__);
             int64_t timestamp = task.timestamp;
             SNORE_PatientModel *patientModel = task.patientModel;
             if (patientModel != nullptr) {
