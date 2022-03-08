@@ -133,6 +133,7 @@ Java_com_scut_component_LibGLThread_onPause(__unused JNIEnv *env, __unused jobje
 JNIEXPORT jboolean JNICALL
 Java_com_scut_utils_LibSRP_create(JNIEnv *env, __unused jobject thiz, jobject controller) {
     if (initialFlag) return true;
+    snore::snoreInitialize();
     dispatcher = new AudioDataDispatcher();
     audioSource = new AudioRecord(dispatcher, SAMPLE_RATE, FRAME_SIZE);
     patientJNICallback = new PatientJNICallback(env, controller);
@@ -175,6 +176,7 @@ Java_com_scut_utils_LibSRP_destroy(JNIEnv *env, __unused jobject thiz,
     snoreJNICallback = nullptr;
     splJNICallback = nullptr;
     patientJNICallback = nullptr;
+    snore::snoreTerminate();
     initialFlag = false;
     return true;
 }

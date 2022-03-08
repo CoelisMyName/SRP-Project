@@ -72,13 +72,16 @@ namespace snore {
         virtual SNORE_UNUSED void clear() = 0;
     };
 
+    SNORE_UNUSED extern void snoreInitialize();
+
+    SNORE_UNUSED extern void snoreTerminate();
+
     /**
      * 模型入口函数
      * @param src 输入音频数据
      * @param modelResult 输出模型运算结果
      */
-    SNORE_UNUSED extern void
-    calculateModelResult(SNORE_F64pcm &src, SNORE_ModelResult &modelResult);
+    SNORE_UNUSED extern void calculateModelResult(SNORE_F64pcm &src, SNORE_ModelResult &modelResult);
 
     /**
      * 生成噪声特征文件
