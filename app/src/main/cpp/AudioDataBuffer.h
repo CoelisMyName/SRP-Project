@@ -26,7 +26,7 @@ public:
         return true;
     }
 
-    bool pop(T &dst) {
+    bool poll(T &dst) {
         if (empty()) return false;
         dst = mArray[mHead];
         mHead = (mHead + 1) % mCapacity;
@@ -144,7 +144,7 @@ public:
 
 private:
     volatile T *mBuffer;
-    volatile Queue<int64_t> mTimestamp;
+    Queue<int64_t> mTimestamp;
     volatile int32_t mSampleRate;
     volatile int64_t mSampleCount = 0;
     volatile int32_t mCapacity;

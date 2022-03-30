@@ -44,7 +44,7 @@ void PatientThread::run(JNIEnv *env) {
             exit = mExit;
             if (!exit && !mQueue.empty()) {
                 hasTask = true;
-                mQueue.pop(task);
+                mQueue.poll(task);
             }
             mCond.notify_all();
             lock.unlock();
@@ -74,7 +74,7 @@ void PatientThread::run(JNIEnv *env) {
     mAlive = false;
     //discard all task
     while (!mQueue.empty()) {
-        mQueue.pop(task);
+        mQueue.poll(task);
         //in case memory leak
         deletePatientModel(task.patientModel);
     }

@@ -102,7 +102,7 @@ int32_t AudioDataBuffer<T>::next(T *dst, int32_t capacity, int64_t &timestamp) {
         memcpy(&dst[mCapacity - front], mBuffer, rear * sizeof(T));
     }
     mHead = (mHead + mFrame - mOverlap) % mCapacity;
-    assert(mTimestamp.pop(timestamp));
+    assert(mTimestamp.poll(timestamp));
     return mFrame;
 }
 
