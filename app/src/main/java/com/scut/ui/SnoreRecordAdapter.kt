@@ -2,6 +2,7 @@ package com.scut.ui
 
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +25,7 @@ class SnoreRecordAdapter : RecyclerView.Adapter<SnoreRecordAdapter.SnoreRecordVi
                 R.string.snore_date,
                 SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault()).format(snoreRecord.timestamp)
             )
+            Log.d("SnoreRecordViewHolder", "bind: ${snoreRecord.timestamp}")
             mBinding.snoreDuration.text = context.getString(
                 R.string.snore_duration,
                 SimpleDateFormat("ss.SSS秒", Locale.UK).apply {

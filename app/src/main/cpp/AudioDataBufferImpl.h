@@ -63,6 +63,7 @@ int32_t AudioDataBuffer<T>::capacity() {
     return mCapacity - 1;
 }
 
+//TODO timestamp has some bug
 template<typename T>
 int32_t AudioDataBuffer<T>::put(int64_t timestamp, T *src, int32_t size) {
     if (full()) return 0;
@@ -101,7 +102,7 @@ int32_t AudioDataBuffer<T>::next(T *dst, int32_t capacity, int64_t &timestamp) {
         memcpy(&dst[mCapacity - front], mBuffer, rear * sizeof(T));
     }
     mHead = (mHead + mFrame - mOverlap) % mCapacity;
-    assert(mTimestamp.pop(timestamp));
+    assert(mTimestamp.poll(timestamp));
     return mFrame;
 }
 

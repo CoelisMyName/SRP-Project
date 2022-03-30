@@ -76,7 +76,7 @@ extern "C"
    command-line flag.  This is not necessary under MinGW/Cygwin, where
    libtool does the imports/exports automatically. */
 #if defined(FFTW_DLL) && (defined(_WIN32) || defined(__WIN32__))
-   /* annoying Windows syntax for shared-library declarations */
+/* annoying Windows syntax for shared-library declarations */
 #  if defined(COMPILING_FFTW) /* defined in api.h when compiling FFTW */
 #    define FFTW_EXTERN extern __declspec(dllexport)
 #  else /* user is calling FFTW; import symbol */
@@ -94,25 +94,27 @@ extern "C"
 #endif
 
 enum fftw_r2r_kind_do_not_use_me {
-     FFTW_R2HC=0, FFTW_HC2R=1, FFTW_DHT=2,
-     FFTW_REDFT00=3, FFTW_REDFT01=4, FFTW_REDFT10=5, FFTW_REDFT11=6,
-     FFTW_RODFT00=7, FFTW_RODFT01=8, FFTW_RODFT10=9, FFTW_RODFT11=10
+    FFTW_R2HC = 0, FFTW_HC2R = 1, FFTW_DHT = 2,
+    FFTW_REDFT00 = 3, FFTW_REDFT01 = 4, FFTW_REDFT10 = 5, FFTW_REDFT11 = 6,
+    FFTW_RODFT00 = 7, FFTW_RODFT01 = 8, FFTW_RODFT10 = 9, FFTW_RODFT11 = 10
 };
 
 struct fftw_iodim_do_not_use_me {
-     int n;                     /* dimension size */
-     int is;			/* input stride */
-     int os;			/* output stride */
+    int n;                     /* dimension size */
+    int is;            /* input stride */
+    int os;            /* output stride */
 };
 
 #include <stddef.h> /* for ptrdiff_t */
+
 struct fftw_iodim64_do_not_use_me {
-     ptrdiff_t n;                     /* dimension size */
-     ptrdiff_t is;			/* input stride */
-     ptrdiff_t os;			/* output stride */
+    ptrdiff_t n;                     /* dimension size */
+    ptrdiff_t is;            /* input stride */
+    ptrdiff_t os;            /* output stride */
 };
 
 typedef void (FFTW_CDECL *fftw_write_char_func_do_not_use_me)(char c, void *);
+
 typedef int (FFTW_CDECL *fftw_read_char_func_do_not_use_me)(void *);
 
 /*

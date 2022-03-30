@@ -1,3 +1,6 @@
+/**
+ * 文件主要是JNI接口
+ */
 #include <jni.h>
 #include <cassert>
 #include <snore.h>
