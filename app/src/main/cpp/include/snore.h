@@ -81,7 +81,8 @@ namespace snore {
      * @param src 输入音频数据
      * @param modelResult 输出模型运算结果
      */
-    SNORE_UNUSED extern void calculateModelResult(SNORE_F64pcm &src, SNORE_ModelResult &modelResult);
+    SNORE_UNUSED extern void
+    calculateModelResult(SNORE_F64pcm &src, SNORE_ModelResult &modelResult);
 
     /**
      * 生成噪声特征文件

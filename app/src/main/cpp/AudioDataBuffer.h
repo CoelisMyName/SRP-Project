@@ -12,6 +12,7 @@ public:
         }
         mCapacity = capacity + 1;
         mArray = new T[mCapacity];
+        mHead = mRear = 0;
     }
 
     virtual ~Queue() {
@@ -68,17 +69,34 @@ public:
     }
 
 private:
-    T *mArray;
-    int32_t mCapacity;
-    int32_t mHead = 0;
-    int32_t mRear = 0;
+    volatile T *mArray;
+    volatile int32_t mCapacity;
+    volatile int32_t mHead = 0;
+    volatile int32_t mRear = 0;
 };
 
+/**
+ * 音频数据缓冲容器
+ * @tparam T
+ */
 template<typename T>
 class AudioDataBuffer {
 public:
+    /**
+     *
+     * @param sample_rate 采样率
+     * @param frame 每次读取数据帧大小
+     * @param overlap 帧与帧之间重叠大小
+     */
     AudioDataBuffer(int32_t sample_rate, int32_t frame, int32_t overlap);
 
+    /**
+     *
+     * @param sample_rate 采样率
+     * @param capacity 容器大小
+     * @param frame 每次读取数据帧大小
+     * @param overlap 帧与帧之间重叠大小
+     */
     AudioDataBuffer(int32_t sample_rate, int32_t capacity, int32_t frame, int32_t overlap);
 
     virtual ~AudioDataBuffer();
@@ -93,6 +111,7 @@ public:
 
     /**
      * 写入数据
+     * @param timestamp 毫秒时间戳
      * @param src 数据指针
      * @param size 数据长度
      * @return 数据写入大小
@@ -103,28 +122,36 @@ public:
      * 读一帧数据
      * @param dst 存放数组指针
      * @param capacity 数组容量
+     * @param timestamp 返回当前帧毫秒时间戳
      * @return 若容量不足返回 -1，若未有一帧数据则返回 0，若读到数据则返回帧大小
      */
     int32_t next(T *dst, int32_t capacity, int64_t &timestamp);
 
+    /**
+     * 当前有一帧数据
+     * @return
+     */
     bool ready();
 
     bool empty();
 
     bool full();
 
+    /**
+     * 清空数据
+     */
     void clear();
 
 private:
-    T *mBuffer;
-    Queue<int64_t> mTimestamp;
-    int32_t mSampleRate;
-    int64_t mSampleCount = 0;
-    int32_t mCapacity;
-    int32_t mFrame;
-    int32_t mOverlap;
-    int32_t mHead = 0;
-    int32_t mRear = 0;
+    volatile T *mBuffer;
+    volatile Queue<int64_t> mTimestamp;
+    volatile int32_t mSampleRate;
+    volatile int64_t mSampleCount = 0;
+    volatile int32_t mCapacity;
+    volatile int32_t mFrame;
+    volatile int32_t mOverlap;
+    volatile int32_t mHead = 0;
+    volatile int32_t mRear = 0;
 };
 
 #include "AudioDataBufferImpl.h"

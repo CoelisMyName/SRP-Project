@@ -63,6 +63,7 @@ int32_t AudioDataBuffer<T>::capacity() {
     return mCapacity - 1;
 }
 
+//TODO timestamp has some bug
 template<typename T>
 int32_t AudioDataBuffer<T>::put(int64_t timestamp, T *src, int32_t size) {
     if (full()) return 0;
