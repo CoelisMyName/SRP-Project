@@ -19,7 +19,7 @@ public:
         delete[] mArray;
     }
 
-    bool push(T src) {
+    bool push(const T &src) {
         if (full()) return false;
         mArray[mRear] = src;
         mRear = (mRear + 1) % mCapacity;

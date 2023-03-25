@@ -28,7 +28,7 @@ void AudioDataDispatcher::dispatchStart(int64_t timestamp) {
         if (cb == nullptr) continue;
         cb->onAudioDataStart(timestamp);
     }
-    log_i("%s(): timestamp = %lld", __FUNCTION__, timestamp);
+    log_i("%s(): timestamp = %lld", __FUNCTION__, (long long)timestamp);
 }
 
 void AudioDataDispatcher::dispatchStop(int64_t timestamp) {
@@ -39,7 +39,7 @@ void AudioDataDispatcher::dispatchStop(int64_t timestamp) {
         if (cb == nullptr) continue;
         cb->onAudioDataStop(timestamp);
     }
-    log_i("%s(): timestamp = %lld", __FUNCTION__, timestamp);
+    log_i("%s(): timestamp = %lld", __FUNCTION__, (long long)timestamp);
 }
 
 void AudioDataDispatcher::dispatchAudioData(int64_t timestamp, int16_t *data, int32_t length) {
@@ -57,7 +57,7 @@ void AudioDataDispatcher::dispatchAudioData(int64_t timestamp, int16_t *data, in
 #ifdef BENCHMARK
     ems = currentTimeMillis();
     if (ems - sms > 40) {
-        log_w("%s(): time cost = %lld", __FUNCTION__, ems - sms);
+        log_w("%s(): time cost = %lld", __FUNCTION__, (long long)(ems - sms));
     }
 #endif
 }

@@ -80,7 +80,7 @@ int32_t sprintTimeMillis(char *str, int64_t millis) {
     localtime_r(&time, &result);
     //2022-02-24 19:13:48.134
     int32_t size = strftime(str, 50, "%F %X", &result);
-    size += sprintf(&str[size], ".%03lld", millis % 1000);
+    size += sprintf(&str[size], ".%03lld", (long long)(millis % 1000ll));
     return size;
 }
 

@@ -72,10 +72,10 @@ int32_t AudioDataBuffer<T>::put(int64_t timestamp, T *src, int32_t size) {
     int32_t write = std::min(empty, size);
     int32_t rear = (head + write) % mCapacity;
     if (rear >= head) {
-        memcpy(&mBuffer[head], src, write * sizeof(T));
+        memcpy((void *)(&mBuffer[head]), (const void *)src, write * sizeof(T));
     } else {
-        memcpy(&mBuffer[head], src, (mCapacity - head) * sizeof(T));
-        memcpy(mBuffer, src, (write - mCapacity + head) * sizeof(T));
+        memcpy((void *)(&mBuffer[head]), (const void *)src, (mCapacity - head) * sizeof(T));
+        memcpy((void *)mBuffer, (const void *)src, (write - mCapacity + head) * sizeof(T));
     }
     auto skew = (int32_t) (mSampleCount % (mFrame - mOverlap));
     skew = ((mFrame - mOverlap) - skew) % (mFrame - mOverlap);
@@ -96,10 +96,10 @@ int32_t AudioDataBuffer<T>::next(T *dst, int32_t capacity, int64_t &timestamp) {
     int32_t front = mHead;
     int32_t rear = (mHead + mFrame) % mCapacity;
     if (rear >= front) {
-        memcpy(dst, &mBuffer[front], mFrame * sizeof(T));
+        memcpy((void *)dst, (const void *)(&mBuffer[front]), mFrame * sizeof(T));
     } else {
-        memcpy(dst, &mBuffer[front], (mCapacity - front) * sizeof(T));
-        memcpy(&dst[mCapacity - front], mBuffer, rear * sizeof(T));
+        memcpy((void *)dst, (const void *)(&mBuffer[front]), (mCapacity - front) * sizeof(T));
+        memcpy((void *)(&dst[mCapacity - front]), (const void *)mBuffer, rear * sizeof(T));
     }
     mHead = (mHead + mFrame - mOverlap) % mCapacity;
     assert(mTimestamp.poll(timestamp));

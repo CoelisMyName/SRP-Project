@@ -6,10 +6,26 @@
 #include "AudioDataBuffer.h"
 #include "PatientJNICallback.h"
 
-typedef struct {
+struct PatientIdentifyTask {
+public:
     int64_t timestamp;
     snore::SNORE_PatientModel *patientModel;
-} PatientIdentifyTask;
+    PatientIdentifyTask (int64_t _timestamp = 0, snore::SNORE_PatientModel *_patientModel = nullptr):
+        timestamp (_timestamp), patientModel (_patientModel) {
+
+    }
+    volatile PatientIdentifyTask& operator= (const volatile PatientIdentifyTask &from) volatile {
+        this->patientModel = from.patientModel;
+        this->timestamp = from.timestamp;
+        return *this;
+    }
+
+    PatientIdentifyTask& operator= (PatientIdentifyTask &&from) {
+        this->patientModel = from.patientModel;
+        this->timestamp = from.timestamp;
+        return *this;
+    }
+};
 
 /**
  * PatientModel计算线程，负责计算和回收SNORE_PatientModel

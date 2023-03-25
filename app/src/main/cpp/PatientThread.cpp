@@ -66,7 +66,7 @@ void PatientThread::run(JNIEnv *env) {
             } else {
                 //TODO recreate patient model
             }
-            task = {0L, nullptr};
+            task = PatientIdentifyTask(0L, nullptr);
         }
     }
 
@@ -83,7 +83,7 @@ void PatientThread::run(JNIEnv *env) {
 }
 
 bool PatientThread::submitTask(int64_t timestamp, snore::SNORE_PatientModel *patientModel) {
-    PatientIdentifyTask task = {timestamp, patientModel};
+    PatientIdentifyTask task {timestamp, patientModel};
     unique_lock<mutex> lock(mMutex);
     while (!mExit && mAlive) {
         mCond.notify_all();

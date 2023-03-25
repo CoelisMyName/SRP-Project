@@ -140,7 +140,7 @@ void SnoreThread::run(JNIEnv *env) {
 
         if (mBuffer.ready()) {
             rd = mBuffer.next(buf1, size, frameTimestamp);
-            log_d("%s(): timestamp = %lld", __FUNCTION__, frameTimestamp);
+            log_d("%s(): timestamp = %lld", __FUNCTION__, (long long)frameTimestamp);
             ready = true;
         }
         state = mState;
