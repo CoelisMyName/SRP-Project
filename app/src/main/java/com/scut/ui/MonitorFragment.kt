@@ -31,6 +31,8 @@ class MonitorFragment : Fragment() {
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.RECORD_AUDIO
     )
+    // 状态标记，用于明确提示文本
+    private final var mIsFinish: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,13 +42,11 @@ class MonitorFragment : Fragment() {
         mBinding = FragmentMonitorBinding.inflate(inflater, container, false)
         mViewModel = ViewModelProvider(this)[MonitorViewModel::class.java]
         mBinding.wave.setRender(mViewModel.newRender(RenderFactory.WAVE_RENDER))
-        mBinding.begin.setOnClickListener { onClick(it) }
+        mBinding.start.setOnClickListener { onClick(it) }
         mBinding.showDetail.setOnClickListener { onClick(it) }
-        mBinding.showDetail.visibility = View.GONE
         initView()
         return mBinding.root
     }
-
     private fun initView() {
         lifecycleScope.launchWhenResumed {
             mViewModel.getAudioStateFlow().collectLatest {
@@ -55,10 +55,20 @@ class MonitorFragment : Fragment() {
                         mAudioStart = it
                     }
                     if (it is SnoreRepository.Message.Stop) {
-                        mBinding.begin.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+//                        mBinding.start.setImageResource(R.drawable.ic_baseline_play_arrow_24)
+                        if (mIsFinish) {
+                            mBinding.start.text = getString(R.string.monitor_tap_to_restart)
+                            mBinding.monitorNotes.text = getString(R.string.monitor_note_stop)
+                        }
+                        else {
+                            mBinding.start.text = getString(R.string.monitor_tap_to_start)
+                            mBinding.monitorNotes.text = getString(R.string.monitor_note_ready)
+                        }
                     }
                     if (it is SnoreRepository.Message.Start) {
-                        mBinding.begin.setImageResource(R.drawable.ic_baseline_stop_24)
+//                        mBinding.start.setImageResource(R.drawable.ic_baseline_stop_24)
+                        mBinding.start.text = getString(R.string.monitor_tap_to_stop)
+                        mBinding.monitorNotes.text = getString(R.string.monitor_note_recording)
                     }
                     mAudioState = it
                 }
@@ -79,7 +89,14 @@ class MonitorFragment : Fragment() {
         }
         lifecycleScope.launchWhenResumed {
             mViewModel.getDetailVisibilityFlow().collectLatest {
-                mBinding.showDetail.visibility = it
+                if (it == View.VISIBLE) {
+                    mBinding.showDetail.isEnabled = true
+                    mBinding.showDetail.text = getString(R.string.monitor_detail_ok)
+                }
+                else {
+                    mBinding.showDetail.isEnabled = false
+                    mBinding.showDetail.text = getString(R.string.monitor_detail_not)
+                }
             }
         }
     }
@@ -108,12 +125,24 @@ class MonitorFragment : Fragment() {
         val intent = Intent(requireActivity() as MainActivity, MyService::class.java)
         ContextCompat.startForegroundService(requireActivity() as MainActivity, intent)
         mViewModel.startSnoreModule()
+        // 更新标记
+        this.mIsFinish = false
+        // 更新显示内容
+        (requireActivity() as MainActivity).updateRecording(true)
+        mBinding.start.text = getString(R.string.monitor_tap_to_stop)
+        mBinding.monitorNotes.text = getString(R.string.monitor_note_recording)
     }
 
     private fun stopSnoreModule() {
         val service = Intent(requireActivity() as MainActivity, MyService::class.java)
         (requireActivity() as MainActivity).stopService(service)
         mViewModel.stopSnoreModule()
+        // 更新标记
+        this.mIsFinish = true
+        // 更新显示内容
+        (requireActivity() as MainActivity).updateRecording(false)
+        mBinding.start.text = getString(R.string.monitor_tap_try_stop)
+        mBinding.monitorNotes.text = getString(R.string.monitor_note_stopping)
     }
 
     private fun showPermissionDeniedMessage() {
@@ -121,7 +150,7 @@ class MonitorFragment : Fragment() {
     }
 
     private fun onClick(view: View) {
-        if (view == mBinding.begin) {
+        if (view == mBinding.start) {
             if (mAudioState is SnoreRepository.Message.Stop || mAudioState is SnoreRepository.Message.Void) {
                 val activity = requireActivity() as MainActivity
                 activity.mPermissionManager.goCheckPermission(

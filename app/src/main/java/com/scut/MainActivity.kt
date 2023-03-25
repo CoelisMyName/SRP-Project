@@ -1,7 +1,10 @@
 package com.scut
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -44,5 +47,9 @@ class MainActivity : AppCompatActivity() {
     fun toFragment(fragment: Fragment) {
         mFragmentManger.beginTransaction().replace(mBinding.container.id, fragment)
             .addToBackStack(null).commit()
+    }
+
+    public final fun updateRecording (state: Boolean) {
+        this.mMainFragment.updateRecording(state)
     }
 }

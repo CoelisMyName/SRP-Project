@@ -3,42 +3,81 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="0dp"
+    android:clipChildren="false">
 
     <com.google.android.material.card.MaterialCardView
+        style="@style/ListedCardViewStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        app:cardCornerRadius="5dp"
-        app:cardElevation="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:cardBackgroundColor="@color/foreground">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp">
+            android:padding="0dp">
 
             <TextView
-                android:id="@+id/snoreDate"
+                android:id="@+id/snoreStart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="鼾声时间：01时23分" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:textSize="20sp"
+                android:textColor="@color/text_main"
+                tools:text="HH:mm:ss.SSS" />
+
+            <TextView
+                android:id="@+id/snoreStartNote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/snoreStart"
+                app:layout_constraintBaseline_toBaselineOf="@id/snoreStart"
+                android:layout_marginStart="10sp"
+                android:textSize="16sp"
+                android:textColor="@color/text_aux"
+                android:text="@string/snore_start_at" />
+
+            <TextView
+                android:id="@+id/snoreDurationNote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10sp"
+                android:text="@string/snore_duration"
+                android:textColor="@color/text_aux"
+                android:textSize="16sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/snoreDuration"
+                app:layout_constraintEnd_toStartOf="@id/snoreDuration"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@id/snoreStartNote" />
 
             <TextView
                 android:id="@+id/snoreDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/snoreDate"
-                tools:text="鼾声时长：5秒" />
+                app:layout_constraintEnd_toStartOf="@id/unitSecond"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="10sp"
+                android:textSize="20sp"
+                android:textColor="@color/text_main"
+                tools:text="ss.SSS" />
+
+            <TextView
+                android:id="@+id/unitSecond"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBaseline_toBaselineOf="@id/snoreStart"
+                android:textSize="16sp"
+                android:textColor="@color/text_aux"
+                android:text="@string/duration_s_unit" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

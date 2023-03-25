@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.scut.R
 import com.scut.databinding.ItemSnoreBinding
 import com.scut.model.SnoreRecord
 import java.util.*
@@ -20,18 +19,13 @@ class SnoreRecordAdapter : RecyclerView.Adapter<SnoreRecordAdapter.SnoreRecordVi
 
         fun bind(snoreRecord: SnoreRecord) {
             mSnoreRecord = snoreRecord
-            val context = mBinding.root.context
-            mBinding.snoreDate.text = context.getString(
-                R.string.snore_date,
+            mBinding.snoreStart.text =
                 SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault()).format(snoreRecord.timestamp)
-            )
             Log.d("SnoreRecordViewHolder", "bind: ${snoreRecord.timestamp}")
-            mBinding.snoreDuration.text = context.getString(
-                R.string.snore_duration,
-                SimpleDateFormat("ss.SSS秒", Locale.UK).apply {
+            mBinding.snoreDuration.text =
+                SimpleDateFormat("ss.SSS", Locale.UK).apply {
                     timeZone = TimeZone.getTimeZone("UTC")
                 }.format(snoreRecord.length)
-            )
         }
     }
 

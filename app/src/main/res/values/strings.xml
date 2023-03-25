@@ -2,16 +2,48 @@
     <string name="app_name">SRP Project</string>
     <string name="snoring_recognition">鼾声识别</string>
     <string name="click_to_see_info">点击查看详情</string>
-    <string name="sleep_test_date">测试睡眠时间：%s</string>
-    <string name="sleep_duration">睡眠时长：%s</string>
-    <string name="snore_times">鼾声次数：%d</string>
-    <string name="is_patient_or_not">是否检测为病人：%s</string>
-    <string name="yes">是</string>
-    <string name="no">否</string>
-    <string name="calculating">正在计算</string>
-    <string name="snore_date">鼾声时间：%s</string>
-    <string name="snore_duration">鼾声时长：%s</string>
-    <string name="show_detail">显示详情</string>
-    <string name="sleep_record">睡眠记录</string>
-    <string name="sleep_monitor">睡眠监测</string>
+    <string name="log_start_text">开始记录</string>
+    <!-- 记录共用字符串-->
+    <string name="yes">存疑</string>
+    <string name="no">正常</string>
+    <string name="calculating">计算中</string>
+    <string name="unexcept">出错了</string>
+    <string name="duration_s_unit">秒</string>
+    <string name="duration_s">%d秒</string>
+    <string name="duration_ms">%d分%d秒</string>
+    <string name="duration_hm">%d小时%d分</string>
+    <!-- 列表页一次记录内容显示-->
+    <string name="log_duration">记录时长 %s</string>
+    <string name="snore_total_duration">鼾声总时长 %s</string>
+    <string name="snore_times">共 %d 次鼾声</string>
+    <string name="snore_time_0">未检测到鼾声</string>
+    <!--    详情页一次记录内容显示-->
+    <string name="detail_duration">记录时长</string>
+    <string name="detail_snore_duration">鼾声总时长</string>
+    <string name="detail_snore_times">鼾声次数</string>
+    <string name="detail_subtitle_maybe">结果似乎不太安全，建议前往医院进一步诊断</string>
+    <string name="detail_subtitle_healthy">目前未检测到疑似症状</string>
+    <string name="detail_subtitle_calcing">还在计算中，请稍后查看</string>
+    <string name="detail_subtitle_exception">Oops！软件出现了未知问题！</string>
+    <string name="detail_only_4_ref">该检测结果仅供参考，不作为最终诊断依据</string>
+    <!--    一次鼾声详情显示-->
+    <string name="snore_start_at">开始</string>
+    <string name="snore_duration">持续</string>
+    <!--    录音界面文本-->
+    <string name="monitor_detail_not">详情暂不可用</string>
+    <string name="monitor_detail_ok">显示详情</string>
+    <string name="monitor_note_ready">随时可以开始</string>
+    <string name="monitor_note_recording">正在监测中</string>
+    <string name="monitor_note_stopping">正在停止，如长期未响应可能为程序故障</string>
+    <string name="monitor_note_stop">已终止监测，可点击下方查看结果</string>
+    <string name="monitor_tap_to_start">开始监测</string>
+    <string name="monitor_tap_to_stop">停止监测</string>
+    <string name="monitor_tap_try_stop">正在停止</string>
+    <string name="monitor_tap_to_restart">再次开始</string>
+    <!--    导航栏字符串 -->
+    <string name="navigator_history">历史记录</string>
+    <string name="navigator_to_monitor">准备监测</string>
+    <string name="navigator_monitoring">监测中</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

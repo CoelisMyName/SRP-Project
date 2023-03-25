@@ -3,68 +3,48 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/foreground">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_report"
-        android:layout_width="0dp"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/mainView"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="20dp"
-        app:cardCornerRadius="30dp"
-        app:layout_constraintDimensionRatio="H,2:1"
+        app:layout_constraintBottom_toTopOf="@id/navigatorTab"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" >
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/history_result"
-            tools:ignore="ContentDescription" />
+    </androidx.viewpager2.widget.ViewPager2>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginStart="10dp"
-            android:layout_marginBottom="10dp"
-            android:text="@string/sleep_record"
-            android:textColor="@color/black"
-            android:textSize="30sp"
-            android:textStyle="bold" />
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_monitor"
-        android:layout_width="0dp"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/navigatorTab"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="20dp"
-        app:cardCornerRadius="30dp"
-        app:layout_constraintDimensionRatio="H,2:1"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:minHeight="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/card_report">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@color/background"
+        app:tabTextAppearance="@style/Navigator"
+        app:tabSelectedTextColor="@color/text_main_strong"
+        app:tabTextColor="@color/text_aux"
+        app:tabIndicatorGravity="stretch"
+        app:tabIndicatorColor="@color/foreground"
+        app:tabIndicator="@drawable/page_selector"
+        app:tabRippleColor="@color/none">
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/noise_measure"
-            tools:ignore="ContentDescription" />
 
-        <TextView
+        <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginStart="10dp"
-            android:layout_marginBottom="10dp"
-            android:text="@string/sleep_monitor"
-            android:textColor="@color/black"
-            android:textSize="30sp"
-            android:textStyle="bold" />
+            android:text="@string/navigator_to_monitor" />
 
-    </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/navigator_history" />
+
+    </com.google.android.material.tabs.TabLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

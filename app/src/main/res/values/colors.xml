@@ -3,8 +3,37 @@
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
+
+    <color name="blue_light">#FF317AF7</color>
+    <color name="blue_medium">#FF0A59F7</color>
+    <color name="blue_dark">#FF0339A4</color>
+
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+<!--    customise color info-->
+<!--    text shows healthy data-->
+    <color name="state_healthy">#FF00BA4A</color>
+    <color name="state_healthy_bg">#FFE2FFEA</color>
+<!--    text shows warning-->
+    <color name="state_warning">#FFEFAB00</color>
+    <color name="state_warning_bg">#FFFFF7E4</color>
+<!--    text shows danger-->
+    <color name="state_danger">#FFBB260B</color>
+    <color name="state_danger_bg">#FFFFE4DF</color>
+<!--    grayscale colors, for text color and widget background-->
+    <color name="text_main">#FF1A1A23</color>
+    <color name="text_aux">#FF5D5D63</color>
+    <color name="text_main_convert">#FFF7F7FF</color>
+    <color name="text_main_strong">@color/blue_medium</color>
+    <color name="text_aux_convert">#FFDDDDE3</color>
+    <color name="behind_background">#FFC7C7D0</color>
+    <color name="background">#FFE0E0E7</color>
+    <color name="foreground">#FFF7F7FF</color>
+<!--    action color-->
+    <color name="on_activate">#77317AF7</color>
+    <color name="none">#00FFFFFF</color>
+
 </resources>
