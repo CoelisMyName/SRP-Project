@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SRP Project</string>
+    <string name="app_name">鼾声识别</string>
     <string name="snoring_recognition">鼾声识别</string>
     <string name="click_to_see_info">点击查看详情</string>
     <string name="log_start_text">开始记录</string>
@@ -44,6 +44,6 @@
     <string name="navigator_history">历史记录</string>
     <string name="navigator_to_monitor">准备监测</string>
     <string name="navigator_monitoring">监测中</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!--    标题栏字符串 -->
+    <string name="title_detail">记录详情</string>
 </resources>

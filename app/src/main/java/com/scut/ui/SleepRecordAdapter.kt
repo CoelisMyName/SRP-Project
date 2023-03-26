@@ -56,14 +56,14 @@ class SleepRecordAdapter(cb: SleepRecordCallback) :
                 else -> context.getString(R.string.unexcept)
             }
             // 着色，无鼾声无标签为正常，有标签为危险，其他为警告
-            var txtColor = R.color.state_warning
+            var txtColor = R.color.state_warning_text
             var bgColor = R.color.state_warning_bg
             if (sleepRecord.label == 1.0) {
-                txtColor = R.color.state_danger
+                txtColor = R.color.state_danger_text
                 bgColor = R.color.state_danger_bg
             }
             else if ((sleepRecord.label == 0.0) and (sleepRecord.snoreTimes == 0L)) {
-                txtColor = R.color.state_healthy
+                txtColor = R.color.state_healthy_text
                 bgColor = R.color.state_healthy_bg
             }
             val txtClr = context.getColor (txtColor)

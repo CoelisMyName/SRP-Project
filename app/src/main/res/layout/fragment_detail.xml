@@ -10,23 +10,34 @@
         android:id="@+id/resultHolder"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:minHeight="220sp"
+        android:minHeight="280sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/state_warning">
+        android:background="@color/state_warning_dark_bg">
+
+        <TextView
+            android:id="@+id/CustomizeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/CustomizeTitle"
+            android:text="@string/title_detail"
+            android:textColor="@color/text_main_convert"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/sleepDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="40sp"
             android:layout_marginTop="16sp"
             android:textColor="@color/text_main"
             android:textSize="18sp"
             android:textStyle="normal"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/CustomizeTitle"
             tools:text="2023/10/08 10:08:00" />
 
         <TextView

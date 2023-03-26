@@ -1,10 +1,8 @@
 package com.scut
 
 import android.content.Intent
-import android.graphics.Color
+import android.content.res.Configuration
 import android.os.Bundle
-import android.view.View
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -49,7 +47,15 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null).commit()
     }
 
-    public final fun updateRecording (state: Boolean) {
+    fun updateRecording (state: Boolean) {
         this.mMainFragment.updateRecording(state)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        for (f in this.mFragmentManger.fragments) {
+            this.mFragmentManger.beginTransaction().detach(f).commit()
+            this.mFragmentManger.beginTransaction().attach(f).commit()
+        }
     }
 }

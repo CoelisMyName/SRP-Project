@@ -6,12 +6,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.scut.R
 import com.scut.databinding.FragmentDetailBinding
@@ -76,16 +74,20 @@ class DetailFragment : Fragment() {
         val onlyS   = byS % 60L
         val byM     = byS / 60L
         val onlyM   = byM % 60L
-        if (byS < 60L) {
-            return getString(R.string.duration_s, byS)
+        var ret = getString(R.string.duration_s, 0)
+        if (duration != 0L) {
+            if (duration < 1000L) {
+                ret = "0." + getString(R.string.duration_s, duration / 100L)
+            } else if (byS < 60L) {
+                ret = getString(R.string.duration_s, byS)
+            } else if (byM < 60L) {
+                ret = getString(R.string.duration_ms, byM, onlyS)
+            } else {
+                val byH = byM / 60L
+                ret = getString(R.string.duration_hm, byH, onlyM)
+            }
         }
-        else if (byM < 60L) {
-            return getString(R.string.duration_ms, byM, onlyS)
-        }
-        else {
-            val byH = byM / 60L
-            return getString(R.string.duration_hm, byH, onlyM)
-        }
+        return ret
     }
 
     private fun showSleepRecord(sl: SleepRecord) {
@@ -108,15 +110,15 @@ class DetailFragment : Fragment() {
             else -> getString(R.string.detail_subtitle_exception)
         }
         // 更新颜色，无鼾声无标签为正常，有标签为危险，其他为警告
-        var txtColor = R.color.state_warning_bg
-        var bgColor = R.color.state_warning
+        var txtColor = R.color.state_warning_dark_text
+        var bgColor = R.color.state_warning_dark_bg
         if (sl.label == 1.0) {
-            txtColor = R.color.state_danger_bg
-            bgColor = R.color.state_danger
+            txtColor = R.color.state_danger_dark_text
+            bgColor = R.color.state_danger_dark_bg
         }
         else if ((sl.label == 0.0) and (sl.snoreTimes == 0L)) {
-            txtColor = R.color.state_healthy_bg
-            bgColor = R.color.state_healthy
+            txtColor = R.color.state_healthy_dark_text
+            bgColor = R.color.state_healthy_dark_bg
         }
         val context = mBinding.root.context
         val txtClr = context.getColor (txtColor)

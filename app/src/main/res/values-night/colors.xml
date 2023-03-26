@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="blue_light">#FF5B7DB7</color>
+    <color name="blue_medium">#FF3D7BE4</color>
+    <color name="blue_dark">#FF1B4CAE</color>
+
+    <color name="black">#FF000000</color>
+<!--    customise color info-->
+<!--    text shows healthy data-->
+    <color name="state_healthy_text">#FF93BA9E</color>
+    <color name="state_healthy_bg">#FF00712D</color>
+    <color name="state_healthy_dark_text">@color/state_healthy_text</color>
+    <color name="state_healthy_dark_bg">@color/state_healthy_bg</color>
+    <!--    text shows warning-->
+    <color name="state_warning_text">#FFCBC1AC</color>
+    <color name="state_warning_bg">#FFA27607</color>
+    <color name="state_warning_dark_text">@color/state_warning_text</color>
+    <color name="state_warning_dark_bg">@color/state_warning_bg</color>
+    <!--    text shows danger-->
+    <color name="state_danger_text">#FFB49993</color>
+    <color name="state_danger_bg">#FF99230D</color>
+    <color name="state_danger_dark_text">@color/state_danger_text</color>
+    <color name="state_danger_dark_bg">@color/state_danger_bg</color>
+<!--    grayscale colors, for text color and widget background-->
+    <color name="text_main">#FFD9D9D9</color>
+    <color name="text_aux">#FFAAAAAA</color>
+    <color name="text_main_convert">@color/text_main</color>
+    <color name="text_main_strong">@color/blue_medium</color>
+    <color name="text_aux_convert">@color/text_aux</color>
+    <color name="background">#FF000000</color>
+    <color name="foreground">#FF303030</color>
+<!--    action color-->
+    <color name="on_activate">#775B7DB7</color>
+    <color name="none">#00000000</color>
+
+</resources>
