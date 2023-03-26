@@ -64,6 +64,12 @@ public:
     void lifecycleChanged(LifecycleState state);
 
     /**
+     * 通知深色模式的切换状态
+     * @param intoNightMode 为 true 时表示当前正在向深色模式变化，否则为反向
+     */
+    void onDarkModeChange(bool intoDarkMode);
+
+    /**
      * 等待线程退出
      */
     void waitForExit();

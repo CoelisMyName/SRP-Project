@@ -11,6 +11,17 @@ TAG(WaveRender)
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define MIN3(x, y, z) ((MIN((x), (y)) < (z)) ? MIN((x), (y)) : (z))
 
+const static float _Color_Light_Background[4] = WAVERENDER_COLOR_LIGHT_BACKGROUND;
+const static float _Color_Dark_Background[4] = WAVERENDER_COLOR_DARK_BACKGROUND;
+
+const static float * const _Color_Backgrounds[2] =
+        {_Color_Light_Background, _Color_Dark_Background};
+#undef WAVERENDER_COLOR2F
+#undef WAVERENDER_COLOR
+
+#define WAVERENDER_PTR2PARAM(ptr)   ptr[0], ptr[1], ptr[2], ptr[3]
+#define WAVERENDER_CUR_BG(thiz)     WAVERENDER_PTR2PARAM(_Color_Backgrounds[thiz->_m_isAtDarkMode])
+
 /**
  * @brief 将 int16_t 型输入按对数规则映射。最大最小值仍为 [INT16_MIN, INT16_MAX]
  *
@@ -45,7 +56,7 @@ int16_t log10_map(int16_t origin) {
  * @return int16_t
  */
 int16_t strength_map(int16_t origin) {
-    return int16_t((int32_t(origin) * 5 + int32_t(log10_map(origin))) / 6);
+    return int16_t((int32_t(origin) * 9 + int32_t(log10_map(origin))) / 10);
 }
 
 WaveRender::WaveRender() {
@@ -164,24 +175,26 @@ void WaveRender::onSurfaceCreate(int32_t width, int32_t height) {
     mHeight = height;
     if (!mInit) {
         bool ret;
-        ret = loadProgramFromAssets("shader/wave.vert", "shader/wave.frag", mPgr);
+        // 两组着色器，分别用于深色与浅色模式
+        ret = loadProgramFromAssets("shader/wave.vert", "shader/wave_light.frag", mPgrLight);
         if (ret) {
-            mInit = true;
+            ret = loadProgramFromAssets("shader/wave.vert", "shader/wave_dark.frag", mPgrDark);
+            if (ret) {
+                mInit = true;
+            } else {
+                return;
+            }
+        } else {
+            return;
         }
-        glClearColor(WAVERENDER_BACKGROUND_COLOR);
+        glClearColor(WAVERENDER_CUR_BG(this));
         glClear(GL_COLOR_BUFFER_BIT);
-        // const static GLfloat vertices[] = {
-        //     -0.5f, -0.5f, 0.0f,
-        //     0.5f, -0.5f, 0.0f,
-        //     0.0f, 0.5f, 0.0f};
         mVbo = 0, mVao = 0;
         glGenVertexArrays(1, &mVao);
         glBindVertexArray(mVao);
 
         glGenBuffers(1, &mVbo);
         glBindBuffer(GL_ARRAY_BUFFER, mVbo);
-        // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
         glEnableVertexAttribArray(0);
     }
 }
@@ -190,8 +203,12 @@ void WaveRender::onSurfaceDraw() {
     // 复制数据
     this->_copy_from_receiver();
     // 清屏
-    glUseProgram(mPgr);
-    glClearColor(WAVERENDER_BACKGROUND_COLOR);
+    if (this->_m_isAtDarkMode) {
+        glUseProgram(mPgrDark);
+    } else {
+        glUseProgram(mPgrLight);
+    }
+    glClearColor(WAVERENDER_CUR_BG(this));
     glClear(GL_COLOR_BUFFER_BIT);
     // 如果没有可用绘制数据，直接返回
     if (0 == this->_m_renderDatas.size) {
@@ -217,9 +234,15 @@ void WaveRender::onSurfaceSizeChange(int32_t width, int32_t height) {
 }
 
 void WaveRender::onSurfaceDestroy() {
+    if (mPgrLight) {
+        glDeleteProgram(mPgrLight);
+        mPgrLight = 0;
+    }
+    if (mPgrDark) {
+        glDeleteProgram(mPgrDark);
+        mPgrDark = 0;
+    }
     if (mInit) {
-        glDeleteProgram(mPgr);
-        mPgr = 0;
         mInit = false;
         glDeleteBuffers(1, &mVbo);
         glDeleteVertexArrays(1, &mVao);
@@ -229,6 +252,10 @@ void WaveRender::onSurfaceDestroy() {
 }
 
 void WaveRender::onRenderDetach() {
+}
+
+void WaveRender::onDarkModeChange(bool intoDarkMode) {
+    this->_m_isAtDarkMode = intoDarkMode;
 }
 
 void WaveRender::_recv_dataReinit() {

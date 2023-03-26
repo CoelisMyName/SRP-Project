@@ -68,6 +68,10 @@ class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
             mRender.recycle()
             Log.d(TAG, "finalize: ")
         }
+
+        fun onDarkModeChange(intoDarkMode: Boolean) {
+            LibGLThread.onDarkModeChange(mThread, intoDarkMode)
+        }
     }
 
     private var mFlagInit: Boolean = false
@@ -105,40 +109,57 @@ class NativeTextureView : TextureView, TextureView.SurfaceTextureListener {
     }
 
     override fun onSurfaceTextureDestroyed(st: SurfaceTexture): Boolean {
+        Log.d(TAG, "ONDESTROY RECEIEVE")
         if (!mFlagInit) return true
-        Log.d(TAG, "onSurfaceTextureDestroyed: ")
+        Log.d(TAG, "ONDESTROY                  ACCEPT")
         return mThread.surfaceDestroyed()
     }
 
     override fun onSurfaceTextureUpdated(st: SurfaceTexture) {
+//        Log.d(TAG, "ONUPDATE RECEIEVE")
         if (!mFlagInit) return
-//        Log.d(TAG, "onSurfaceTextureUpdated: ")
+//        Log.d(TAG, "ONUPDATE                  ACCEPT")
         mThread.surfaceUpdated(st)
+//        Log.d(TAG, "ONUPDATE          SUCCESS")
     }
 
     override fun onAttachedToWindow() {
-        Log.d(TAG, "onAttachedToWindow: ")
+        Log.d(TAG, "ONATTACH RECEIEVE")
         super.onAttachedToWindow()
+        Log.d(TAG, "ONATTACH          SUCCESS")
     }
 
     override fun onDetachedFromWindow() {
-        Log.d(TAG, "onDetachedFromWindow: ")
+        Log.d(TAG, "ONDETACH RECEIEVE")
         super.onDetachedFromWindow()
+        Log.d(TAG, "ONDETACH          SUCCESS")
     }
 
     fun onStart() {
+        Log.d(TAG, "ONSTART RECEIEVE")
         mThread.onStart()
+        Log.d(TAG, "ONSTART          SUCCESS")
     }
 
     fun onStop() {
+        Log.d(TAG, "ONSTOP RECEIEVE")
         mThread.onStop()
+        Log.d(TAG, "ONSTOP          SUCCESS")
     }
 
     fun onResume() {
+        Log.d(TAG, "ONRESUME RECEIEVE")
         mThread.onResume()
+        Log.d(TAG, "ONRESUME          SUCCESS")
     }
 
     fun onPause() {
+        Log.d(TAG, "ONPAUSE RECEIEVE")
         mThread.onPause()
+        Log.d(TAG, "ONPAUSE          SUCCESS")
+    }
+
+    fun onDarkModeChange(intoDarkMode: Boolean) {
+        mThread.onDarkModeChange(intoDarkMode)
     }
 }

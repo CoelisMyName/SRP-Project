@@ -48,6 +48,10 @@ public:
 
     }
 
+    virtual void onDarkModeChange(bool intoDarkMode) override {
+
+    }
+
     virtual void onSurfaceCreate(int32_t width, int32_t height) override {
         mWidth = width;
         mHeight = height;

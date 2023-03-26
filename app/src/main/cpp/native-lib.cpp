@@ -132,6 +132,14 @@ Java_com_scut_component_LibGLThread_onPause(__unused JNIEnv *env, __unused jobje
     p_thread->lifecycleChanged(LifecycleState::PAUSE);
 }
 
+// 该函数用于传递深色模式变化，更新绘图颜色
+JNIEXPORT void JNICALL
+Java_com_scut_component_LibGLThread_onDarkModeChange(__unused JNIEnv *env, __unused jobject thiz,
+                                            jlong thread, jboolean intoDarkMode) {
+    auto p_thread = (GLThread *) thread;
+    p_thread->onDarkModeChange(intoDarkMode);
+}
+
 // LibSRP.kt
 JNIEXPORT jboolean JNICALL
 Java_com_scut_utils_LibSRP_create(JNIEnv *env, __unused jobject thiz, jobject controller) {

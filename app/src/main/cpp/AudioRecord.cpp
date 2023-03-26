@@ -103,7 +103,7 @@ AudioRecord::onAudioReady(AudioStream *audioStream, void *audioData, int32_t num
         int64_t timestamp =
                 currentTimeMillis() - (int64_t) ((1000.0 / getSampleRate()) * numFrames);
         mDispatcher->dispatchAudioData(timestamp, data, numFrames);
-        log_d("%s(): timestamp = %lld", __FUNCTION__, (long long)timestamp);
+        // log_d("%s(): timestamp = %lld", __FUNCTION__, (long long)timestamp);
 //        log_i("%s(): %s", __FUNCTION__, "dispatch data");
     }
     return DataCallbackResult::Continue;

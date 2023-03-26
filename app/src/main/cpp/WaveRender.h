@@ -26,14 +26,29 @@
 #define WAVERENDER_BUFFER_SIZE 8192
 // 实际可被显示的波形数组最大大小，也是显示缓冲区的大小
 #define WAVERENDER_MAX_WIDTH 7500
-// _render_convert() 会对视图内的波形进行缩放，视图的Y轴范围是动态的 [-y,y] 区间. 
+
+#if WAVERENDER_BUFFER_SIZE <= WAVERENDER_MAX_WIDTH
+#error MACRO [WAVERENDER_BUFFER_SIZE] should greater than MACRO [WAVERENDER_MAX_WIDTH]
+#endif // 检查上面两个参数的配置是否正确
+
+// _render_convert() 会对视图内的波形进行缩放，视图的Y轴范围是动态的 [-y,y] 区间.
+// y 的最大取值为 INT16_MAX
 // 该宏控制y的最小取值
-#define WAVERENDER_SCALE_PROTECTED_HEIGHT 4095
+#define WAVERENDER_SCALE_PROTECTED_HEIGHT 8191
 // 该宏控制 y 在相邻两帧内的最大变化量
 #define WAVERENDER_SCALE_MAX_STEP 600
-// 该宏控制区域背景颜色
-#define WAVERENDER_BACKGROUND_COLOR 0.9f, 0.9f, 0.9f, 1.0f
 
+#define WAVERENDER_COLOR2F(XX) (((float)(0x##XX))/255.0f)
+
+#define WAVERENDER_COLOR(A,R,G,B)             {\
+        WAVERENDER_COLOR2F(R),                 \
+        WAVERENDER_COLOR2F(G),                 \
+        WAVERENDER_COLOR2F(B),                 \
+        WAVERENDER_COLOR2F(A)}
+
+// 这四个宏控制 亮色/暗色模式 下绘制区域的背景颜色，顶点颜色在着色器改
+#define WAVERENDER_COLOR_LIGHT_BACKGROUND           WAVERENDER_COLOR(FF,E0,E0,E7)
+#define WAVERENDER_COLOR_DARK_BACKGROUND            WAVERENDER_COLOR(FF,20,20,20)
 
 class WaveRender : public AudioGLRender {
 public:
@@ -63,10 +78,12 @@ public:
 
     virtual void onRenderDetach() override;
 
+    virtual void onDarkModeChange(bool intoDarkMode) override;
+
 private:
     int32_t mWidth = 0, mHeight = 0;
     bool mInit = false;
-    GLuint mPgr = 0;
+    GLuint mPgrLight = 0,mPgrDark=0;
     GLuint mVbo = 0, mVao = 0;
 
 #ifndef WAVERENDER_SYNC_RISK
@@ -160,6 +177,8 @@ private:
 
     // 从波形高度生成坐标
     void _render_genPoints();
+
+    bool _m_isAtDarkMode = false;
 };
 
 #endif

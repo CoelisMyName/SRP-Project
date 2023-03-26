@@ -2,6 +2,7 @@ package com.scut.ui
 
 import android.Manifest
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -99,6 +100,10 @@ class MonitorFragment : Fragment() {
                 }
             }
         }
+        this.mBinding.wave.onDarkModeChange(when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+            Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        })
     }
 
     override fun onStart() {

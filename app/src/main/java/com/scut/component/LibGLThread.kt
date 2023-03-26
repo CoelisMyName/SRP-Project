@@ -17,4 +17,5 @@ object LibGLThread {
     external fun onStop(thread: Long)
     external fun onResume(thread: Long)
     external fun onPause(thread: Long)
+    external fun onDarkModeChange(thread: Long, intoDarkMode: Boolean)
 }

@@ -45,6 +45,8 @@ public:
      * 从 GLThread 移除后调用，只调用一次，一般发生在 GLThread 要被回收的时候，做数据销毁，比如销毁 OpenGL
      */
     virtual void onRenderDetach() = 0;
+
+    virtual void onDarkModeChange(bool intoDarkMode) = 0;
 };
 
 #endif

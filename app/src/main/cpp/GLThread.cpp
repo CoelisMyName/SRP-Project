@@ -277,6 +277,10 @@ void GLThread::lifecycleChanged(LifecycleState state) {
     lock.unlock();
 }
 
+void GLThread::onDarkModeChange(bool intoDarkMode) {
+    mRender->onDarkModeChange(intoDarkMode);
+}
+
 static bool initialEGL(EGLObject &eglObject) {
     eglObject = {EGL_NO_DISPLAY, 0, 0, nullptr, EGL_NO_CONTEXT, EGL_NO_SURFACE, EGL_SUCCESS,
                  nullptr,
