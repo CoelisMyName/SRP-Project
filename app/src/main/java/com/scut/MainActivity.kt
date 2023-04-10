@@ -47,6 +47,10 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null).commit()
     }
 
+    fun popFragment() {
+        mFragmentManger.popBackStack()
+    }
+
     fun updateRecording (state: Boolean) {
         this.mMainFragment.updateRecording(state)
     }

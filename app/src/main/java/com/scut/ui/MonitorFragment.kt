@@ -45,6 +45,7 @@ class MonitorFragment : Fragment() {
         mBinding.wave.setRender(mViewModel.newRender(RenderFactory.WAVE_RENDER))
         mBinding.start.setOnClickListener { onClick(it) }
         mBinding.showDetail.setOnClickListener { onClick(it) }
+        mBinding.toAbout.setOnClickListener { onClick(it) }
         initView()
         return mBinding.root
     }
@@ -179,6 +180,9 @@ class MonitorFragment : Fragment() {
                 fragment.arguments = bundle
                 activity.toFragment(fragment)
             }
+        }
+        if (view == mBinding.toAbout) {
+            (requireActivity() as MainActivity).toFragment(AboutFragment())
         }
     }
 }

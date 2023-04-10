@@ -1,0 +1,873 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="auto"
+    android:background="@color/background">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/header"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        style="@style/IndependentCustomizeTitle_CardView">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            style="@style/IndependentCustomizeTitle_Layout">
+            <ImageButton
+                android:id="@+id/go_back"
+                style="@style/CustomizeBack"
+                android:contentDescription="@string/back"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                style="@style/IndependentCustomizeTitle_Text"
+                android:text="@string/psqi_test_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingVertical="10dp"
+            android:layout_marginHorizontal="10dp">
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/ContentCardViewStyle">
+                <LinearLayout
+                    style="@style/ContentCardViewLayoutStyle">
+                    <TextView
+                        style="@style/ContentCardViewTitleStyle"
+                        android:text="@string/psqi_test_partA_1_title" />
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partA_2_question1"/>
+
+
+                    <RadioGroup
+                        android:id="@+id/sel1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel1sub1" >
+                        <RadioButton
+                            android:id="@+id/sel1sub1"
+                            style="@style/PsqiSelectorStyle"
+                            android:text="@string/psqi_test_partA_3_choice1" />
+                        <RadioButton
+                            android:id="@+id/sel1sub2"
+                            style="@style/PsqiSelectorStyle"
+                            android:text="@string/psqi_test_partA_3_choice2" />
+                        <RadioButton
+                            android:id="@+id/sel1sub3"
+                            style="@style/PsqiSelectorStyle"
+                            android:text="@string/psqi_test_partA_3_choice3" />
+                        <RadioButton
+                            android:id="@+id/sel1sub4"
+                            style="@style/PsqiSelectorStyle"
+                            android:text="@string/psqi_test_partA_3_choice4" />
+                    </RadioGroup>
+
+                    <LinearLayout
+                        android:id="@+id/partADetail"
+                        style="@style/PsqiPartDescribeLayout_Packer">
+                        <View style="@style/HorizontalSepLineStyle_Margin10" />
+                        <LinearLayout style="@style/PsqiPartDescribeLayout">
+                            <LinearLayout style="@style/PsqiPartDescribeLayout_Left">
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_Common_DetailOneQuestion" />
+                            </LinearLayout>
+                            <View style="@style/VerticalSepLineStyle_Margin10" />
+                            <LinearLayout style="@style/MinVerticalLinearLayoutCenter">
+                                <TextView
+                                    android:id="@+id/PartAPoint"
+                                    style="@style/PsqiScoreText"
+                                    tools:text="0" />
+                                <TextView style="@style/PsqiScoreNoteTextPart" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/ContentCardViewStyle">
+                <LinearLayout
+                    style="@style/ContentCardViewLayoutStyle">
+                        <TextView
+                            style="@style/ContentCardViewTitleStyle"
+                            android:text="@string/psqi_test_partB_1_title" />
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partB_2_question2"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+                        <NumberPicker
+                            android:id="@+id/question2HourPicker"
+                            android:layout_width="60sp"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            style="@style/PsqiQuestionTextStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_marginHorizontal="8dp"
+                            android:text="@string/psqi_test_partB_2_question2_hour"/>
+                        <NumberPicker
+                            android:id="@+id/question2MinutePicker"
+                            android:layout_width="60sp"
+                            android:layout_height="wrap_content" />
+                        <TextView
+                            style="@style/PsqiQuestionTextStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_marginHorizontal="8dp"
+                            android:text="@string/psqi_test_partB_2_question2_minute"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/partBQuestion2Detail"
+                        style="@style/ContentCardViewLayoutStyle"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            style="@style/ContentCardViewMainStyle"
+                            android:text="@string/psqi_test_Common_Standard" />
+                        <TextView
+                            style="@style/ContentCardViewMainStyleNewParam"
+                            android:text="@string/psqi_test_partB_4_detail4q2_1" />
+                        <TextView
+                            style="@style/ContentCardViewMainStyle"
+                            android:text="@string/psqi_test_partB_4_detail4q2_2" />
+                        <TextView
+                            style="@style/ContentCardViewMainStyle"
+                            android:text="@string/psqi_test_partB_4_detail4q2_3" />
+                        <TextView
+                            style="@style/ContentCardViewMainStyle"
+                            android:text="@string/psqi_test_partB_4_detail4q2_4" />
+                    </LinearLayout>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partB_3_question3"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel3sub1" >
+                        <RadioButton
+                            android:id="@+id/sel3sub1"
+                            style="@style/PsqiSelectorStyleCommon1" />
+                        <RadioButton
+                            android:id="@+id/sel3sub2"
+                            style="@style/PsqiSelectorStyleCommon2" />
+                        <RadioButton
+                            android:id="@+id/sel3sub3"
+                            style="@style/PsqiSelectorStyleCommon3" />
+                        <RadioButton
+                            android:id="@+id/sel3sub4"
+                            style="@style/PsqiSelectorStyleCommon4" />
+                    </RadioGroup>
+
+                    <TextView
+                        android:id="@+id/partBQuestion3Detail"
+                        style="@style/ContentCardViewMainStyleNewParam"
+                        android:text="@string/psqi_test_partB_4_detail4q3" />
+
+                    <LinearLayout
+                        android:id="@+id/partBDetail"
+                        style="@style/PsqiPartDescribeLayout_Packer">
+                        <View style="@style/HorizontalSepLineStyle_Margin10" />
+                        <LinearLayout style="@style/PsqiPartDescribeLayout">
+                            <LinearLayout style="@style/PsqiPartDescribeLayout_Left">
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_Common_DetailIndependent" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyleNewParam"
+                                    android:text="@string/psqi_test_partB_5_mapper1" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partB_5_mapper2" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partB_5_mapper3" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partB_5_mapper4" />
+                            </LinearLayout>
+                            <View style="@style/VerticalSepLineStyle_Margin10" />
+                            <LinearLayout style="@style/MinVerticalLinearLayoutCenter">
+                                <TextView
+                                    android:id="@+id/PartBSum"
+                                    style="@style/PsqiScoreText"
+                                    tools:text="0" />
+                                <TextView
+                                    style="@style/PsqiScoreNoteTextPart"
+                                    android:text="@string/psqi_test_partSum" />
+                                <TextView
+                                    android:id="@+id/PartBPoint"
+                                    style="@style/PsqiScoreTextWithPadding"
+                                    tools:text="0" />
+                                <TextView style="@style/PsqiScoreNoteTextPart" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/ContentCardViewStyle">
+                <LinearLayout
+                    style="@style/ContentCardViewLayoutStyle">
+                   <TextView
+                       style="@style/ContentCardViewTitleStyle"
+                       android:text="@string/psqi_test_partC_1_title" />
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partC_2_question4"/>
+
+                    <TimePicker
+                        android:id="@+id/question4_asleepPicker"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:timePickerMode="spinner" />
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partC_3_question5"/>
+
+                    <TimePicker
+                        android:id="@+id/question5_getUpPicker"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:timePickerMode="spinner" />
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partC_4_question6"/>
+
+                    <TimePicker
+                        android:id="@+id/question6_durationPicker"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:timePickerMode="spinner" />
+
+                    <LinearLayout
+                        android:id="@+id/partCDetail"
+                        style="@style/PsqiPartDescribeLayout_Packer">
+
+                        <LinearLayout
+                            style="@style/ContentCardViewLayoutStyle"
+                            android:layout_height="wrap_content">
+                            <TextView
+                                style="@style/ContentCardViewMainStyle"
+                                android:text="@string/psqi_test_Common_Standard" />
+                            <TextView
+                                style="@style/ContentCardViewMainStyleNewParam"
+                                android:text="@string/psqi_test_partC_5_detail4q6_1" />
+                            <TextView
+                                style="@style/ContentCardViewMainStyle"
+                                android:text="@string/psqi_test_partC_5_detail4q6_2" />
+                            <TextView
+                                style="@style/ContentCardViewMainStyle"
+                                android:text="@string/psqi_test_partC_5_detail4q6_3" />
+                            <TextView
+                                style="@style/ContentCardViewMainStyle"
+                                android:text="@string/psqi_test_partC_5_detail4q6_4" />
+                        </LinearLayout>
+                        <View style="@style/HorizontalSepLineStyle_Margin10" />
+                        <LinearLayout style="@style/PsqiPartDescribeLayout">
+                            <LinearLayout style="@style/PsqiPartDescribeLayout_Left">
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partC_6_efficiency1" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyleNewParam"
+                                    android:text="@string/psqi_test_partC_6_efficiency2" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partC_6_efficiency3" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyleNewParam"
+                                    android:text="@string/psqi_test_partC_6_efficiency4" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partC_6_efficiency5" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partC_6_efficiency6" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partC_6_efficiency7" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyleNewParam"
+                                    android:text="@string/psqi_test_partC_7_detail" />
+                            </LinearLayout>
+                            <View style="@style/VerticalSepLineStyle_Margin10" />
+                            <LinearLayout style="@style/MinVerticalLinearLayoutCenter">
+                                <TextView
+                                    android:id="@+id/PartCTimeScore"
+                                    style="@style/PsqiScoreText"
+                                    tools:text="0" />
+                                <TextView
+                                    style="@style/PsqiScoreNoteTextPart"
+                                    android:text="@string/psqi_test_partC_8_timeScore" />
+                                <TextView
+                                    android:id="@+id/PartCEfficiencyScore"
+                                    style="@style/PsqiScoreTextWithPadding"
+                                    tools:text="0" />
+                                <TextView
+                                    style="@style/PsqiScoreNoteTextPart"
+                                    android:text="@string/psqi_test_partC_8_timeEfficiency" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/ContentCardViewStyle">
+                <LinearLayout
+                    style="@style/ContentCardViewLayoutStyle">
+                    <TextView
+                        style="@style/ContentCardViewTitleStyle"
+                        android:text="@string/psqi_test_partD_1_title" />
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partD_2_question7"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel7"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel7sub1" >
+                        <RadioButton
+                            android:id="@+id/sel7sub1"
+                            style="@style/PsqiSelectorStyleCommon1" />
+                        <RadioButton
+                            android:id="@+id/sel7sub2"
+                            style="@style/PsqiSelectorStyleCommon2" />
+                        <RadioButton
+                            android:id="@+id/sel7sub3"
+                            style="@style/PsqiSelectorStyleCommon3" />
+                        <RadioButton
+                            android:id="@+id/sel7sub4"
+                            style="@style/PsqiSelectorStyleCommon4" />
+                    </RadioGroup>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partD_3_question8"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel8"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel8sub1" >
+                        <RadioButton
+                            android:id="@+id/sel8sub1"
+                            style="@style/PsqiSelectorStyleCommon1" />
+                        <RadioButton
+                            android:id="@+id/sel8sub2"
+                            style="@style/PsqiSelectorStyleCommon2" />
+                        <RadioButton
+                            android:id="@+id/sel8sub3"
+                            style="@style/PsqiSelectorStyleCommon3" />
+                        <RadioButton
+                            android:id="@+id/sel8sub4"
+                            style="@style/PsqiSelectorStyleCommon4" />
+                    </RadioGroup>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partD_4_question9"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel9"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel9sub1" >
+                        <RadioButton
+                            android:id="@+id/sel9sub1"
+                            style="@style/PsqiSelectorStyleCommon1" />
+                        <RadioButton
+                            android:id="@+id/sel9sub2"
+                            style="@style/PsqiSelectorStyleCommon2" />
+                        <RadioButton
+                            android:id="@+id/sel9sub3"
+                            style="@style/PsqiSelectorStyleCommon3" />
+                        <RadioButton
+                            android:id="@+id/sel9sub4"
+                            style="@style/PsqiSelectorStyleCommon4" />
+                    </RadioGroup>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partD_5_question10"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel10"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel10sub1" >
+                        <RadioButton
+                            android:id="@+id/sel10sub1"
+                            style="@style/PsqiSelectorStyleCommon1" />
+                        <RadioButton
+                            android:id="@+id/sel10sub2"
+                            style="@style/PsqiSelectorStyleCommon2" />
+                        <RadioButton
+                            android:id="@+id/sel10sub3"
+                            style="@style/PsqiSelectorStyleCommon3" />
+                        <RadioButton
+                            android:id="@+id/sel10sub4"
+                            style="@style/PsqiSelectorStyleCommon4" />
+                    </RadioGroup>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partD_6_question11"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel11"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel11sub1" >
+                        <RadioButton
+                            android:id="@+id/sel11sub1"
+                            style="@style/PsqiSelectorStyleCommon1" />
+                        <RadioButton
+                            android:id="@+id/sel11sub2"
+                            style="@style/PsqiSelectorStyleCommon2" />
+                        <RadioButton
+                            android:id="@+id/sel11sub3"
+                            style="@style/PsqiSelectorStyleCommon3" />
+                        <RadioButton
+                            android:id="@+id/sel11sub4"
+                            style="@style/PsqiSelectorStyleCommon4" />
+                    </RadioGroup>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partD_7_question12"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel12"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel12sub1" >
+                        <RadioButton
+                            android:id="@+id/sel12sub1"
+                            style="@style/PsqiSelectorStyleCommon1" />
+                        <RadioButton
+                            android:id="@+id/sel12sub2"
+                            style="@style/PsqiSelectorStyleCommon2" />
+                        <RadioButton
+                            android:id="@+id/sel12sub3"
+                            style="@style/PsqiSelectorStyleCommon3" />
+                        <RadioButton
+                            android:id="@+id/sel12sub4"
+                            style="@style/PsqiSelectorStyleCommon4" />
+                    </RadioGroup>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partD_8_question13"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel13"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel13sub1" >
+                        <RadioButton
+                            android:id="@+id/sel13sub1"
+                            style="@style/PsqiSelectorStyleCommon1" />
+                        <RadioButton
+                            android:id="@+id/sel13sub2"
+                            style="@style/PsqiSelectorStyleCommon2" />
+                        <RadioButton
+                            android:id="@+id/sel13sub3"
+                            style="@style/PsqiSelectorStyleCommon3" />
+                        <RadioButton
+                            android:id="@+id/sel13sub4"
+                            style="@style/PsqiSelectorStyleCommon4" />
+                    </RadioGroup>
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partD_9_question14"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel14"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel14sub1" >
+                        <RadioButton
+                            android:id="@+id/sel14sub1"
+                            style="@style/PsqiSelectorStyleCommon1" />
+                        <RadioButton
+                            android:id="@+id/sel14sub2"
+                            style="@style/PsqiSelectorStyleCommon2" />
+                        <RadioButton
+                            android:id="@+id/sel14sub3"
+                            style="@style/PsqiSelectorStyleCommon3" />
+                        <RadioButton
+                            android:id="@+id/sel14sub4"
+                            style="@style/PsqiSelectorStyleCommon4" />
+                    </RadioGroup>
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partD_10_question15"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel15"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel15sub1" >
+                        <RadioButton
+                            android:id="@+id/sel15sub1"
+                            style="@style/PsqiSelectorStyleCommon1" />
+                        <RadioButton
+                            android:id="@+id/sel15sub2"
+                            style="@style/PsqiSelectorStyleCommon2" />
+                        <RadioButton
+                            android:id="@+id/sel15sub3"
+                            style="@style/PsqiSelectorStyleCommon3" />
+                        <RadioButton
+                            android:id="@+id/sel15sub4"
+                            style="@style/PsqiSelectorStyleCommon4" />
+                    </RadioGroup>
+
+                    <LinearLayout
+                        android:id="@+id/partDDetail"
+                        style="@style/PsqiPartDescribeLayout_Packer">
+                        <View style="@style/HorizontalSepLineStyle_Margin10" />
+                        <LinearLayout style="@style/PsqiPartDescribeLayout">
+                            <LinearLayout style="@style/PsqiPartDescribeLayout_Left">
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_Common_DetailPerQuestion" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyleNewParam"
+                                    android:text="@string/psqi_test_partD_11_mapper1" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partD_11_mapper2" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partD_11_mapper3" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partD_11_mapper4" />
+                            </LinearLayout>
+                            <View style="@style/VerticalSepLineStyle_Margin10" />
+                            <LinearLayout style="@style/MinVerticalLinearLayoutCenter">
+                                <TextView
+                                    android:id="@+id/PartDSum"
+                                    style="@style/PsqiScoreText"
+                                    tools:text="0" />
+                                <TextView
+                                    style="@style/PsqiScoreNoteTextPart"
+                                    android:text="@string/psqi_test_partSum" />
+                                <TextView
+                                    android:id="@+id/PartDPoint"
+                                    style="@style/PsqiScoreTextWithPadding"
+                                    tools:text="0" />
+                                <TextView style="@style/PsqiScoreNoteTextPart" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/ContentCardViewStyle">
+                <LinearLayout
+                    style="@style/ContentCardViewLayoutStyle">
+                    <TextView
+                        style="@style/ContentCardViewTitleStyle"
+                        android:text="@string/psqi_test_partE_1_title" />
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partE_2_question16"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel16"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel16sub1" >
+                        <RadioButton
+                            android:id="@+id/sel16sub1"
+                            style="@style/PsqiSelectorStyleCommon1" />
+                        <RadioButton
+                            android:id="@+id/sel16sub2"
+                            style="@style/PsqiSelectorStyleCommon2" />
+                        <RadioButton
+                            android:id="@+id/sel16sub3"
+                            style="@style/PsqiSelectorStyleCommon3" />
+                        <RadioButton
+                            android:id="@+id/sel16sub4"
+                            style="@style/PsqiSelectorStyleCommon4" />
+                    </RadioGroup>
+
+                    <LinearLayout
+                        android:id="@+id/partEDetail"
+                        style="@style/PsqiPartDescribeLayout_Packer">
+                        <View style="@style/HorizontalSepLineStyle_Margin10" />
+                        <LinearLayout style="@style/PsqiPartDescribeLayout">
+                            <LinearLayout style="@style/PsqiPartDescribeLayout_Left">
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_Common_DetailOneQuestion" />
+                            </LinearLayout>
+                            <View style="@style/VerticalSepLineStyle_Margin10" />
+                            <LinearLayout style="@style/MinVerticalLinearLayoutCenter">
+                                <TextView
+                                    android:id="@+id/PartEPoint"
+                                    style="@style/PsqiScoreText"
+                                    tools:text="0" />
+                                <TextView style="@style/PsqiScoreNoteTextPart" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/ContentCardViewStyle">
+                <LinearLayout
+                    style="@style/ContentCardViewLayoutStyle">
+                    <TextView
+                        style="@style/ContentCardViewTitleStyle"
+                        android:text="@string/psqi_test_partF_1_title" />
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partF_2_question17"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel17"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel17sub1" >
+                        <RadioButton
+                            android:id="@+id/sel17sub1"
+                            style="@style/PsqiSelectorStyle"
+                            android:text="@string/psqi_test_partF_2_question17_choice1" />
+                        <RadioButton
+                            android:id="@+id/sel17sub2"
+                            style="@style/PsqiSelectorStyle"
+                            android:text="@string/psqi_test_partF_2_question17_choice2" />
+                        <RadioButton
+                            android:id="@+id/sel17sub3"
+                            style="@style/PsqiSelectorStyle"
+                            android:text="@string/psqi_test_partF_2_question17_choice3" />
+                        <RadioButton
+                            android:id="@+id/sel17sub4"
+                            style="@style/PsqiSelectorStyle"
+                            android:text="@string/psqi_test_partF_2_question17_choice4" />
+                    </RadioGroup>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
+                    <TextView
+                        style="@style/PsqiQuestionTextStyle"
+                        android:text="@string/psqi_test_partF_3_question18"/>
+
+                    <RadioGroup
+                        android:id="@+id/sel18"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checkedButton="@id/sel18sub1" >
+                        <RadioButton
+                            android:id="@+id/sel18sub1"
+                            style="@style/PsqiSelectorStyle"
+                            android:text="@string/psqi_test_partF_3_question18_choice1" />
+                        <RadioButton
+                            android:id="@+id/sel18sub2"
+                            style="@style/PsqiSelectorStyle"
+                            android:text="@string/psqi_test_partF_3_question18_choice2" />
+                        <RadioButton
+                            android:id="@+id/sel18sub3"
+                            style="@style/PsqiSelectorStyle"
+                            android:text="@string/psqi_test_partF_3_question18_choice3" />
+                        <RadioButton
+                            android:id="@+id/sel18sub4"
+                            style="@style/PsqiSelectorStyle"
+                            android:text="@string/psqi_test_partF_3_question18_choice4" />
+                    </RadioGroup>
+
+                    <LinearLayout
+                        android:id="@+id/partFDetail"
+                        style="@style/PsqiPartDescribeLayout_Packer">
+                        <View style="@style/HorizontalSepLineStyle_Margin10" />
+                        <LinearLayout style="@style/PsqiPartDescribeLayout">
+                            <LinearLayout style="@style/PsqiPartDescribeLayout_Left">
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_Common_DetailPerQuestion" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyleNewParam"
+                                    android:text="@string/psqi_test_partF_4_mapper1" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partF_4_mapper2" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partF_4_mapper3" />
+                                <TextView
+                                    style="@style/ContentCardViewMainStyle"
+                                    android:text="@string/psqi_test_partF_4_mapper4" />
+                            </LinearLayout>
+                            <View style="@style/VerticalSepLineStyle_Margin10" />
+                            <LinearLayout style="@style/MinVerticalLinearLayoutCenter">
+                                <TextView
+                                    android:id="@+id/PartFSum"
+                                    style="@style/PsqiScoreText"
+                                    tools:text="0" />
+                                <TextView
+                                    style="@style/PsqiScoreNoteTextPart"
+                                    android:text="@string/psqi_test_partSum" />
+                                <TextView
+                                    android:id="@+id/PartFPoint"
+                                    style="@style/PsqiScoreTextWithPadding"
+                                    tools:text="0" />
+                                <TextView style="@style/PsqiScoreNoteTextPart" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/ContentCardViewStyle">
+                <LinearLayout
+                    style="@style/ContentCardViewLayoutStyle">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/result"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5sp"
+                            android:textColor="@color/text_main"
+                            android:textAlignment="center"
+                            android:textSize="28sp"
+                            android:textStyle="normal"
+                            android:layout_weight="2"
+                            tools:text="@string/psqi_test_result_1" />
+
+                        <View style="@style/VerticalSepLineStyle" />
+
+                        <LinearLayout
+                            style="@style/MinVerticalLinearLayoutCenter"
+                            android:layout_weight="1">
+                            <TextView
+                                android:id="@+id/sumPoint"
+                                style="@style/PsqiScoreText"
+                                tools:text="0" />
+
+                            <TextView
+                                style="@style/PsqiScoreNoteText"
+                                android:text="@string/psqi_test_result_scoreNote" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/ContentCardViewMainStyleNewParam"
+                        android:text="@string/psqi_test_benchmark" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyleNewParam"
+                        android:text="@string/psqi_test_benchmark1" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyle"
+                        android:text="@string/psqi_test_benchmark2" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyle"
+                        android:text="@string/psqi_test_benchmark3" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyle"
+                        android:text="@string/psqi_test_benchmark4" />
+
+                    <View
+                        style="@style/HorizontalSepLineStyle"
+                        android:layout_marginVertical="5dp"/>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/showDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:maxWidth="310dp"
+                        android:text="@string/psqi_test_benchmark_detail" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

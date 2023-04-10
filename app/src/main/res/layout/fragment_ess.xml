@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="auto"
+    android:background="@color/background">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/header"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        style="@style/IndependentCustomizeTitle_CardView">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            style="@style/IndependentCustomizeTitle_Layout">
+            <ImageButton
+                android:id="@+id/go_back"
+                style="@style/CustomizeBack"
+                android:contentDescription="@string/back"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                style="@style/IndependentCustomizeTitle_Text"
+                android:text="@string/ess_test_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingVertical="10dp"
+            android:layout_marginHorizontal="10dp">
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/ContentCardViewStyle">
+                <LinearLayout
+                    style="@style/ContentCardViewLayoutStyle">
+                    <TextView
+                        style="@style/ContentCardViewMainStyle"
+                        android:text="@string/ess_test_description"/>
+                    <TextView
+                        style="@style/ContentCardViewMainStyleNewParam"
+                        android:text="@string/ess_test_description1" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyle"
+                        android:text="@string/ess_test_description2" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyle"
+                        android:text="@string/ess_test_description3" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyle"
+                        android:text="@string/ess_test_description4" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyleNewParam"
+                        android:text="@string/ess_test_descriptionEnd" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyleNewParam"
+                        android:text="@string/ess_test_descriptionGuid" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/ContentCardViewStyle">
+                <LinearLayout
+                    style="@style/ContentCardViewLayoutStyle"
+                    android:id="@+id/linearLayout">
+
+                    <TextView
+                        style="@style/ContentCardViewTitleStyle"
+                        android:text="@string/ess_test_question1" />
+
+                    <LinearLayout
+                        style="@style/EssRatingBarLayoutStyle">
+                        <RatingBar
+                            android:id="@+id/question1"
+                            android:contentDescription="@string/ess_test_ratingBarHelp"
+                            style="@style/EssRatingBarStyle" />
+                        <TextView
+                            android:id="@+id/response1"
+                            style="@style/ContentCardViewMainStyle"
+                            tools:text="@string/ess_test_choice_0" />
+                    </LinearLayout>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin20" />
+
+                    <TextView
+                        style="@style/ContentCardViewTitleStyle"
+                        android:text="@string/ess_test_question2" />
+
+                    <LinearLayout
+                        style="@style/EssRatingBarLayoutStyle">
+                        <RatingBar
+                            android:id="@+id/question2"
+                            android:contentDescription="@string/ess_test_ratingBarHelp"
+                            style="@style/EssRatingBarStyle" />
+                        <TextView
+                            android:id="@+id/response2"
+                            style="@style/ContentCardViewMainStyle"
+                            tools:text="@string/ess_test_choice_0" />
+                    </LinearLayout>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin20" />
+
+                    <TextView
+                        style="@style/ContentCardViewTitleStyle"
+                        android:text="@string/ess_test_question3" />
+
+                    <LinearLayout
+                        style="@style/EssRatingBarLayoutStyle">
+                        <RatingBar
+                            android:id="@+id/question3"
+                            android:contentDescription="@string/ess_test_ratingBarHelp"
+                            style="@style/EssRatingBarStyle" />
+                        <TextView
+                            android:id="@+id/response3"
+                            style="@style/ContentCardViewMainStyle"
+                            tools:text="@string/ess_test_choice_0" />
+                    </LinearLayout>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin20" />
+
+                    <TextView
+                        style="@style/ContentCardViewTitleStyle"
+                        android:text="@string/ess_test_question4" />
+
+                    <LinearLayout
+                        style="@style/EssRatingBarLayoutStyle">
+                        <RatingBar
+                            android:id="@+id/question4"
+                            android:contentDescription="@string/ess_test_ratingBarHelp"
+                            style="@style/EssRatingBarStyle" />
+                        <TextView
+                            android:id="@+id/response4"
+                            style="@style/ContentCardViewMainStyle"
+                            tools:text="@string/ess_test_choice_0" />
+                    </LinearLayout>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin20" />
+
+                    <TextView
+                        style="@style/ContentCardViewTitleStyle"
+                        android:text="@string/ess_test_question5" />
+
+                    <LinearLayout
+                        style="@style/EssRatingBarLayoutStyle">
+                        <RatingBar
+                            android:id="@+id/question5"
+                            android:contentDescription="@string/ess_test_ratingBarHelp"
+                            style="@style/EssRatingBarStyle" />
+                        <TextView
+                            android:id="@+id/response5"
+                            style="@style/ContentCardViewMainStyle"
+                            tools:text="@string/ess_test_choice_0" />
+                    </LinearLayout>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin20" />
+
+                    <TextView
+                        style="@style/ContentCardViewTitleStyle"
+                        android:text="@string/ess_test_question6" />
+
+                    <LinearLayout
+                        style="@style/EssRatingBarLayoutStyle">
+                        <RatingBar
+                            android:id="@+id/question6"
+                            android:contentDescription="@string/ess_test_ratingBarHelp"
+                            style="@style/EssRatingBarStyle" />
+                        <TextView
+                            android:id="@+id/response6"
+                            style="@style/ContentCardViewMainStyle"
+                            tools:text="@string/ess_test_choice_0" />
+                    </LinearLayout>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin20" />
+
+                    <TextView
+                        style="@style/ContentCardViewTitleStyle"
+                        android:text="@string/ess_test_question7" />
+
+                    <LinearLayout
+                        style="@style/EssRatingBarLayoutStyle">
+                        <RatingBar
+                            android:id="@+id/question7"
+                            android:contentDescription="@string/ess_test_ratingBarHelp"
+                            style="@style/EssRatingBarStyle" />
+                        <TextView
+                            android:id="@+id/response7"
+                            style="@style/ContentCardViewMainStyle"
+                            tools:text="@string/ess_test_choice_0" />
+                    </LinearLayout>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin20" />
+
+                    <TextView
+                        style="@style/ContentCardViewTitleStyle"
+                        android:text="@string/ess_test_question8" />
+
+                    <LinearLayout
+                        style="@style/EssRatingBarLayoutStyle">
+                        <RatingBar
+                            android:id="@+id/question8"
+                            android:contentDescription="@string/ess_test_ratingBarHelp"
+                            style="@style/EssRatingBarStyle" />
+                        <TextView
+                            android:id="@+id/response8"
+                            style="@style/ContentCardViewMainStyle"
+                            tools:text="@string/ess_test_choice_0" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/ContentCardViewStyle">
+                <LinearLayout
+                    style="@style/ContentCardViewLayoutStyle">
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/result"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5sp"
+                            android:textColor="@color/text_main"
+                            android:textAlignment="center"
+                            android:textSize="32sp"
+                            android:textStyle="normal"
+                            android:layout_weight="2"
+                            tools:text="@string/ess_test_result_1" />
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="@color/background" />
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:layout_weight="1">
+                            <TextView
+                                android:id="@+id/sumPoint"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5sp"
+                                android:textColor="@color/text_main"
+                                android:textSize="26sp"
+                                android:textStyle="normal"
+                                tools:text="0" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/ess_test_result_note"
+                                android:textColor="@color/text_aux"
+                                android:textSize="18sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/ContentCardViewMainStyleNewParam"
+                        android:text="@string/ess_test_benchmark" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyleNewParam"
+                        android:text="@string/ess_test_benchmark1" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyle"
+                        android:text="@string/ess_test_benchmark2" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyle"
+                        android:text="@string/ess_test_benchmark3" />
+                    <TextView
+                        style="@style/ContentCardViewMainStyle"
+                        android:text="@string/ess_test_benchmark4" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

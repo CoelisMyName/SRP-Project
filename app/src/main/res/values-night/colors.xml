@@ -28,6 +28,7 @@
     <color name="text_main_strong">@color/blue_medium</color>
     <color name="text_aux_convert">@color/text_aux</color>
     <color name="background">#FF000000</color>
+    <color name="darkerBackground">#FF000000</color>
     <color name="foreground">#FF303030</color>
 <!--    action color-->
     <color name="on_activate">#775B7DB7</color>

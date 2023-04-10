@@ -8,14 +8,31 @@
 
     <TextView
         android:id="@+id/CustomizeTitle"
+        style="@style/CustomizeTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/CustomizeTitle"
         android:text="@string/app_name"
         android:textColor="@color/text_main"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/to_about"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/none"
+        android:backgroundTint="@color/on_activate"
+        android:padding="0dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:layout_marginEnd="20dp"
+        android:text="@string/about"
+        android:textColor="@color/text_main_strong"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/CustomizeTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/CustomizeTitle" />
 
     <com.scut.component.NativeTextureView
         android:id="@+id/wave"
@@ -73,6 +90,7 @@
         android:paddingVertical="6dp"
         android:minWidth="80sp"
         android:maxWidth="300dp"
+        app:layout_constraintWidth_max="300dp"
         android:text="@string/monitor_tap_to_start"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"

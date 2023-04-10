@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.scut.MainActivity
 import com.scut.R
 import com.scut.databinding.FragmentDetailBinding
 import com.scut.model.SleepRecord
@@ -39,6 +40,7 @@ class DetailFragment : Fragment() {
         mBinding.recycler.layoutManager = layoutManager
         mBinding.recycler.adapter = mAdapter
         initView()
+        mBinding.goBack.setOnClickListener { back_onclick() }
         return mBinding.root
     }
 
@@ -128,5 +130,9 @@ class DetailFragment : Fragment() {
         mBinding.resultHolder.setBackgroundColor(bgClr)
 //        activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 //        activity?.window?.statusBarColor = bgClr
+    }
+
+    fun back_onclick() {
+        (activity as MainActivity).popFragment()
     }
 }

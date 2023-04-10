@@ -32,7 +32,10 @@
         app:tabIndicatorGravity="stretch"
         app:tabIndicatorColor="@color/foreground"
         app:tabIndicator="@drawable/page_selector"
-        app:tabRippleColor="@color/none">
+        app:tabRippleColor="@color/none"
+        app:tabMode="fixed"
+        app:tabGravity="fill"
+        app:tabMaxWidth="0dp">
 
 
         <com.google.android.material.tabs.TabItem
