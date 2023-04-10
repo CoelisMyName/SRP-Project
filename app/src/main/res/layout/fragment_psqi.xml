@@ -540,6 +540,8 @@
                             style="@style/PsqiSelectorStyleCommon4" />
                     </RadioGroup>
 
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
+
                     <TextView
                         style="@style/PsqiQuestionTextStyle"
                         android:text="@string/psqi_test_partD_9_question14"/>
@@ -562,6 +564,8 @@
                             android:id="@+id/sel14sub4"
                             style="@style/PsqiSelectorStyleCommon4" />
                     </RadioGroup>
+
+                    <View style="@style/HorizontalSepLineStyle_Margin10" />
 
                     <TextView
                         style="@style/PsqiQuestionTextStyle"
